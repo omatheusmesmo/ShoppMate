@@ -1,23 +1,39 @@
 <div class="login-container">
     <h2>Login</h2>
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
       <div>
         <label for="email">Email:</label>
         <input id="email" type="email" formControlName="email">
-        <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
-          <small *ngIf="loginForm.get('email')?.errors?.['required']">Email é obrigatório.</small>
-          <small *ngIf="loginForm.get('email')?.errors?.['email']">Email inválido.</small>
+
+        @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+        <div>
+          @if (loginForm.get('email')?.errors?.['required']) {
+            <small>Email é obrigatório.</small>
+          }
+          @if (loginForm.get('email')?.errors?.['email']) {
+            <small>Email é inválido.</small>
+          }
         </div>
+        }
       </div>
+
       <div>
         <label for="password">Senha:</label>
         <input id="password" type="password" formControlName="password">
-        <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
-          <small *ngIf="loginForm.get('password')?.errors?.['required']">Senha é obrigatória.</small>
-          <small *ngIf="loginForm.get('password')?.errors?.['minlength']">Mínimo de 6 caracteres.</small>
-        </div>
+        @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+          <div>
+            @if (loginForm.get('password')?.errors?.['required']) {
+              <small>Senha é obrigatória.</small>
+            }
+            @if (loginForm.get('password')?.errors?.['minlength']) {
+              <small>Mínimo de 6 caracteres.</small>
+            }
+          </div>
+          }
       </div>
+
       <button type="submit">Entrar</button>
+
     </form>
   </div>
-  
