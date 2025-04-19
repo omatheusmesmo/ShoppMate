@@ -1,0 +1,15 @@
+<mat-sidenav-container class="layout-container">
+
+  <mat-sidenav-content>
+    <mat-toolbar color="primary" class="toolbar">
+      <a mat-button routerLink="/" routerLinkActive="active-link">Home</a>
+      <a mat-button routerLink="/list" routerLinkActive="active-link">Minha Lista</a>
+      <span class="spacer"></span>
+      <span class="app-title">ShoppMate</span>
+      <span class="spacer"></span>
+      <span>Perfil</span>
+    </mat-toolbar>
+
+    <ng-content></ng-content>
+  </mat-sidenav-content>
+</mat-sidenav-container>

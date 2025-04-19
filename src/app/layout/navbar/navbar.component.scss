@@ -1,0 +1,41 @@
+@use '@angular/material' as mat;
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  height: 64px; // Altura padrão do mat-toolbar
+//  background-color: mat.get-color-from-palette(mat.$primary-palette); // Cor primária do tema
+//  color: mat.get-color-from-palette(mat.$primary-palette, 'contrast'); // Cor de contraste
+  position: relative; // Necessário para centralizar o título
+}
+
+.app-title {
+  position: absolute; // Centraliza o título
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5rem;
+  font-weight: bold;
+//  color: inherit; // Usa a cor definida no .toolbar
+}
+
+.spacer {
+  flex: 1;
+}
+
+a {
+  text-decoration: none;
+//  color: mat.get-color-from-palette(mat.$primary-palette, 'contrast'); // Cor de contraste
+  font-size: 1rem;
+  margin-left: 16px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+a.active-link {
+  font-weight: bold;
+  text-decoration: underline;
+}
