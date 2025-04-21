@@ -8,14 +8,12 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { catchError, finalize, tap, throwError, of } from 'rxjs';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
+
+
 interface LoginResponse {
   token: string;
-  // user: {
-  //   id: number;
-  //   name: string;
-  //   email: string;
-  // };
 }
+
 
 @Component({
   standalone: true,
@@ -36,7 +34,7 @@ export class LoginComponent {
   isLoading = false;
   errorMessage: string | null = null;
 
-  private apiUrl = 'http://localhost:8080/auth/login';
+  private apiUrl = '/api/auth/login';
 
   constructor(
     private fb: FormBuilder,
@@ -63,14 +61,17 @@ export class LoginComponent {
     this.errorMessage = null;
     const credentials = this.loginForm.value;
 
-    this.http.post<LoginResponse>(this.apiUrl, credentials)
+    this.http.post(
+      this.apiUrl,
+      credentials,
+      { responseType: 'text' }
+    )
     .pipe(
-      tap((response) => {
-        localStorage.setItem('token', response.token);
+      tap((token: string) => {
+        localStorage.setItem('authToken', token);
         //localStorage.setItem('user', JSON.stringify(response.user));
-        console.log('Token saved to localStorage');
 
-        this.router.navigate(['/home']);
+        this.router.navigate(['/']);
       }),
       catchError((error: HttpErrorResponse) => {
         console.error('Login failed', error);
