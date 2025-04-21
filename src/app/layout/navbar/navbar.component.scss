@@ -1,5 +1,9 @@
 @use '@angular/material' as mat;
 
+.layout-container {
+  height: 100%;
+}
+
 .toolbar {
   display: flex;
   justify-content: space-between;
@@ -9,33 +13,46 @@
 //  background-color: mat.get-color-from-palette(mat.$primary-palette); // Cor primária do tema
 //  color: mat.get-color-from-palette(mat.$primary-palette, 'contrast'); // Cor de contraste
   position: relative; // Necessário para centralizar o título
-}
 
-.app-title {
-  position: absolute; // Centraliza o título
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 1.5rem;
-  font-weight: bold;
+  .spacer {
+    flex: 1;
+  }
+
+  .app-title {
+    position: absolute; // Centraliza o título
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.2rem;
+    font-weight: bold;
 //  color: inherit; // Usa a cor definida no .toolbar
-}
+  }
 
-.spacer {
-  flex: 1;
-}
-
-a {
-  text-decoration: none;
+  a {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
 //  color: mat.get-color-from-palette(mat.$primary-palette, 'contrast'); // Cor de contraste
-  font-size: 1rem;
-  margin-left: 16px;
+    font-size: 1rem;
+    margin-left: 16px;
 
-  &:hover {
-    text-decoration: underline;
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }
 
 a.active-link {
   font-weight: bold;
   text-decoration: underline;
+}
+
+.active-link {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+mat-sidenav-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }

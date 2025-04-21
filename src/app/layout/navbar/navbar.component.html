@@ -1,14 +1,32 @@
 <mat-sidenav-container class="layout-container">
-
   <mat-sidenav-content>
     <mat-toolbar color="primary" class="toolbar">
-      <a mat-button routerLink="/" routerLinkActive="active-link">Home</a>
-      <a mat-button routerLink="/list" routerLinkActive="active-link">Minha Lista</a>
+      <a mat-button routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
+        <mat-icon>home</mat-icon>
+        <span>Home</span>
+      </a>
+      <a mat-button routerLink="/lists" routerLinkActive="active-link">
+        <mat-icon>list</mat-icon>
+        <span>Minhas Listas</span>
+      </a>
       <span class="spacer"></span>
       <span class="app-title">ShoppMate</span>
       <span class="spacer"></span>
-      <span>Perfil</span>
+      <button mat-icon-button [matMenuTriggerFor]="profileMenu">
+        <mat-icon>account_circle</mat-icon>
+      </button>
     </mat-toolbar>
+
+    <mat-menu #profileMenu="matMenu">
+      <a mat-menu-item routerLink="/profile">
+        <mat-icon>person</mat-icon>
+        <span>Perfil</span>
+      </a>
+      <button mat-menu-item>
+        <mat-icon>logout</mat-icon>
+        <span>Sair</span>
+      </button>
+    </mat-menu>
 
     <ng-content></ng-content>
   </mat-sidenav-content>
