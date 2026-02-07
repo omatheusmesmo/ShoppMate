@@ -1,0 +1,24 @@
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.add-item-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.item-table {
+  width: 100%;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+
+  p {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+}
