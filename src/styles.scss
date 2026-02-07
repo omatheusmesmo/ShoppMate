@@ -1,5 +1,10 @@
 @use '@angular/material' as mat;
 
+// Define variables for colors based on Design Tokens
+$primary-token: var(--mat-sys-color-primary);
+$accent-token: var(--mat-sys-color-secondary);
+$warn-token: var(--mat-sys-color-error);
+
 html {
   color-scheme: light dark;
   @include mat.theme((
@@ -8,3 +13,61 @@ html {
     density: 0
   ));
 }
+
+body {
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  height: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.page-header {
+  margin-bottom: 24px;
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 500;
+    margin: 0;
+  }
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.flex-container {
+  display: flex;
+  gap: 16px;
+}
+
+.flex-grow {
+  flex: 1;
+}
+
+.mt-1 { margin-top: 8px; }
+.mt-2 { margin-top: 16px; }
+.mt-3 { margin-top: 24px; }
+
+.mb-1 { margin-bottom: 8px; }
+.mb-2 { margin-bottom: 16px; }
+.mb-3 { margin-bottom: 24px; }
+
+// Helpers
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-primary { color: $primary-token; }
+.text-accent { color: $accent-token; }
+.text-warn { color: $warn-token; }

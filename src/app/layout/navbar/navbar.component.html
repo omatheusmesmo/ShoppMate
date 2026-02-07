@@ -1,33 +1,76 @@
 <mat-sidenav-container class="layout-container">
   <mat-sidenav-content>
     <mat-toolbar color="primary" class="toolbar">
-      <a mat-button routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
-        <mat-icon>home</mat-icon>
-        <span>Home</span>
-      </a>
-      <a mat-button routerLink="/lists" routerLinkActive="active-link">
+      <span class="app-title">ShoppMate</span>
+      <span class="spacer"></span>
+
+      @if (isLoggedIn$ | async) {
+        <div class="nav-links" [class.hidden-mobile]="!isLargeScreen">
+          <a mat-button routerLink="/lists" routerLinkActive="active-link">
+            <mat-icon>list</mat-icon>
+            <span>Minhas Listas</span>
+          </a>
+          <a mat-button routerLink="/items" routerLinkActive="active-link">
+            <mat-icon>shopping_basket</mat-icon>
+            <span>Itens</span>
+          </a>
+          <a mat-button routerLink="/categories" routerLinkActive="active-link">
+            <mat-icon>category</mat-icon>
+            <span>Categorias</span>
+          </a>
+          <a mat-button routerLink="/units" routerLinkActive="active-link">
+            <mat-icon>straighten</mat-icon>
+            <span>Unidades</span>
+          </a>
+        </div>
+
+        @if (!isLargeScreen) {
+          <button mat-icon-button [matMenuTriggerFor]="navMenu">
+            <mat-icon>menu</mat-icon>
+          </button>
+        }
+
+        <button mat-icon-button [matMenuTriggerFor]="profileMenu">
+          <mat-icon>account_circle</mat-icon>
+        </button>
+      } @else {
+        <a mat-button routerLink="/login" routerLinkActive="active-link">Login</a>
+        <a mat-button routerLink="/signup" routerLinkActive="active-link">Cadastro</a>
+      }
+    </mat-toolbar>
+
+    <mat-menu #navMenu="matMenu">
+      <a mat-menu-item routerLink="/lists">
         <mat-icon>list</mat-icon>
         <span>Minhas Listas</span>
       </a>
-      <span class="spacer"></span>
-      <span class="app-title">ShoppMate</span>
-      <span class="spacer"></span>
-      <button mat-icon-button [matMenuTriggerFor]="profileMenu">
-        <mat-icon>account_circle</mat-icon>
-      </button>
-    </mat-toolbar>
+      <a mat-menu-item routerLink="/items">
+        <mat-icon>shopping_basket</mat-icon>
+        <span>Itens</span>
+      </a>
+      <a mat-menu-item routerLink="/categories">
+        <mat-icon>category</mat-icon>
+        <span>Categorias</span>
+      </a>
+      <a mat-menu-item routerLink="/units">
+        <mat-icon>straighten</mat-icon>
+        <span>Unidades</span>
+      </a>
+    </mat-menu>
 
     <mat-menu #profileMenu="matMenu">
       <a mat-menu-item routerLink="/profile">
         <mat-icon>person</mat-icon>
         <span>Perfil</span>
       </a>
-      <button mat-menu-item>
+      <button mat-menu-item (click)="logout()">
         <mat-icon>logout</mat-icon>
         <span>Sair</span>
       </button>
     </mat-menu>
 
-    <ng-content></ng-content>
+    <div class="content-container">
+      <ng-content></ng-content>
+    </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

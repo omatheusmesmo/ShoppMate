@@ -1,58 +1,72 @@
 @use '@angular/material' as mat;
 
 .layout-container {
+  display: flex;
+  flex-direction: column;
   height: 100%;
 }
 
 .toolbar {
+  position: fixed;
+  top: 0;
+  z-index: 1000;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 0 16px;
-  height: 64px; // Altura padrão do mat-toolbar
-//  background-color: mat.get-color-from-palette(mat.$primary-palette); // Cor primária do tema
-//  color: mat.get-color-from-palette(mat.$primary-palette, 'contrast'); // Cor de contraste
-  position: relative; // Necessário para centralizar o título
-
-  .spacer {
-    flex: 1;
-  }
-
-  .app-title {
-    position: absolute; // Centraliza o título
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.2rem;
-    font-weight: bold;
-//  color: inherit; // Usa a cor definida no .toolbar
-  }
-
-  a {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    text-decoration: none;
-//  color: mat.get-color-from-palette(mat.$primary-palette, 'contrast'); // Cor de contraste
-    font-size: 1rem;
-    margin-left: 16px;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-a.active-link {
-  font-weight: bold;
-  text-decoration: underline;
+.spacer {
+  flex: 1 1 auto;
+}
+
+.app-title {
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  margin-left: 1rem;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hidden-mobile {
+  display: none;
 }
 
 .active-link {
-  background: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
-mat-sidenav-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+.content-container {
+  margin-top: 64px; // toolbar height
+  padding: 1rem;
+  box-sizing: border-box;
+  min-height: calc(100vh - 64px);
+  background-color: #f8f9fa;
+}
+
+@media (min-width: 768px) {
+  .active-link {
+    position: relative;
+  }
+
+  .active-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #fff;
+  }
+}
+
+@media (max-width: 767px) {
+  .content-container {
+    margin-top: 56px; // smaller toolbar height on mobile
+    min-height: calc(100vh - 56px);
+  }
 }
