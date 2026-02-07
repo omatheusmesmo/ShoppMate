@@ -13,6 +13,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AsyncPipe } from '@angular/common';
 import { finalize, Observable } from 'rxjs';
+import { ItemDialogComponent } from './item-dialog/item-dialog.component';
 
 import { ItemService } from '../../../shared/services/item.service';
 import { CategoryService } from '../../../shared/services/category.service';
@@ -79,8 +80,30 @@ export class ItemsManagementComponent implements OnInit {
   }
 
   editItem(item: ItemResponseDTO): void {
-    // Implementar posteriormente
-    console.log('Edit item:', item);
+    const dialogRef = this.dialog.open(ItemDialogComponent, {
+      width: '400px',
+      data: { 
+        item: {
+          name: item.name,
+          idCategory: item.category.id,
+          idUnit: item.unit.id
+        }
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.itemService.updateItem(item.id, result).subscribe({
+          next: () => {
+            this.loadData();
+            this.snackBar.open('Item atualizado com sucesso', 'Fechar', { duration: 3000 });
+          },
+          error: () => {
+            this.snackBar.open('Erro ao atualizar item', 'Fechar', { duration: 3000 });
+          }
+        });
+      }
+    });
   }
 
   deleteItem(item: ItemResponseDTO): void {
