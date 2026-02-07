@@ -31,8 +31,8 @@ export class ShoppingListService extends BaseService {
       .pipe(catchError(this.handleError));
   }
 
-  updateShoppingList(list: ShoppingListRequestDTO): Observable<ShoppingListResponseDTO> {
-    return this.http.put<ShoppingListResponseDTO>(this.apiUrl, list)
+  updateShoppingList(id: number, list: ShoppingListRequestDTO): Observable<ShoppingListResponseDTO> {
+    return this.http.put<ShoppingListResponseDTO>(`${this.apiUrl}/${id}`, list)
       .pipe(catchError(this.handleError));
   }
 
