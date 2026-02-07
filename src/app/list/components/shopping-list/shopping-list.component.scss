@@ -1,50 +1,56 @@
-.shopping-list-container {
-  padding: 24px;
+.lists-container {
+  padding: 1rem;
   max-width: 1200px;
   margin: 0 auto;
+}
 
-  .form-card {
-    margin-bottom: 24px;
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
 
-    mat-form-field {
-      width: 100%;
-    }
+.lists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
 
-    .form-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 16px;
-    }
-  }
-
-  .loading-spinner {
+  .list-card {
+    height: 100%;
     display: flex;
-    justify-content: center;
-    margin: 32px 0;
-  }
+    flex-direction: column;
 
-  .empty-state {
-    text-align: center;
-    padding: 32px;
-    margin-top: 24px;
-  }
+    mat-card-header {
+      flex-shrink: 0;
+    }
 
-  .lists-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 16px;
-    margin-top: 24px;
+    mat-card-content {
+      flex-grow: 1;
+    }
 
-    .list-card {
-      mat-card-header {
-        margin-bottom: 16px;
-      }
-
-      mat-card-actions {
-        display: flex;
-        justify-content: flex-end;
-        padding: 8px;
-      }
+    mat-card-actions {
+      flex-shrink: 0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      padding: 1rem;
     }
   }
+}
+
+.no-lists {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+
+  p {
+    margin-bottom: 1rem;
+  }
+}
+
+mat-card-actions {
+  padding: 1rem;
+  display: flex;
+  justify-content: flex-end;
 }
