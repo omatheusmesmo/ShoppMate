@@ -1,0 +1,39 @@
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.item-table {
+  width: 100%;
+}
+
+.purchased {
+  text-decoration: line-through;
+  color: #888;
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-category {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.empty-list {
+  text-align: center;
+  padding: 2rem;
+
+  p {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+}
+
+.list-actions {
+  display: flex;
+  justify-content: flex-end;
+}
