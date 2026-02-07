@@ -23,8 +23,8 @@ export class ListPermissionService extends BaseService {
       .pipe(catchError(this.handleError));
   }
 
-  updateListPermission(listPermission: ListPermission): Observable<ListPermission> {
-    return this.http.put<ListPermission>(`${this.baseUrl}/lists/${listPermission.shoppingList.id}/permissions`, listPermission)
+  updateListPermission(listId: number, permissionId: number, listPermission: ListPermission): Observable<ListPermission> {
+    return this.http.put<ListPermission>(`${this.baseUrl}/lists/${listId}/permissions/${permissionId}`, listPermission)
       .pipe(catchError(this.handleError));
   }
 
