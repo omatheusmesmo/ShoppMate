@@ -1,33 +1,46 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ListItemRequestDTO, ListItemResponseDTO } from '../interfaces/list-item.interface';
+import { BaseService } from './base.service';
+import { catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ListItemService {
-  private apiUrl = '/api/lists';
+export class ListItemService extends BaseService {
+  private readonly endpoint = `${this.baseUrl}/lists`;
 
-  constructor(private http: HttpClient) {}
-
-  getAllListItems(listId: number): Observable<ListItemResponseDTO[]> {
-    return this.http.get<ListItemResponseDTO[]>(`${this.apiUrl}/${listId}/items`);
+  getAllListItemsByListId(listId: number): Observable<ListItemResponseDTO[]> {
+    return this.http.get<ListItemResponseDTO[]>(`${this.endpoint}/${listId}/items`);
   }
 
-  getListItemById(listId: number, id: number): Observable<ListItemResponseDTO> {
-    return this.http.get<ListItemResponseDTO>(`${this.apiUrl}/${listId}/items/${id}`);
+  getListItemsByListId(listId: number): Observable<ListItemResponseDTO[]> {
+    return this.http.get<ListItemResponseDTO[]>(`${this.endpoint}/${listId}/items`)
+      .pipe(catchError(this.handleError));
   }
 
-  addListItem(listItem: ListItemRequestDTO): Observable<ListItemResponseDTO> {
-    return this.http.post<ListItemResponseDTO>(`${this.apiUrl}/${listItem.listId}/items`, listItem);
+  getListItemById(listId: number, itemId: number): Observable<ListItemResponseDTO> {
+    return this.http.get<ListItemResponseDTO>(`${this.endpoint}/${listId}/items/${itemId}`)
+      .pipe(catchError(this.handleError));
   }
 
-  updateListItem(listId: number, id: number, listItem: ListItemRequestDTO): Observable<ListItemResponseDTO> {
-    return this.http.put<ListItemResponseDTO>(`${this.apiUrl}/${listId}/items/${id}`, listItem);
+  addListItem(listId: number, item: Omit<ListItemRequestDTO, 'listId'>): Observable<ListItemResponseDTO> {
+    const request: ListItemRequestDTO = {
+      ...item,
+      listId
+    };
+    return this.http.post<ListItemResponseDTO>(`${this.endpoint}/${listId}/items`, request)
+      .pipe(catchError(this.handleError));
   }
 
-  deleteListItem(listId: number, id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${listId}/items/${id}`);
+  updateListItem(listId: number, itemId: number, item: ListItemRequestDTO): Observable<ListItemResponseDTO> {
+    return this.http.put<ListItemResponseDTO>(`${this.endpoint}/${listId}/items/${itemId}`, item)
+      .pipe(catchError(this.handleError));
+  }
+
+  deleteListItem(listId: number, itemId: number): Observable<void> {
+    return this.http.delete<void>(`${this.endpoint}/${listId}/items/${itemId}`)
+      .pipe(catchError(this.handleError));
   }
 }
