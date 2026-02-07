@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ShoppingListService } from '../../../shared/services/shopping-list.service';
 import { ShoppingListResponseDTO, ShoppingListRequestDTO } from '../../../shared/interfaces/shopping-list.interface';
+import { AuthService } from '../../../shared/services/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialogActions } from '@angular/material/dialog';
 import { MatDialogContent } from '@angular/material/dialog';
@@ -31,6 +32,7 @@ export class ShoppingListDialogComponent {
   private fb = inject(FormBuilder);
   private shoppingListService = inject(ShoppingListService);
   private snackBar = inject(MatSnackBar);
+  private authService = inject(AuthService);
   private data = inject(MAT_DIALOG_DATA) as { list?: ShoppingListResponseDTO, isEdit: boolean };
 
   listForm: FormGroup;
@@ -53,11 +55,11 @@ export class ShoppingListDialogComponent {
     if (this.listForm.valid) {
       const listData: ShoppingListRequestDTO = {
         name: this.listForm.value.name,
-        idUser: 1 // TODO: Get from auth service
+        idUser: this.authService.getCurrentUserId() // Get from auth service
       };
 
       if (this.isEdit && this.data.list) {
-        this.shoppingListService.updateShoppingList(listData).subscribe({
+        this.shoppingListService.updateShoppingList(this.data.list.idList, listData).subscribe({
           next: () => {
             this.snackBar.open('Lista atualizada com sucesso', 'Fechar', { duration: 3000 });
             this.dialogRef.close(true);
