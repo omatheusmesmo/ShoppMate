@@ -74,4 +74,10 @@ export class AuthService {
   private hasToken(): boolean {
     return !!this.getToken();
   }
+
+  getCurrentUserId(): number {
+    // TODO: Extract user ID from JWT token or user data
+    // For now, return 1 as placeholder
+    return 1;
+  }
 }
