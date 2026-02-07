@@ -27,7 +27,12 @@ export class UnitService extends BaseService {
   }
 
   updateUnit(unit: Unit): Observable<Unit> {
-    return this.http.put<Unit>(this.apiUrl, unit)
+    const requestBody = {
+      id: unit.id,
+      name: unit.name,
+      abbreviation: unit.symbol  // Map symbol to abbreviation for API
+    };
+    return this.http.put<Unit>(this.apiUrl, requestBody)
       .pipe(catchError(this.handleError));
   }
 
