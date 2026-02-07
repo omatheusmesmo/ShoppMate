@@ -1,60 +1,52 @@
-<div class="shopping-list-container">
-  <mat-card class="form-card">
+<div class="lists-container">
+  <mat-card>
     <mat-card-header>
-      <mat-card-title>{{ editingListId ? 'Editar Lista' : 'Nova Lista de Compras' }}</mat-card-title>
+      <mat-card-title>Minhas Listas de Compras</mat-card-title>
     </mat-card-header>
-    <mat-card-content>
-      <form [formGroup]="listForm" (ngSubmit)="onSubmit()">
-        <mat-form-field appearance="outline">
-          <mat-label>Nome da Lista</mat-label>
-          <input matInput formControlName="name" placeholder="Ex: Compras do Mês">
-          @if (listForm.get('name')?.errors?.['required'] && listForm.get('name')?.touched) {
-            <mat-error>Nome da lista é obrigatório</mat-error>
-          }
-          @if (listForm.get('name')?.errors?.['minlength'] && listForm.get('name')?.touched) {
-            <mat-error>Nome deve ter pelo menos 3 caracteres</mat-error>
-          }
-        </mat-form-field>
 
-        <div class="form-actions">
-          <button mat-raised-button color="primary" type="submit" [disabled]="listForm.invalid">
-            {{ editingListId ? 'Atualizar' : 'Criar' }}
-          </button>
-          @if (editingListId) {
-            <button mat-button type="button" (click)="resetForm()">Cancelar</button>
+    <mat-card-content>
+      @if (isLoading) {
+        <div class="loading-spinner">
+          <mat-spinner diameter="50"></mat-spinner>
+        </div>
+      } @else {
+        <div class="lists-grid">
+          @for (list of shoppingLists; track list.idList) {
+            <mat-card class="list-card">
+              <mat-card-header>
+                <mat-card-title>{{ list.listName }}</mat-card-title>
+                <mat-card-subtitle>Criada por: {{ list.owner.fullName }}</mat-card-subtitle>
+              </mat-card-header>
+
+              <mat-card-actions>
+                <button mat-icon-button color="primary" (click)="openEditDialog(list)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="accent" [routerLink]="['/lists', list.idList]">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="deleteList(list.idList)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          } @empty {
+            <div class="no-lists">
+              <p>Você ainda não tem nenhuma lista de compras</p>
+              <button mat-raised-button color="primary" (click)="openNewListDialog()">
+                Criar Primeira Lista
+              </button>
+            </div>
           }
         </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
-
-  @if (isLoading) {
-    <div class="loading-spinner">
-      <mat-spinner></mat-spinner>
-    </div>
-  } @else if (lists.length === 0) {
-    <mat-card class="empty-state">
-      <mat-card-content>
-        <p>Nenhuma lista de compras encontrada</p>
-      </mat-card-content>
-    </mat-card>
-  } @else {
-    <div class="lists-grid">
-      @for (list of lists; track list.idList) {
-        <mat-card class="list-card">
-          <mat-card-header>
-            <mat-card-title>{{ list.listName }}</mat-card-title>
-            <mat-card-subtitle>Criado por: {{ list.owner.fullName }}</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-actions>
-            <button mat-icon-button color="primary" (click)="startEdit(list)">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" (click)="deleteList(list.idList)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </mat-card-actions>
-        </mat-card>
       }
-    </div>
-  }
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-raised-button color="primary" (click)="openNewListDialog()">
+        <mat-icon>add</mat-icon>
+        Nova Lista
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>
