@@ -1,4 +1,4 @@
-# 🛒 ShoppMate Monorepo
+# 🛒 ShoppMate
 
 ShoppMate is a full-stack, smart shopping list management solution. It empowers users to organize their purchases, manage custom categories and units, and collaborate on shared lists.
 
