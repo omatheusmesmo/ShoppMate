@@ -105,17 +105,11 @@ src/
 
 ## 🤝 Contributing
 
-We welcome contributions! Please follow our [Development Guidelines](#-architecture--standards).
-
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'feat: Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+We welcome contributions! Please refer to the [CONTRIBUTING.md](../CONTRIBUTING.md) file in the project root for detailed guidelines on how to report bugs, suggest enhancements, and submit pull requests.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details (if applicable).
+This project is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International Public License. See the [LICENSE.md](../LICENSE.md) file in the project root for details.
 
 ---
 Developed with ❤️ by [Matheus](https://github.com/omatheusmesmo)
