@@ -1,0 +1,23 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Editar Lista' : 'Nova Lista' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="listForm">
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Nome da Lista</mat-label>
+      <input matInput formControlName="name" placeholder="Digite o nome da lista">
+      @if (listForm.get('name')?.hasError('required')) {
+        <mat-error>Nome é obrigatório</mat-error>
+      }
+      @if (listForm.get('name')?.hasError('minlength')) {
+        <mat-error>Nome deve ter pelo menos 3 caracteres</mat-error>
+      }
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!listForm.valid">
+    {{ isEdit ? 'Atualizar' : 'Criar' }}
+  </button>
+</mat-dialog-actions>
