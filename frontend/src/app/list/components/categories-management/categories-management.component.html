@@ -1,0 +1,42 @@
+<div class="categories-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Gerenciamento de Categorias</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (isLoading) {
+        <div class="loading-spinner">
+          <mat-spinner diameter="50"></mat-spinner>
+        </div>
+      } @else {
+        <div class="categories-list">
+          @for (category of categories; track category.id) {
+            <div class="category-item">
+              <span>{{ category.name }}</span>
+              <div class="category-actions">
+                <button mat-icon-button color="primary" (click)="openEditDialog(category)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="category.id && deleteCategory(category.id)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          } @empty {
+            <div class="no-categories">
+              <p>Nenhuma categoria cadastrada</p>
+            </div>
+          }
+        </div>
+      }
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-raised-button color="primary" (click)="openNewCategoryDialog()">
+        <mat-icon>add</mat-icon>
+        Nova Categoria
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

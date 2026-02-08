@@ -1,0 +1,52 @@
+<div class="lists-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Minhas Listas de Compras</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (isLoading) {
+        <div class="loading-spinner">
+          <mat-spinner diameter="50"></mat-spinner>
+        </div>
+      } @else {
+        <div class="lists-grid">
+          @for (list of shoppingLists; track list.idList) {
+            <mat-card class="list-card">
+              <mat-card-header>
+                <mat-card-title>{{ list.listName }}</mat-card-title>
+                <mat-card-subtitle>Criada por: {{ list.owner.fullName }}</mat-card-subtitle>
+              </mat-card-header>
+
+              <mat-card-actions>
+                <button mat-icon-button color="primary" (click)="openEditDialog(list)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="accent" [routerLink]="['/lists', list.idList]">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="deleteList(list.idList)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          } @empty {
+            <div class="no-lists">
+              <p>Você ainda não tem nenhuma lista de compras</p>
+              <button mat-raised-button color="primary" (click)="openNewListDialog()">
+                Criar Primeira Lista
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-raised-button color="primary" (click)="openNewListDialog()">
+        <mat-icon>add</mat-icon>
+        Nova Lista
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

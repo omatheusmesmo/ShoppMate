@@ -1,0 +1,56 @@
+.lists-container {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.lists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+
+  .list-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    mat-card-header {
+      flex-shrink: 0;
+    }
+
+    mat-card-content {
+      flex-grow: 1;
+    }
+
+    mat-card-actions {
+      flex-shrink: 0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      padding: 1rem;
+    }
+  }
+}
+
+.no-lists {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+
+  p {
+    margin-bottom: 1rem;
+  }
+}
+
+mat-card-actions {
+  padding: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}

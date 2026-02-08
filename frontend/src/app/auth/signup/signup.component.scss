@@ -1,0 +1,33 @@
+.signup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 64px); // Considerando a altura da navbar
+  padding: 16px;
+
+  mat-card {
+    width: 100%;
+    max-width: 500px;
+
+    mat-card-header {
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    mat-card-content {
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+
+        mat-form-field {
+          width: 100%;
+        }
+
+        button {
+          margin-top: 16px;
+        }
+      }
+    }
+  }
+}

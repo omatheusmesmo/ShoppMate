@@ -1,0 +1,51 @@
+.item-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .form-card {
+    margin-bottom: 24px;
+
+    mat-form-field {
+      width: 100%;
+      margin-bottom: 16px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+  }
+
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    margin: 32px 0;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 32px;
+    margin-top: 24px;
+  }
+
+  .items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+
+    .item-card {
+      mat-card-header {
+        margin-bottom: 16px;
+      }
+
+      mat-card-actions {
+        display: flex;
+        justify-content: flex-end;
+        padding: 8px;
+      }
+    }
+  }
+}
