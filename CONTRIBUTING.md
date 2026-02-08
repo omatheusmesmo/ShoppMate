@@ -51,7 +51,7 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/) speci
 `fix(list): resolve N+1 query in shopping list retrieval`
 
 ## Technical Stack
-- **Backend**: Java 21+, Spring Boot 3+
+- **Backend**: Java 17+, Spring Boot 3+
 - **Database**: PostgreSQL (Migrations via Flyway)
 - **Security**: Spring Security + JWT
 - **API Testing**: Bruno (collections found in `/bruno`)
