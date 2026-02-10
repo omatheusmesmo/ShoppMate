@@ -31,11 +31,10 @@ public class ListPermissionController {
     @Operation(description = "Return all ListPermissions")
     @GetMapping
     public ResponseEntity<List<ListPermissionSummaryDTO>> getAllListPermissions(@PathVariable Long listId) {
-            List<ListPermission> listPermissions = service.findAllPermissionsByListId(listId);
-            List<ListPermissionSummaryDTO> responseDTOs = listPermissions.stream()
-                    .map(listPermissionMapper::toSummaryDTO)
-                    .toList();
-            return HttpResponseUtil.ok(responseDTOs);
+        List<ListPermission> listPermissions = service.findAllPermissionsByListId(listId);
+        List<ListPermissionSummaryDTO> responseDTOs = listPermissions.stream().map(listPermissionMapper::toSummaryDTO)
+                .toList();
+        return HttpResponseUtil.ok(responseDTOs);
     }
 
     @Operation(summary = "Add a new ListPermission")
@@ -45,11 +44,8 @@ public class ListPermissionController {
         ListPermission addedListPermission = service.addListPermission(requestDTO);
         ListPermissionResponseDTO responseDTO = listPermissionMapper.toResponseDTO(addedListPermission);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(addedListPermission.getId())
-                .toUri();
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(addedListPermission.getId()).toUri();
 
         return ResponseEntity.created(location).body(responseDTO);
     }
@@ -57,14 +53,13 @@ public class ListPermissionController {
     @Operation(summary = "Delete a ListPermission by id")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteListPermission(@PathVariable Long id) {
-            service.removeList(id);
-            return HttpResponseUtil.noContent();
+        service.removeList(id);
+        return HttpResponseUtil.noContent();
     }
 
     @Operation(summary = "Update a ListPermission")
     @PutMapping("/{id}")
-    public ResponseEntity<ListPermissionResponseDTO> updateListPermission(
-            @PathVariable Long id,
+    public ResponseEntity<ListPermissionResponseDTO> updateListPermission(@PathVariable Long id,
             @Valid @RequestBody ListPermissionUpdateRequestDTO requestDTO) {
 
         ListPermission updatedListPermission = service.editList(id, requestDTO);

@@ -17,7 +17,7 @@ public class UnitService {
     @Autowired
     private AuditService auditService;
 
-    public Unit saveUnit(Unit unit){
+    public Unit saveUnit(Unit unit) {
         isUnitValid(unit);
         auditService.setAuditData(unit, true);
         unitRepository.save(unit);
@@ -37,19 +37,19 @@ public class UnitService {
         return unitRepository.findAll();
     }
 
-    public Optional<Unit> findUnitById(Long id){
+    public Optional<Unit> findUnitById(Long id) {
         return unitRepository.findById(id);
     }
 
-    public Optional<Unit> findUnitBySymbol(String symbol){
+    public Optional<Unit> findUnitBySymbol(String symbol) {
         return unitRepository.findBySymbol(symbol);
     }
 
-    public Optional<Unit> findUnitByName(String name){
+    public Optional<Unit> findUnitByName(String name) {
         return unitRepository.findByName(name);
     }
 
-    public void removeUnit(Unit unit){
+    public void removeUnit(Unit unit) {
         auditService.softDelete(unit);
         saveUnit(unit);
     }
@@ -61,7 +61,7 @@ public class UnitService {
         saveUnit(deletedUnit);
     }
 
-    private boolean unitExists(Unit unit){
+    private boolean unitExists(Unit unit) {
         return unitRepository.existsById(unit.getId());
     }
 

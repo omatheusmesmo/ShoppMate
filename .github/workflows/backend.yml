@@ -47,6 +47,12 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Run Checkstyle
+        run: mvn -B -ntp checkstyle:check
+
+      - name: Validate Code Formatting
+        run: mvn -B -ntp formatter:validate
+
       - name: Build and Test with Maven
         run: mvn -B -ntp clean verify
 

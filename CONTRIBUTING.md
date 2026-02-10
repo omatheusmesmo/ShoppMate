@@ -23,10 +23,14 @@ By participating in this project, you agree to abide by our Code of Conduct (sta
    - Match the existing indentation (4 spaces for Java).
    - Use meaningful variable and method names.
    - Adhere to SOLID principles and Clean Code practices.
-4. **Write tests**: If you're adding a feature or fixing a bug, please include tests.
-5. **Update documentation**: If you change how the API works, update the relevant README or Bruno collection.
-6. **Self-review**: Read through your changes before submitting.
-7. **Submit the PR**: Link it to the relevant issue (e.g., `Closes #15`).
+4. **Pass code quality checks**:
+   - **Backend**: Run `mvn checkstyle:check` to verify Java code style compliance.
+   - **Frontend**: Run `npm run lint && npm run prettier:check` to verify TypeScript/Angular code quality.
+   - All PRs must pass these checks in the CI pipeline before merging.
+5. **Write tests**: If you're adding a feature or fixing a bug, please include tests.
+6. **Update documentation**: If you change how the API works, update the relevant README or Bruno collection.
+7. **Self-review**: Read through your changes before submitting.
+8. **Submit the PR**: Link it to the relevant issue (e.g., `Closes #15`).
 
 ## Development Workflow
 
