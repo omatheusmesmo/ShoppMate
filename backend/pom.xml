@@ -191,6 +191,16 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>11.0.0</version>
+				<configuration>
+					<url>${DB_URL}</url>
+					<user>${DB_USERNAME}</user>
+					<password>${DB_PASSWORD}</password>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 

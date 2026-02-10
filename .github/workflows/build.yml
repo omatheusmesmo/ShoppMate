@@ -1,0 +1,60 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-backend-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  POSTGRES_DB: shoppmate
+  POSTGRES_USER: user
+  POSTGRES_PASSWORD: password
+  DB_HOST: localhost
+  DB_PORT: 5432
+  JWT_TOKEN_EXPIRATION: 3600000
+  
+jobs:
+  backendBuildAndTest:
+    name: Backend Build and Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend   
+
+    env:
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB || 'shoppmate' }}
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER || 'user' }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD || 'password' }}
+      DB_HOST: ${{ secrets.DB_HOST || 'localhost' }}
+      DB_PORT: ${{ secrets.DB_PORT || '5432' }}
+      JWT_TOKEN_EXPIRATION: ${{ secrets.JWT_TOKEN_EXPIRATION || '3600000' }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build and Test with Maven
+        run: mvn -B -ntp clean verify
+
+      - name: Validate Flyway Migrations       
+        run: mvn -B -ntp flyway:validate -Dflyway.url=jdbc:postgresql://${{ env.DB_HOST }}:${{ env.DB_PORT }}/${{ env.POSTGRES_DB }} -Dflyway.user=${{ env.POSTGRES_USER }} -Dflyway.password=${{ env.POSTGRES_PASSWORD }}
+
+      - name: Upload JaCoCo Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: backend/target/site/jacoco       
