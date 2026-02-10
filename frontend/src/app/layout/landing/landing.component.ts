@@ -15,9 +15,9 @@ import { MatDividerModule } from '@angular/material/divider';
     MatIconModule,
     MatCardModule,
     MatStepperModule,
-    MatDividerModule
+    MatDividerModule,
   ],
   templateUrl: './landing.component.html',
-  styleUrls: ['./landing.component.scss']
+  styleUrls: ['./landing.component.scss'],
 })
 export class LandingComponent {}

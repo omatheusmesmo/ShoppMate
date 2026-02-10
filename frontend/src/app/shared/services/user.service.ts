@@ -6,7 +6,7 @@ import { BaseService } from './base.service';
 import { catchError } from 'rxjs/operators';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserService extends BaseService {
   constructor(override http: HttpClient) {
@@ -14,12 +14,14 @@ export class UserService extends BaseService {
   }
 
   getAllUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.baseUrl}/users/users`)
+    return this.http
+      .get<User[]>(`${this.baseUrl}/users/users`)
       .pipe(catchError(this.handleError));
   }
 
   getUserById(id: number): Observable<User> {
-    return this.http.get<User>(`${this.baseUrl}/users/userDetailsService/${id}`)
+    return this.http
+      .get<User>(`${this.baseUrl}/users/userDetailsService/${id}`)
       .pipe(catchError(this.handleError));
   }
 }

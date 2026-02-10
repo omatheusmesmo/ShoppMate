@@ -9,32 +9,51 @@
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Email</mat-label>
-            <input matInput type="email" formControlName="email" placeholder="Seu email">
+            <input
+              matInput
+              type="email"
+              formControlName="email"
+              placeholder="Seu email"
+            />
 
-            @if (loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched) {
-              <mat-error>
-                Email é obrigatório
-              </mat-error>
+            @if (
+              loginForm.get("email")?.hasError("required") &&
+              loginForm.get("email")?.touched
+            ) {
+              <mat-error> Email é obrigatório </mat-error>
             }
 
-            @if (loginForm.get('email')?.hasError('email') && !loginForm.get('email')?.hasError('required')) {
-              <mat-error>
-                Email inválido
-              </mat-error>
+            @if (
+              loginForm.get("email")?.hasError("email") &&
+              !loginForm.get("email")?.hasError("required")
+            ) {
+              <mat-error> Email inválido </mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Senha</mat-label>
-            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
-            <button type="button" mat-icon-button matSuffix (click)="hidePassword = !hidePassword">
-              <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            <input
+              matInput
+              [type]="hidePassword ? 'password' : 'text'"
+              formControlName="password"
+            />
+            <button
+              type="button"
+              mat-icon-button
+              matSuffix
+              (click)="hidePassword = !hidePassword"
+            >
+              <mat-icon>{{
+                hidePassword ? "visibility_off" : "visibility"
+              }}</mat-icon>
             </button>
 
-            @if (loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched) {
-              <mat-error>
-                Senha é obrigatória
-              </mat-error>
+            @if (
+              loginForm.get("password")?.hasError("required") &&
+              loginForm.get("password")?.touched
+            ) {
+              <mat-error> Senha é obrigatória </mat-error>
             }
           </mat-form-field>
 
@@ -43,7 +62,8 @@
               mat-raised-button
               color="primary"
               type="submit"
-              [disabled]="loginForm.invalid || isLoading">
+              [disabled]="loginForm.invalid || isLoading"
+            >
               @if (isLoading) {
                 <mat-spinner diameter="24"></mat-spinner>
               } @else {

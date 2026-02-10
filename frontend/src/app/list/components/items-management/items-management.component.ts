@@ -1,5 +1,10 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -36,10 +41,10 @@ import { Unit } from '../../../shared/interfaces/unit.interface';
     MatPaginatorModule,
     MatProgressSpinnerModule,
     ReactiveFormsModule,
-    AsyncPipe
+    AsyncPipe,
   ],
   templateUrl: './items-management.component.html',
-  styleUrls: ['./items-management.component.scss']
+  styleUrls: ['./items-management.component.scss'],
 })
 export class ItemsManagementComponent implements OnInit {
   private itemService = inject(ItemService);
@@ -61,15 +66,15 @@ export class ItemsManagementComponent implements OnInit {
 
   loadData(): void {
     this.loading = true;
-    this.items$ = this.itemService.getAllItems().pipe(
-      finalize(() => this.loading = false)
-    );
+    this.items$ = this.itemService
+      .getAllItems()
+      .pipe(finalize(() => (this.loading = false)));
 
-    this.categoryService.getAllCategories().subscribe(categories => {
+    this.categoryService.getAllCategories().subscribe((categories) => {
       this.categories = categories;
     });
 
-    this.unitService.getAllUnits().subscribe(units => {
+    this.unitService.getAllUnits().subscribe((units) => {
       this.units = units;
     });
   }
@@ -82,25 +87,29 @@ export class ItemsManagementComponent implements OnInit {
   editItem(item: ItemResponseDTO): void {
     const dialogRef = this.dialog.open(ItemDialogComponent, {
       width: '400px',
-      data: { 
+      data: {
         item: {
           name: item.name,
           idCategory: item.category.id,
-          idUnit: item.unit.id
-        }
-      }
+          idUnit: item.unit.id,
+        },
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.itemService.updateItem(item.id, result).subscribe({
           next: () => {
             this.loadData();
-            this.snackBar.open('Item atualizado com sucesso', 'Fechar', { duration: 3000 });
+            this.snackBar.open('Item atualizado com sucesso', 'Fechar', {
+              duration: 3000,
+            });
           },
           error: () => {
-            this.snackBar.open('Erro ao atualizar item', 'Fechar', { duration: 3000 });
-          }
+            this.snackBar.open('Erro ao atualizar item', 'Fechar', {
+              duration: 3000,
+            });
+          },
         });
       }
     });
@@ -112,15 +121,15 @@ export class ItemsManagementComponent implements OnInit {
         next: () => {
           this.loadData();
           this.snackBar.open('Item excluído com sucesso', 'Fechar', {
-            duration: 3000
+            duration: 3000,
           });
         },
         error: (error) => {
           console.error('Error deleting item:', error);
           this.snackBar.open('Erro ao excluir item', 'Fechar', {
-            duration: 3000
+            duration: 3000,
           });
-        }
+        },
       });
     }
   }

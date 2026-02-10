@@ -15,10 +15,18 @@
             <div class="category-item">
               <span>{{ category.name }}</span>
               <div class="category-actions">
-                <button mat-icon-button color="primary" (click)="openEditDialog(category)">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="openEditDialog(category)"
+                >
                   <mat-icon>edit</mat-icon>
                 </button>
-                <button mat-icon-button color="warn" (click)="category.id && deleteCategory(category.id)">
+                <button
+                  mat-icon-button
+                  color="warn"
+                  (click)="category.id && deleteCategory(category.id)"
+                >
                   <mat-icon>delete</mat-icon>
                 </button>
               </div>
@@ -33,7 +41,11 @@
     </mat-card-content>
 
     <mat-card-actions>
-      <button mat-raised-button color="primary" (click)="openNewCategoryDialog()">
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="openNewCategoryDialog()"
+      >
         <mat-icon>add</mat-icon>
         Nova Categoria
       </button>

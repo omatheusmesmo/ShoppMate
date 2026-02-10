@@ -1,4 +1,4 @@
-@use '@angular/material' as mat;
+@use "@angular/material" as mat;
 
 .layout-container {
   display: flex;
@@ -54,7 +54,7 @@
   }
 
   .active-link::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: 0;
     left: 0;

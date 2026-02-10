@@ -1,17 +1,25 @@
 <div class="item-container">
   <mat-card class="form-card">
     <mat-card-header>
-      <mat-card-title>{{ editingItemId ? 'Edit Item' : 'New Item' }}</mat-card-title>
+      <mat-card-title>{{
+        editingItemId ? "Edit Item" : "New Item"
+      }}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
         <mat-form-field appearance="outline">
           <mat-label>Name</mat-label>
-          <input matInput formControlName="name" placeholder="Ex: Rice">
-          @if (itemForm.get('name')?.errors?.['required'] && itemForm.get('name')?.touched) {
+          <input matInput formControlName="name" placeholder="Ex: Rice" />
+          @if (
+            itemForm.get("name")?.errors?.["required"] &&
+            itemForm.get("name")?.touched
+          ) {
             <mat-error>Name is required</mat-error>
           }
-          @if (itemForm.get('name')?.errors?.['minlength'] && itemForm.get('name')?.touched) {
+          @if (
+            itemForm.get("name")?.errors?.["minlength"] &&
+            itemForm.get("name")?.touched
+          ) {
             <mat-error>Name must have at least 2 characters</mat-error>
           }
         </mat-form-field>
@@ -23,7 +31,10 @@
               <mat-option [value]="category.id">{{ category.name }}</mat-option>
             }
           </mat-select>
-          @if (itemForm.get('idCategory')?.errors?.['required'] && itemForm.get('idCategory')?.touched) {
+          @if (
+            itemForm.get("idCategory")?.errors?.["required"] &&
+            itemForm.get("idCategory")?.touched
+          ) {
             <mat-error>Category is required</mat-error>
           }
         </mat-form-field>
@@ -32,20 +43,32 @@
           <mat-label>Unit</mat-label>
           <mat-select formControlName="idUnit">
             @for (unit of units; track unit.id) {
-              <mat-option [value]="unit.id">{{ unit.name }} ({{ unit.symbol }})</mat-option>
+              <mat-option [value]="unit.id"
+                >{{ unit.name }} ({{ unit.symbol }})</mat-option
+              >
             }
           </mat-select>
-          @if (itemForm.get('idUnit')?.errors?.['required'] && itemForm.get('idUnit')?.touched) {
+          @if (
+            itemForm.get("idUnit")?.errors?.["required"] &&
+            itemForm.get("idUnit")?.touched
+          ) {
             <mat-error>Unit is required</mat-error>
           }
         </mat-form-field>
 
         <div class="form-actions">
-          <button mat-raised-button color="primary" type="submit" [disabled]="itemForm.invalid">
-            {{ editingItemId ? 'Update' : 'Create' }}
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="itemForm.invalid"
+          >
+            {{ editingItemId ? "Update" : "Create" }}
           </button>
           @if (editingItemId) {
-            <button mat-button type="button" (click)="resetForm()">Cancel</button>
+            <button mat-button type="button" (click)="resetForm()">
+              Cancel
+            </button>
           }
         </div>
       </form>
@@ -84,3 +107,4 @@
       }
     </div>
   }
+</div>

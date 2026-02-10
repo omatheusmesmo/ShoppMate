@@ -38,20 +38,22 @@
                   <button
                     mat-icon-button
                     color="primary"
-                    (click)="editUnit(element)">
+                    (click)="editUnit(element)"
+                  >
                     <mat-icon>edit</mat-icon>
                   </button>
                   <button
                     mat-icon-button
                     color="warn"
-                    (click)="deleteUnit(element)">
+                    (click)="deleteUnit(element)"
+                  >
                     <mat-icon>delete</mat-icon>
                   </button>
                 </td>
               </ng-container>
 
               <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
             </table>
           </mat-card-content>
         </mat-card>
@@ -59,7 +61,11 @@
         <mat-card appearance="outlined" class="empty-state">
           <mat-card-content>
             <p>Nenhuma unidade cadastrada.</p>
-            <button mat-raised-button color="primary" (click)="openNewUnitDialog()">
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="openNewUnitDialog()"
+            >
               Cadastrar Primeira Unidade
             </button>
           </mat-card-content>

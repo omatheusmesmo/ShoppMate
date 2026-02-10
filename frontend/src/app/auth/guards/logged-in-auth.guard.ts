@@ -9,12 +9,12 @@ export const loggedInAuthGuard: CanActivateFn = (route, state) => {
 
   return authService.isLoggedIn$.pipe(
     take(1),
-    map(isLoggedIn => {
+    map((isLoggedIn) => {
       if (isLoggedIn) {
         router.navigate(['/lists']); // Redirect to lists if already logged in
         return false;
       }
       return true; // Allow access to login/signup if not logged in
-    })
+    }),
   );
 };

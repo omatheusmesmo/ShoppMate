@@ -1,35 +1,53 @@
 <div class="unit-container">
   <mat-card class="form-card">
     <mat-card-header>
-      <mat-card-title>{{ editingUnitId ? 'Edit Unit' : 'New Unit' }}</mat-card-title>
+      <mat-card-title>{{
+        editingUnitId ? "Edit Unit" : "New Unit"
+      }}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <form [formGroup]="unitForm" (ngSubmit)="onSubmit()">
         <mat-form-field appearance="outline">
           <mat-label>Name</mat-label>
-          <input matInput formControlName="name" placeholder="Ex: Kilogram">
-          @if (unitForm.get('name')?.errors?.['required'] && unitForm.get('name')?.touched) {
+          <input matInput formControlName="name" placeholder="Ex: Kilogram" />
+          @if (
+            unitForm.get("name")?.errors?.["required"] &&
+            unitForm.get("name")?.touched
+          ) {
             <mat-error>Name is required</mat-error>
           }
-          @if (unitForm.get('name')?.errors?.['minlength'] && unitForm.get('name')?.touched) {
+          @if (
+            unitForm.get("name")?.errors?.["minlength"] &&
+            unitForm.get("name")?.touched
+          ) {
             <mat-error>Name must have at least 2 characters</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline">
           <mat-label>Symbol</mat-label>
-          <input matInput formControlName="symbol" placeholder="Ex: kg">
-          @if (unitForm.get('symbol')?.errors?.['required'] && unitForm.get('symbol')?.touched) {
+          <input matInput formControlName="symbol" placeholder="Ex: kg" />
+          @if (
+            unitForm.get("symbol")?.errors?.["required"] &&
+            unitForm.get("symbol")?.touched
+          ) {
             <mat-error>Symbol is required</mat-error>
           }
         </mat-form-field>
 
         <div class="form-actions">
-          <button mat-raised-button color="primary" type="submit" [disabled]="unitForm.invalid">
-            {{ editingUnitId ? 'Update' : 'Create' }}
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="unitForm.invalid"
+          >
+            {{ editingUnitId ? "Update" : "Create" }}
           </button>
           @if (editingUnitId) {
-            <button mat-button type="button" (click)="resetForm()">Cancel</button>
+            <button mat-button type="button" (click)="resetForm()">
+              Cancel
+            </button>
           }
         </div>
       </form>
@@ -66,3 +84,4 @@
       }
     </div>
   }
+</div>

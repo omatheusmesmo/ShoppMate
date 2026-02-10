@@ -1,7 +1,11 @@
 import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import {
+  MatDialogModule,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,43 +20,50 @@ import { Unit } from '../../../../shared/interfaces/unit.interface';
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
   ],
   template: `
     <h2 mat-dialog-title>{{ data.unit ? 'Editar' : 'Nova' }} Unidade</h2>
     <mat-dialog-content>
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>Nome</mat-label>
-        <input matInput [(ngModel)]="unit.name" required>
+        <input matInput [(ngModel)]="unit.name" required />
       </mat-form-field>
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>Símbolo</mat-label>
-        <input matInput [(ngModel)]="unit.symbol" required>
+        <input matInput [(ngModel)]="unit.symbol" required />
       </mat-form-field>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
       <button mat-button (click)="onCancel()">Cancelar</button>
-      <button mat-raised-button color="primary" (click)="onSave()" [disabled]="!unit.name || !unit.symbol">
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="onSave()"
+        [disabled]="!unit.name || !unit.symbol"
+      >
         Salvar
       </button>
     </mat-dialog-actions>
   `,
-  styles: [`
-    .w-100 {
-      width: 100%;
-      margin-bottom: 1rem;
-    }
-  `]
+  styles: [
+    `
+      .w-100 {
+        width: 100%;
+        margin-bottom: 1rem;
+      }
+    `,
+  ],
 })
 export class UnitDialogComponent {
   unit: Unit = {
     name: '',
-    symbol: ''
+    symbol: '',
   };
 
   constructor(
     public dialogRef: MatDialogRef<UnitDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { unit?: Unit }
+    @Inject(MAT_DIALOG_DATA) public data: { unit?: Unit },
   ) {
     if (data.unit) {
       this.unit = { ...data.unit };

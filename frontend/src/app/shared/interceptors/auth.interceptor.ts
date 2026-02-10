@@ -14,11 +14,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   if (token) {
     const authReq = req.clone({
-      headers: req.headers.set('Authorization', `Bearer ${token}`)
+      headers: req.headers.set('Authorization', `Bearer ${token}`),
     });
 
     return next(authReq).pipe(
-      tap(response => {
+      tap((response) => {
         console.log('Interceptor - Response received:', response);
       }),
       catchError((error: HttpErrorResponse) => {
@@ -31,7 +31,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         }
 
         throw error;
-      })
+      }),
     );
   }
 

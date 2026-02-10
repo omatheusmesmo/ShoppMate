@@ -1,11 +1,15 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpHeaders,
+} from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export abstract class BaseService {
   protected http = inject(HttpClient);
@@ -16,7 +20,7 @@ export abstract class BaseService {
     const token = this.authService.getToken();
     let headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Accept': 'application/json'
+      Accept: 'application/json',
     });
 
     if (token) {

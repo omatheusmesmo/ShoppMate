@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -24,8 +29,8 @@ import { CategoryService } from '../../services/category.service';
     MatIconModule,
     MatInputModule,
     MatFormFieldModule,
-    MatProgressSpinnerModule
-  ]
+    MatProgressSpinnerModule,
+  ],
 })
 export class CategoryComponent implements OnInit {
   categories: Category[] = [];
@@ -36,10 +41,10 @@ export class CategoryComponent implements OnInit {
   constructor(
     private categoryService: CategoryService,
     private fb: FormBuilder,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
   ) {
     this.categoryForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2)]]
+      name: ['', [Validators.required, Validators.minLength(2)]],
     });
   }
 
@@ -55,9 +60,11 @@ export class CategoryComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error: Error) => {
-        this.snackBar.open('Error loading categories', 'Close', { duration: 3000 });
+        this.snackBar.open('Error loading categories', 'Close', {
+          duration: 3000,
+        });
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -65,37 +72,42 @@ export class CategoryComponent implements OnInit {
     if (this.categoryForm.invalid) return;
 
     const categoryData: Category = {
-      name: this.categoryForm.value.name
+      name: this.categoryForm.value.name,
     };
 
     if (this.editingCategoryId !== null) {
       categoryData.id = this.editingCategoryId;
     }
 
-    const operation = this.editingCategoryId !== null
-      ? this.categoryService.updateCategory(categoryData)
-      : this.categoryService.addCategory(categoryData);
+    const operation =
+      this.editingCategoryId !== null
+        ? this.categoryService.updateCategory(categoryData)
+        : this.categoryService.addCategory(categoryData);
 
     operation.subscribe({
       next: () => {
         this.snackBar.open(
-          this.editingCategoryId !== null ? 'Category updated successfully' : 'Category created successfully',
+          this.editingCategoryId !== null
+            ? 'Category updated successfully'
+            : 'Category created successfully',
           'Close',
-          { duration: 3000 }
+          { duration: 3000 },
         );
         this.resetForm();
         this.loadCategories();
       },
       error: (error: Error) => {
-        this.snackBar.open('Error saving category', 'Close', { duration: 3000 });
-      }
+        this.snackBar.open('Error saving category', 'Close', {
+          duration: 3000,
+        });
+      },
     });
   }
 
   startEdit(category: Category): void {
     this.editingCategoryId = category.id ?? null;
     this.categoryForm.patchValue({
-      name: category.name
+      name: category.name,
     });
   }
 
@@ -103,12 +115,16 @@ export class CategoryComponent implements OnInit {
     if (confirm('Are you sure you want to delete this category?')) {
       this.categoryService.deleteCategory(id).subscribe({
         next: () => {
-          this.snackBar.open('Category deleted successfully', 'Close', { duration: 3000 });
+          this.snackBar.open('Category deleted successfully', 'Close', {
+            duration: 3000,
+          });
           this.loadCategories();
         },
         error: (error: Error) => {
-          this.snackBar.open('Error deleting category', 'Close', { duration: 3000 });
-        }
+          this.snackBar.open('Error deleting category', 'Close', {
+            duration: 3000,
+          });
+        },
       });
     }
   }

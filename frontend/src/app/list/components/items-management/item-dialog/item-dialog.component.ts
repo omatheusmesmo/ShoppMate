@@ -1,7 +1,11 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import {
+  MatDialogModule,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -22,20 +26,20 @@ import { Unit } from '../../../../shared/interfaces/unit.interface';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatSelectModule
+    MatSelectModule,
   ],
   template: `
     <h2 mat-dialog-title>{{ data.item ? 'Editar' : 'Novo' }} Item</h2>
     <mat-dialog-content>
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>Nome</mat-label>
-        <input matInput [(ngModel)]="item.name" required>
+        <input matInput [(ngModel)]="item.name" required />
       </mat-form-field>
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>Categoria</mat-label>
         <mat-select [(ngModel)]="item.idCategory" required>
           <mat-option *ngFor="let category of categories" [value]="category.id">
-            {{category.name}}
+            {{ category.name }}
           </mat-option>
         </mat-select>
       </mat-form-field>
@@ -43,31 +47,37 @@ import { Unit } from '../../../../shared/interfaces/unit.interface';
         <mat-label>Unidade</mat-label>
         <mat-select [(ngModel)]="item.idUnit" required>
           <mat-option *ngFor="let unit of units" [value]="unit.id">
-            {{unit.name}} ({{unit.symbol}})
+            {{ unit.name }} ({{ unit.symbol }})
           </mat-option>
         </mat-select>
       </mat-form-field>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
       <button mat-button (click)="onCancel()">Cancelar</button>
-      <button mat-raised-button color="primary" (click)="onSave()"
-              [disabled]="!item.name || !item.idCategory || !item.idUnit">
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="onSave()"
+        [disabled]="!item.name || !item.idCategory || !item.idUnit"
+      >
         Salvar
       </button>
     </mat-dialog-actions>
   `,
-  styles: [`
-    .w-100 {
-      width: 100%;
-      margin-bottom: 1rem;
-    }
-  `]
+  styles: [
+    `
+      .w-100 {
+        width: 100%;
+        margin-bottom: 1rem;
+      }
+    `,
+  ],
 })
 export class ItemDialogComponent implements OnInit {
   item: ItemRequestDTO = {
     name: '',
     idCategory: 0,
-    idUnit: 0
+    idUnit: 0,
   };
   categories: Category[] = [];
   units: Unit[] = [];
@@ -76,7 +86,7 @@ export class ItemDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<ItemDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { item?: ItemRequestDTO },
     private categoryService: CategoryService,
-    private unitService: UnitService
+    private unitService: UnitService,
   ) {
     if (data.item) {
       this.item = { ...data.item };
@@ -89,13 +99,13 @@ export class ItemDialogComponent implements OnInit {
   }
 
   loadCategories(): void {
-    this.categoryService.getAllCategories().subscribe(categories => {
+    this.categoryService.getAllCategories().subscribe((categories) => {
       this.categories = categories;
     });
   }
 
   loadUnits(): void {
-    this.unitService.getAllUnits().subscribe(units => {
+    this.unitService.getAllUnits().subscribe((units) => {
       this.units = units;
     });
   }

@@ -22,7 +22,7 @@ import { AuthService } from '../../shared/services/auth.service';
     MatMenuModule,
     RouterLink,
     RouterLinkActive,
-    AsyncPipe
+    AsyncPipe,
   ],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss'],

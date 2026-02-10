@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,7 +16,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ActivatedRoute } from '@angular/router';
-import { ListItemRequestDTO, ListItemResponseDTO } from '../../interfaces/list-item.interface';
+import {
+  ListItemRequestDTO,
+  ListItemResponseDTO,
+} from '../../interfaces/list-item.interface';
 import { ItemResponseDTO } from '../../interfaces/item.interface';
 import { ItemService } from '../../services/item.service';
 import { ListItemService } from '../../services/list-item.service';
@@ -32,8 +40,8 @@ import { forkJoin } from 'rxjs';
     MatFormFieldModule,
     MatProgressSpinnerModule,
     MatSelectModule,
-    MatCheckboxModule
-  ]
+    MatCheckboxModule,
+  ],
 })
 export class ListItemComponent implements OnInit {
   listItems: ListItemResponseDTO[] = [];
@@ -48,12 +56,12 @@ export class ListItemComponent implements OnInit {
     private itemService: ItemService,
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
   ) {
     this.listItemForm = this.fb.group({
       itemId: ['', Validators.required],
       quantity: [1, [Validators.required, Validators.min(1)]],
-      purchased: [false]
+      purchased: [false],
     });
 
     this.listId = Number(this.route.snapshot.paramMap.get('listId'));
@@ -67,7 +75,7 @@ export class ListItemComponent implements OnInit {
     this.isLoading = true;
     forkJoin({
       listItems: this.listItemService.getAllListItems(this.listId),
-      items: this.itemService.getAllItems()
+      items: this.itemService.getAllItems(),
     }).subscribe({
       next: (data) => {
         this.listItems = data.listItems;
@@ -77,7 +85,7 @@ export class ListItemComponent implements OnInit {
       error: (error) => {
         this.snackBar.open('Error loading data', 'Close', { duration: 3000 });
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -87,26 +95,34 @@ export class ListItemComponent implements OnInit {
     const listItemData: ListItemRequestDTO = {
       listId: this.listId,
       itemId: this.listItemForm.value.itemId,
-      quantity: this.listItemForm.value.quantity
+      quantity: this.listItemForm.value.quantity,
     };
 
     const operation = this.editingListItemId
-      ? this.listItemService.updateListItem(this.listId, this.editingListItemId, listItemData)
+      ? this.listItemService.updateListItem(
+          this.listId,
+          this.editingListItemId,
+          listItemData,
+        )
       : this.listItemService.addListItem(listItemData);
 
     operation.subscribe({
       next: () => {
         this.snackBar.open(
-          this.editingListItemId ? 'Item updated successfully' : 'Item added successfully',
+          this.editingListItemId
+            ? 'Item updated successfully'
+            : 'Item added successfully',
           'Close',
-          { duration: 3000 }
+          { duration: 3000 },
         );
         this.resetForm();
         this.loadInitialData();
       },
       error: (error) => {
-        this.snackBar.open('Error saving list item', 'Close', { duration: 3000 });
-      }
+        this.snackBar.open('Error saving list item', 'Close', {
+          duration: 3000,
+        });
+      },
     });
   }
 
@@ -115,7 +131,7 @@ export class ListItemComponent implements OnInit {
     this.listItemForm.patchValue({
       itemId: listItem.item.id,
       quantity: listItem.quantity,
-      purchased: listItem.purchased
+      purchased: listItem.purchased,
     });
   }
 
@@ -123,12 +139,16 @@ export class ListItemComponent implements OnInit {
     if (confirm('Are you sure you want to remove this item from the list?')) {
       this.listItemService.deleteListItem(this.listId, id).subscribe({
         next: () => {
-          this.snackBar.open('Item removed successfully', 'Close', { duration: 3000 });
+          this.snackBar.open('Item removed successfully', 'Close', {
+            duration: 3000,
+          });
           this.loadInitialData();
         },
         error: (error) => {
-          this.snackBar.open('Error removing item', 'Close', { duration: 3000 });
-        }
+          this.snackBar.open('Error removing item', 'Close', {
+            duration: 3000,
+          });
+        },
       });
     }
   }
@@ -137,32 +157,36 @@ export class ListItemComponent implements OnInit {
     const updatedListItem: ListItemRequestDTO = {
       listId: this.listId,
       itemId: listItem.item.id,
-      quantity: listItem.quantity
+      quantity: listItem.quantity,
     };
 
-    this.listItemService.updateListItem(this.listId, listItem.idListItem, updatedListItem)
+    this.listItemService
+      .updateListItem(this.listId, listItem.idListItem, updatedListItem)
       .subscribe({
         next: () => {
           this.loadInitialData();
         },
         error: (error) => {
-          this.snackBar.open('Error updating item status', 'Close', { duration: 3000 });
-        }
+          this.snackBar.open('Error updating item status', 'Close', {
+            duration: 3000,
+          });
+        },
       });
   }
 
   resetForm(): void {
     this.listItemForm.reset({
       quantity: 1,
-      purchased: false
+      purchased: false,
     });
     this.editingListItemId = null;
   }
 
   getAvailableItems(): ItemResponseDTO[] {
     if (!this.editingListItemId) {
-      return this.availableItems.filter(item =>
-        !this.listItems.some(listItem => listItem.item.id === item.id)
+      return this.availableItems.filter(
+        (item) =>
+          !this.listItems.some((listItem) => listItem.item.id === item.id),
       );
     }
     return this.availableItems;

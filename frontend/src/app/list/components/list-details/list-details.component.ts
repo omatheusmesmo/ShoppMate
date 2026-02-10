@@ -38,10 +38,10 @@ import { ShoppingListResponseDTO } from '../../../shared/interfaces/shopping-lis
     MatProgressSpinnerModule,
     FormsModule,
     ReactiveFormsModule,
-    AsyncPipe
+    AsyncPipe,
   ],
   templateUrl: './list-details.component.html',
-  styleUrls: ['./list-details.component.scss']
+  styleUrls: ['./list-details.component.scss'],
 })
 export class ListDetailsComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -67,15 +67,17 @@ export class ListDetailsComponent implements OnInit {
     this.loading = true;
 
     // Get the list details
-    this.list$ = this.shoppingListService.getAllShoppingLists().pipe(
-      map(lists => lists.find(list => list.idList === this.listId)!),
-    );
+    this.list$ = this.shoppingListService
+      .getAllShoppingLists()
+      .pipe(map((lists) => lists.find((list) => list.idList === this.listId)!));
 
     // Get list items
-    this.listItems$ = this.listItemService.getAllListItemsByListId(this.listId).pipe(
-      tap(() => this.loading = false),
-      finalize(() => this.loading = false)
-    );
+    this.listItems$ = this.listItemService
+      .getAllListItemsByListId(this.listId)
+      .pipe(
+        tap(() => (this.loading = false)),
+        finalize(() => (this.loading = false)),
+      );
   }
 
   togglePurchased(item: ListItemResponseDTO): void {
@@ -83,18 +85,19 @@ export class ListDetailsComponent implements OnInit {
       listId: this.listId,
       itemId: item.item.id,
       quantity: item.quantity,
-      purchased: !item.purchased
+      purchased: !item.purchased,
     };
 
-    this.listItemService.updateListItem(this.listId, item.idListItem, updatedItem)
+    this.listItemService
+      .updateListItem(this.listId, item.idListItem, updatedItem)
       .subscribe({
         next: () => this.loadData(),
         error: (error) => {
           console.error('Error updating item status:', error);
           this.snackBar.open('Erro ao atualizar status do item', 'Fechar', {
-            duration: 3000
+            duration: 3000,
           });
-        }
+        },
       });
   }
 
@@ -110,20 +113,21 @@ export class ListDetailsComponent implements OnInit {
 
   removeItem(item: ListItemResponseDTO): void {
     if (confirm(`Tem certeza que deseja remover ${item.item.name} da lista?`)) {
-      this.listItemService.deleteListItem(this.listId, item.idListItem)
+      this.listItemService
+        .deleteListItem(this.listId, item.idListItem)
         .subscribe({
           next: () => {
             this.loadData();
             this.snackBar.open('Item removido com sucesso', 'Fechar', {
-              duration: 3000
+              duration: 3000,
             });
           },
           error: (error) => {
             console.error('Error removing item:', error);
             this.snackBar.open('Erro ao remover item', 'Fechar', {
-              duration: 3000
+              duration: 3000,
             });
-          }
+          },
         });
     }
   }

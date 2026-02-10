@@ -4,9 +4,17 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ShoppingListService } from '../../../shared/services/shopping-list.service';
-import { ShoppingListResponseDTO, ShoppingListRequestDTO } from '../../../shared/interfaces/shopping-list.interface';
+import {
+  ShoppingListResponseDTO,
+  ShoppingListRequestDTO,
+} from '../../../shared/interfaces/shopping-list.interface';
 import { AuthService } from '../../../shared/services/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialogActions } from '@angular/material/dialog';
@@ -22,10 +30,10 @@ import { MatDialogContent } from '@angular/material/dialog';
     MatInputModule,
     ReactiveFormsModule,
     MatDialogActions,
-    MatDialogContent
+    MatDialogContent,
   ],
   templateUrl: './shopping-list-dialog.component.html',
-  styleUrls: ['./shopping-list-dialog.component.scss']
+  styleUrls: ['./shopping-list-dialog.component.scss'],
 })
 export class ShoppingListDialogComponent {
   private dialogRef = inject(MatDialogRef<ShoppingListDialogComponent>);
@@ -33,7 +41,10 @@ export class ShoppingListDialogComponent {
   private shoppingListService = inject(ShoppingListService);
   private snackBar = inject(MatSnackBar);
   private authService = inject(AuthService);
-  private data = inject(MAT_DIALOG_DATA) as { list?: ShoppingListResponseDTO, isEdit: boolean };
+  private data = inject(MAT_DIALOG_DATA) as {
+    list?: ShoppingListResponseDTO;
+    isEdit: boolean;
+  };
 
   listForm: FormGroup;
   isEdit: boolean;
@@ -41,12 +52,12 @@ export class ShoppingListDialogComponent {
   constructor() {
     this.isEdit = this.data.isEdit;
     this.listForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]]
+      name: ['', [Validators.required, Validators.minLength(3)]],
     });
 
     if (this.isEdit && this.data.list) {
       this.listForm.patchValue({
-        name: this.data.list.listName
+        name: this.data.list.listName,
       });
     }
   }
@@ -55,28 +66,38 @@ export class ShoppingListDialogComponent {
     if (this.listForm.valid) {
       const listData: ShoppingListRequestDTO = {
         name: this.listForm.value.name,
-        idUser: this.authService.getCurrentUserId() // Get from auth service
+        idUser: this.authService.getCurrentUserId(), // Get from auth service
       };
 
       if (this.isEdit && this.data.list) {
-        this.shoppingListService.updateShoppingList(this.data.list.idList, listData).subscribe({
-          next: () => {
-            this.snackBar.open('Lista atualizada com sucesso', 'Fechar', { duration: 3000 });
-            this.dialogRef.close(true);
-          },
-          error: () => {
-            this.snackBar.open('Erro ao atualizar lista', 'Fechar', { duration: 3000 });
-          }
-        });
+        this.shoppingListService
+          .updateShoppingList(this.data.list.idList, listData)
+          .subscribe({
+            next: () => {
+              this.snackBar.open('Lista atualizada com sucesso', 'Fechar', {
+                duration: 3000,
+              });
+              this.dialogRef.close(true);
+            },
+            error: () => {
+              this.snackBar.open('Erro ao atualizar lista', 'Fechar', {
+                duration: 3000,
+              });
+            },
+          });
       } else {
         this.shoppingListService.createShoppingList(listData).subscribe({
           next: () => {
-            this.snackBar.open('Lista criada com sucesso', 'Fechar', { duration: 3000 });
+            this.snackBar.open('Lista criada com sucesso', 'Fechar', {
+              duration: 3000,
+            });
             this.dialogRef.close(true);
           },
           error: () => {
-            this.snackBar.open('Erro ao criar lista', 'Fechar', { duration: 3000 });
-          }
+            this.snackBar.open('Erro ao criar lista', 'Fechar', {
+              duration: 3000,
+            });
+          },
         });
       }
     }

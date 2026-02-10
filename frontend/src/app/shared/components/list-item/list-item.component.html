@@ -1,7 +1,9 @@
 <div class="list-item-container">
   <mat-card class="form-card">
     <mat-card-header>
-      <mat-card-title>{{ editingListItemId ? 'Edit Item in List' : 'Add Item to List' }}</mat-card-title>
+      <mat-card-title>{{
+        editingListItemId ? "Edit Item in List" : "Add Item to List"
+      }}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <form [formGroup]="listItemForm" (ngSubmit)="onSubmit()">
@@ -10,32 +12,49 @@
           <mat-select formControlName="itemId">
             @for (item of getAvailableItems(); track item.id) {
               <mat-option [value]="item.id">
-                {{ item.name }} ({{ item.category.name }} - {{ item.unit.symbol }})
+                {{ item.name }} ({{ item.category.name }} -
+                {{ item.unit.symbol }})
               </mat-option>
             }
           </mat-select>
-          @if (listItemForm.get('itemId')?.errors?.['required'] && listItemForm.get('itemId')?.touched) {
+          @if (
+            listItemForm.get("itemId")?.errors?.["required"] &&
+            listItemForm.get("itemId")?.touched
+          ) {
             <mat-error>Item is required</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline">
           <mat-label>Quantity</mat-label>
-          <input matInput type="number" formControlName="quantity" min="1">
-          @if (listItemForm.get('quantity')?.errors?.['required'] && listItemForm.get('quantity')?.touched) {
+          <input matInput type="number" formControlName="quantity" min="1" />
+          @if (
+            listItemForm.get("quantity")?.errors?.["required"] &&
+            listItemForm.get("quantity")?.touched
+          ) {
             <mat-error>Quantity is required</mat-error>
           }
-          @if (listItemForm.get('quantity')?.errors?.['min'] && listItemForm.get('quantity')?.touched) {
+          @if (
+            listItemForm.get("quantity")?.errors?.["min"] &&
+            listItemForm.get("quantity")?.touched
+          ) {
             <mat-error>Quantity must be at least 1</mat-error>
           }
         </mat-form-field>
 
         <div class="form-actions">
-          <button mat-raised-button color="primary" type="submit" [disabled]="listItemForm.invalid">
-            {{ editingListItemId ? 'Update' : 'Add' }}
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="listItemForm.invalid"
+          >
+            {{ editingListItemId ? "Update" : "Add" }}
           </button>
           @if (editingListItemId) {
-            <button mat-button type="button" (click)="resetForm()">Cancel</button>
+            <button mat-button type="button" (click)="resetForm()">
+              Cancel
+            </button>
           }
         </div>
       </form>
@@ -67,14 +86,23 @@
             <mat-checkbox
               [checked]="listItem.purchased"
               (change)="togglePurchased(listItem)"
-              color="primary">
+              color="primary"
+            >
               Purchased
             </mat-checkbox>
             <div class="action-buttons">
-              <button mat-icon-button color="primary" (click)="startEdit(listItem)">
+              <button
+                mat-icon-button
+                color="primary"
+                (click)="startEdit(listItem)"
+              >
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button color="warn" (click)="deleteListItem(listItem.idListItem)">
+              <button
+                mat-icon-button
+                color="warn"
+                (click)="deleteListItem(listItem.idListItem)"
+              >
                 <mat-icon>delete</mat-icon>
               </button>
             </div>
@@ -83,3 +111,4 @@
       }
     </div>
   }
+</div>

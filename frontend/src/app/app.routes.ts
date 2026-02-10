@@ -11,47 +11,56 @@ export const AppRoutes: Routes = [
   {
     path: '',
     component: LandingComponent,
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
   {
     path: 'login',
     component: LoginComponent,
-    canActivate: [loggedInAuthGuard]
+    canActivate: [loggedInAuthGuard],
   },
   {
     path: 'signup',
     component: SignupComponent,
-    canActivate: [loggedInAuthGuard]
+    canActivate: [loggedInAuthGuard],
   },
   {
     path: 'lists',
     component: ShoppingListComponent,
-    canActivate: [authGuard]
+    canActivate: [authGuard],
   },
   {
     path: 'lists/:id',
     component: ListDetailsComponent,
-    canActivate: [authGuard]
+    canActivate: [authGuard],
   },
   {
     path: 'items',
-    loadComponent: () => import('./list/components/items-management/items-management.component').then(m => m.ItemsManagementComponent),
-    canActivate: [authGuard]
+    loadComponent: () =>
+      import('./list/components/items-management/items-management.component').then(
+        (m) => m.ItemsManagementComponent,
+      ),
+    canActivate: [authGuard],
   },
   {
     path: 'categories',
-    loadComponent: () => import('./list/components/categories-management/categories-management.component').then(m => m.CategoriesManagementComponent),
-    canActivate: [authGuard]
+    loadComponent: () =>
+      import('./list/components/categories-management/categories-management.component').then(
+        (m) => m.CategoriesManagementComponent,
+      ),
+    canActivate: [authGuard],
   },
   {
     path: 'units',
-    loadComponent: () => import('./list/components/units-management/units-management.component').then(m => m.UnitsManagementComponent),
-    canActivate: [authGuard]
+    loadComponent: () =>
+      import('./list/components/units-management/units-management.component').then(
+        (m) => m.UnitsManagementComponent,
+      ),
+    canActivate: [authGuard],
   },
   {
     path: '**',
-    redirectTo: ''
-  }
+    redirectTo: '',
+  },
 ];
 
 export default AppRoutes;

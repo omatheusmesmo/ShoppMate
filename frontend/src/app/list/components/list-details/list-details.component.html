@@ -24,8 +24,12 @@
                 <th mat-header-cell *matHeaderCellDef>Item</th>
                 <td mat-cell *matCellDef="let element">
                   <div class="item-info">
-                    <span [class.purchased]="element.purchased">{{ element.item.name }}</span>
-                    <span class="item-category">{{ element.item.category.name }}</span>
+                    <span [class.purchased]="element.purchased">{{
+                      element.item.name
+                    }}</span>
+                    <span class="item-category">{{
+                      element.item.category.name
+                    }}</span>
                   </div>
                 </td>
               </ng-container>
@@ -44,8 +48,9 @@
                 <td mat-cell *matCellDef="let element">
                   <mat-checkbox
                     [checked]="element.purchased"
-                    (change)="togglePurchased(element)">
-                    {{ element.purchased ? 'Comprado' : 'Pendente' }}
+                    (change)="togglePurchased(element)"
+                  >
+                    {{ element.purchased ? "Comprado" : "Pendente" }}
                   </mat-checkbox>
                 </td>
               </ng-container>
@@ -57,20 +62,22 @@
                   <button
                     mat-icon-button
                     color="primary"
-                    (click)="editItem(element)">
+                    (click)="editItem(element)"
+                  >
                     <mat-icon>edit</mat-icon>
                   </button>
                   <button
                     mat-icon-button
                     color="warn"
-                    (click)="removeItem(element)">
+                    (click)="removeItem(element)"
+                  >
                     <mat-icon>delete</mat-icon>
                   </button>
                 </td>
               </ng-container>
 
               <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
             </table>
           }
         </mat-card-content>
@@ -79,7 +86,11 @@
       <mat-card appearance="outlined" class="empty-list">
         <mat-card-content>
           <p>Esta lista não possui itens.</p>
-          <button mat-raised-button color="primary" (click)="openAddItemDialog()">
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="openAddItemDialog()"
+          >
             Adicionar Item
           </button>
         </mat-card-content>

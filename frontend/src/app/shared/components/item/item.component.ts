@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,7 +14,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
-import { ItemResponseDTO, ItemRequestDTO } from '../../interfaces/item.interface';
+import {
+  ItemResponseDTO,
+  ItemRequestDTO,
+} from '../../interfaces/item.interface';
 import { Category } from '../../interfaces/category.interface';
 import { Unit } from '../../interfaces/unit.interface';
 import { ItemService } from '../../services/item.service';
@@ -31,8 +39,8 @@ import { forkJoin } from 'rxjs';
     MatInputModule,
     MatFormFieldModule,
     MatProgressSpinnerModule,
-    MatSelectModule
-  ]
+    MatSelectModule,
+  ],
 })
 export class ItemComponent implements OnInit {
   items: ItemResponseDTO[] = [];
@@ -47,12 +55,12 @@ export class ItemComponent implements OnInit {
     private categoryService: CategoryService,
     private unitService: UnitService,
     private fb: FormBuilder,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
   ) {
     this.itemForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       idCategory: ['', Validators.required],
-      idUnit: ['', Validators.required]
+      idUnit: ['', Validators.required],
     });
   }
 
@@ -65,7 +73,7 @@ export class ItemComponent implements OnInit {
     forkJoin({
       items: this.itemService.getAllItems(),
       categories: this.categoryService.getAllCategories(),
-      units: this.unitService.getAllUnits()
+      units: this.unitService.getAllUnits(),
     }).subscribe({
       next: (data) => {
         this.items = data.items;
@@ -76,7 +84,7 @@ export class ItemComponent implements OnInit {
       error: (error) => {
         this.snackBar.open('Error loading data', 'Close', { duration: 3000 });
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -86,7 +94,7 @@ export class ItemComponent implements OnInit {
     const itemData: ItemRequestDTO = {
       name: this.itemForm.value.name,
       idCategory: this.itemForm.value.idCategory,
-      idUnit: this.itemForm.value.idUnit
+      idUnit: this.itemForm.value.idUnit,
     };
 
     const operation = this.editingItemId
@@ -96,16 +104,18 @@ export class ItemComponent implements OnInit {
     operation.subscribe({
       next: () => {
         this.snackBar.open(
-          this.editingItemId ? 'Item updated successfully' : 'Item created successfully',
+          this.editingItemId
+            ? 'Item updated successfully'
+            : 'Item created successfully',
           'Close',
-          { duration: 3000 }
+          { duration: 3000 },
         );
         this.resetForm();
         this.loadInitialData();
       },
       error: (error) => {
         this.snackBar.open('Error saving item', 'Close', { duration: 3000 });
-      }
+      },
     });
   }
 
@@ -114,7 +124,7 @@ export class ItemComponent implements OnInit {
     this.itemForm.patchValue({
       name: item.name,
       idCategory: item.category.id,
-      idUnit: item.unit.id
+      idUnit: item.unit.id,
     });
   }
 
@@ -122,12 +132,16 @@ export class ItemComponent implements OnInit {
     if (confirm('Are you sure you want to delete this item?')) {
       this.itemService.deleteItem(id).subscribe({
         next: () => {
-          this.snackBar.open('Item deleted successfully', 'Close', { duration: 3000 });
+          this.snackBar.open('Item deleted successfully', 'Close', {
+            duration: 3000,
+          });
           this.loadInitialData();
         },
         error: (error) => {
-          this.snackBar.open('Error deleting item', 'Close', { duration: 3000 });
-        }
+          this.snackBar.open('Error deleting item', 'Close', {
+            duration: 3000,
+          });
+        },
       });
     }
   }

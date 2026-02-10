@@ -9,33 +9,68 @@
         <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Nome Completo</mat-label>
-            <input matInput formControlName="fullName" placeholder="Seu nome completo">
-            @if (signupForm.get('fullName')?.hasError('required') && signupForm.get('fullName')?.touched) {
+            <input
+              matInput
+              formControlName="fullName"
+              placeholder="Seu nome completo"
+            />
+            @if (
+              signupForm.get("fullName")?.hasError("required") &&
+              signupForm.get("fullName")?.touched
+            ) {
               <mat-error>Nome completo é obrigatório</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Email</mat-label>
-            <input matInput type="email" formControlName="email" placeholder="Seu email">
-            @if (signupForm.get('email')?.hasError('required') && signupForm.get('email')?.touched) {
+            <input
+              matInput
+              type="email"
+              formControlName="email"
+              placeholder="Seu email"
+            />
+            @if (
+              signupForm.get("email")?.hasError("required") &&
+              signupForm.get("email")?.touched
+            ) {
               <mat-error>Email é obrigatório</mat-error>
             }
-            @if (signupForm.get('email')?.hasError('email') && !signupForm.get('email')?.hasError('required')) {
+            @if (
+              signupForm.get("email")?.hasError("email") &&
+              !signupForm.get("email")?.hasError("required")
+            ) {
               <mat-error>Email é inválido</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Senha</mat-label>
-            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
-            <button type="button" mat-icon-button matSuffix (click)="hidePassword = !hidePassword">
-              <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            <input
+              matInput
+              [type]="hidePassword ? 'password' : 'text'"
+              formControlName="password"
+            />
+            <button
+              type="button"
+              mat-icon-button
+              matSuffix
+              (click)="hidePassword = !hidePassword"
+            >
+              <mat-icon>{{
+                hidePassword ? "visibility_off" : "visibility"
+              }}</mat-icon>
             </button>
-            @if (signupForm.get('password')?.hasError('required') && signupForm.get('password')?.touched) {
+            @if (
+              signupForm.get("password")?.hasError("required") &&
+              signupForm.get("password")?.touched
+            ) {
               <mat-error>Senha é obrigatória</mat-error>
             }
-            @if (signupForm.get('password')?.hasError('minlength') && !signupForm.get('password')?.hasError('required')) {
+            @if (
+              signupForm.get("password")?.hasError("minlength") &&
+              !signupForm.get("password")?.hasError("required")
+            ) {
               <mat-error>A senha deve conter pelo menos 6 caracteres</mat-error>
             }
           </mat-form-field>
@@ -45,7 +80,8 @@
               mat-raised-button
               color="primary"
               type="submit"
-              [disabled]="signupForm.invalid || isLoading">
+              [disabled]="signupForm.invalid || isLoading"
+            >
               @if (isLoading) {
                 <mat-spinner diameter="24"></mat-spinner>
               } @else {
