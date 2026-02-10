@@ -1,6 +1,5 @@
 package com.omatheusmesmo.shoppmate.user.service;
 
-
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import com.omatheusmesmo.shoppmate.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,18 +17,18 @@ public class UserService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    public User addUser(User user){
+    public User addUser(User user) {
         isUserValid(user);
         encryptPassword(user);
         userRepository.save(user);
         return user;
     }
 
-    private void encryptPassword(User user){
+    private void encryptPassword(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
     }
 
-    public User editUser(User user){
+    public User editUser(User user) {
         findUserById(user.getId());
         validateIfDataIsNullOrEmpty(user);
         encryptPassword(user);
@@ -37,39 +36,51 @@ public class UserService {
         return user;
     }
 
-    public void removeUser(Long id){
+    public void removeUser(Long id) {
         findUserById(id);
         userRepository.deleteById(id);
     }
 
     public User findUserById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() ->new NoSuchElementException("User not found!"));
+                .orElseThrow(() -> new NoSuchElementException("User not found!"));
     }
 
-    public User findUserByEmail(String email){
+    public User findUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new NoSuchElementException("User not found!"));
     }
 
-    // TODO: create a method to validate new and old users to avoid duplicating
-    public void isUserValid(User user){
+    public void isUserValid(User user) {
         validateIfDataIsNullOrEmpty(user);
-       // validateIfUserExists(user.getEmail());
+
+        if (user.getId() == null) {
+            validateIfUserExists(user.getEmail());
+        } else {
+            validateIfEmailBelongsToAnotherUser(user.getId(), user.getEmail());
+        }
+    }
+
+    private void validateIfEmailBelongsToAnotherUser(Long userId, String email) {
+        userRepository.findByEmail(email).ifPresent(existingUser -> {
+            if (!existingUser.getId().equals(userId)) {
+                throw new IllegalArgumentException("E-mail is already being used by another user!");
+            }
+        });
     }
 
     public void validateIfUserExists(String email) {
-        if(userRepository.findByEmail(email).isPresent()){
+        if (userRepository.findByEmail(email).isPresent()) {
             throw new IllegalArgumentException("E-mail is already being used!");
         }
     }
 
     public void validateIfDataIsNullOrEmpty(User user) {
-        if(user.getEmail() == null || user.getEmail().isBlank()){
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
             throw new IllegalArgumentException("E-mail is required!");
         }
 
-        if(user.getPassword() == null || user.getPassword().isBlank()){
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
             throw new IllegalArgumentException("Password is required!");
         }
     }
