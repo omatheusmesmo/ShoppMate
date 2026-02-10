@@ -389,6 +389,33 @@ ShoppMate API adopts a domain-driven architecture, where the code is organized a
 └── ShoppMateApplication.java (Spring Boot application entry point)
 ```
 
+# How Run via Docker
+
+```bash
+  cd backend
+  docker-compose up --d
+```
+
+# How Create Imagem Docker Backend
+
+```bash
+  cd backend
+  docker build -t shoppmate-backend .
+```
+
+# How Run Container Docker Backend
+
+```bash
+  cd backend
+  docker run -p 8080:8080 --env-file .env.example -e DB_HOST=host.docker.internal shoppmate-backend
+```
+
+# How Stop Container Docker Backend
+
+```bash
+  cd backend
+  docker stop shoppmate-backend
+```
 ## Contributing
 
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
