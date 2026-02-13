@@ -1,0 +1,121 @@
+name: Auto Assign on Issue Comment
+
+on:
+  issue_comment:
+    types: [created]
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  auto-assign:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check comment and assign user
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            try {
+              const issue = context.payload.issue || context.payload.comment?.issue;
+              if (!issue) return;
+
+              const repoOwner = context.repo.owner;
+              const repoName = context.repo.repo;
+              const issueNumber = issue.number;
+              const assignedUsers = issue.assignees?.map(user => user.login) || [];
+              const commenter = context.payload.comment?.user?.login;
+              const comment = context.payload.comment?.body?.toLowerCase().trim();
+
+              if (!commenter || !comment || comment.includes("🤖")) return;
+
+              const assignKeywords = [
+                "assign me", "i would like to work on this", "i'll work on this",
+                "i am working on this", "i want to work on this", "can i work on this",
+                "taking this", "can i take this", "/assign", "eu quero trabalhar nisso",
+                "posso fazer", "me atribua", "estou trabalhando nisso", "quero fazer"
+              ];
+
+              const unassignKeywords = [
+                "no", "unassign me", "i can't work on this anymore", 
+                "i am no longer working on this", "/unassign", "não estou mais trabalhando",
+                "pode me remover", "desisto", "não vou mais fazer"
+              ];
+
+              if (unassignKeywords.some(k => comment === k || comment.startsWith(k))) {
+                if (assignedUsers.includes(commenter)) {
+                  await github.rest.issues.removeAssignees({
+                    owner: repoOwner, repo: repoName, issue_number: issueNumber,
+                    assignees: [commenter]
+                  });
+                  await github.rest.issues.createComment({
+                    owner: repoOwner, repo: repoName, issue_number: issueNumber,
+                    body: `🤖 @${commenter} has been removed from the issue. Now anyone can assign themselves!`
+                  });
+                  try {
+                    await github.rest.issues.removeLabel({
+                      owner: repoOwner, repo: repoName, issue_number: issueNumber,
+                      name: 'pending-reassignment'
+                    });
+                  } catch (e) {}
+                }
+                return;
+              }
+
+              if (assignKeywords.some(keyword => comment.includes(keyword))) {
+                if (assignedUsers.length > 0) {
+                  if (assignedUsers.includes(commenter)) {
+                    await github.rest.issues.createComment({
+                      owner: repoOwner, repo: repoName, issue_number: issueNumber,
+                      body: `🤖 @${commenter}, you are already assigned!`
+                    });
+                    return;
+                  }
+                  const currentAssignee = assignedUsers[0];
+                  await github.rest.issues.createComment({
+                    owner: repoOwner, repo: repoName, issue_number: issueNumber,
+                    body: `🤖 @${currentAssignee}, are you still working on this? @${commenter} is interested. If you're done or can't continue, please reply with "no" or "unassign me".`
+                  });
+                  await github.rest.issues.addLabels({
+                    owner: repoOwner, repo: repoName, issue_number: issueNumber,
+                    labels: ['pending-reassignment']
+                  });
+                  return;
+                }
+                await github.rest.issues.addAssignees({
+                  owner: repoOwner, repo: repoName, issue_number: issueNumber,
+                  assignees: [commenter]
+                });
+                await github.rest.issues.createComment({
+                  owner: repoOwner, repo: repoName, issue_number: issueNumber,
+                  body: `🤖 @${commenter}, you have been assigned to this issue! Happy coding! ☕`
+                });
+              }
+            } catch (error) {
+              console.error("❌ Error:", error);
+            }
+
+      - name: Inform how to use the bot
+        if: github.event.action == 'opened'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const instructions = `🤖 **Auto-Assignment Bot**
+
+            To be assigned to this issue, comment with one of the following phrases:
+            - "Assign me"
+            - "I would like to work on this"
+            - "Eu quero trabalhar nisso" (ou "me atribua")
+
+            If you want to unassign yourself, comment with "unassign me" or "no".
+            If the issue is already assigned, the current assignee will be asked if they are still active.`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body: instructions
+            });
