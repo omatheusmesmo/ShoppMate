@@ -1,0 +1,46 @@
+name: External PR Branch Enforcer
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+permissions:
+  pull-requests: write
+  issues: write
+  contents: write
+
+jobs:
+  check-target-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR target branch
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            try {
+              const pr = context.payload.pull_request;
+              const targetBranch = pr.base.ref;
+              const author = pr.user.login;
+              const association = pr.author_association;
+              
+              const isOwner = association === 'OWNER';
+
+              if (targetBranch !== 'develop' && !isOwner) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.number,
+                  body: `🤖 **Attention @${author}!** To keep our project organized, all external contributions must target the `develop` branch. I've automatically updated this PR for you. Thank you! 🚀`
+                });
+                
+                await github.rest.pulls.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: pr.number,
+                  base: 'develop'
+                });
+              }
+            } catch (error) {
+              console.error("❌ Error:", error);
+            }
