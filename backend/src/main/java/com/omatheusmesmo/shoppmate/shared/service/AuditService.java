@@ -7,17 +7,17 @@ import java.time.LocalDateTime;
 
 @Component
 public class AuditService {
-    public <T extends AuditableEntity> void setAuditData(T entity, boolean isNew){
+    public <T extends AuditableEntity> void setAuditData(T entity, boolean isNew) {
         LocalDateTime now = LocalDateTime.now();
-        if(isNew){
+        if (isNew) {
             entity.setCreatedAt(now);
             entity.setDeleted(false);
-        }else{
+        } else {
             entity.setUpdatedAt(now);
         }
     }
 
-    public <T extends AuditableEntity> void softDelete(T entity){
+    public <T extends AuditableEntity> void softDelete(T entity) {
         entity.setDeleted(true);
         entity.setUpdatedAt(LocalDateTime.now());
     }

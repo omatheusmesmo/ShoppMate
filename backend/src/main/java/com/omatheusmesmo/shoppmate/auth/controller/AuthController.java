@@ -29,27 +29,25 @@ public class AuthController {
 
     @Operation(summary = "Register a User")
     @PostMapping("/sign")
-    public ResponseEntity<User> registerUser(@RequestBody User user){
+    public ResponseEntity<User> registerUser(@RequestBody User user) {
         userService.addUser(user);
         return ResponseEntity.ok(user);
     }
 
     @Operation(summary = "User's login")
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest){
+    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
 
         UserDetails user = userDetailsService.loadUserByUsername(loginRequest.getEmail());
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
         String token = jwtService.generateToken(user);
 
         User userSingned = userService.findUserByEmail(loginRequest.getEmail());
 
-
-
-        UserResponseDTO reponse = new UserResponseDTO(userSingned.getId(), userSingned.getFullName(), userSingned.getEmail());
-
-
+        UserResponseDTO reponse = new UserResponseDTO(userSingned.getId(), userSingned.getFullName(),
+                userSingned.getEmail());
 
         return ResponseEntity.ok(token);
     }

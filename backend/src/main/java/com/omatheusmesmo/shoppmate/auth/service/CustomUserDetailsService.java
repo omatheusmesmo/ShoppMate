@@ -1,6 +1,5 @@
 package com.omatheusmesmo.shoppmate.auth.service;
 
-
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import com.omatheusmesmo.shoppmate.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("User not found with email: " + email);
         }
-        return new org.springframework.security.core.userdetails.User(user.get().getEmail(), user.get().getPassword(), new ArrayList<>());
+        return new org.springframework.security.core.userdetails.User(user.get().getEmail(), user.get().getPassword(),
+                new ArrayList<>());
     }
 }

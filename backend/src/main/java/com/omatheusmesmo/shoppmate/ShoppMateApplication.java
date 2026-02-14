@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ShoppMateApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ShoppMateApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ShoppMateApplication.class, args);
+    }
 
 }

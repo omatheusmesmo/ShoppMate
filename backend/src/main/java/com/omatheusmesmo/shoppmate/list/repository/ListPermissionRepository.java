@@ -9,6 +9,5 @@ import java.util.List;
 @Repository
 public interface ListPermissionRepository extends JpaRepository<ListPermission, Long> {
 
-
     List<ListPermission> findByShoppingListIdAndDeletedFalse(Long id);
 }

@@ -27,7 +27,7 @@ class JwtServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        jwtService = Mockito.spy(new JwtService());  // instanciando a classe que será testada
+        jwtService = Mockito.spy(new JwtService()); // instanciando a classe que será testada
         when(userDetails.getUsername()).thenReturn("testuser");
         when(userDetails.isCredentialsNonExpired()).thenReturn(true);
     }
@@ -40,7 +40,7 @@ class JwtServiceTest {
         assertFalse(token.isEmpty(), "Token should not be empty");
     }
 
-   //TODO FIX THIS
+    // TODO FIX THIS
     void shouldFailToValidateInvalidToken() {
         String invalidToken = "invalid_token";
 
@@ -87,7 +87,8 @@ class JwtServiceTest {
             }
         };
 
-        assertThrows(JwtServiceException.class, faultyJwtService::generateRSAKeys, "Key generation failure should throw exception");
+        assertThrows(JwtServiceException.class, faultyJwtService::generateRSAKeys,
+                "Key generation failure should throw exception");
     }
 
     void shouldBuildTokenWithCorrectExpirationTime() {
@@ -99,7 +100,8 @@ class JwtServiceTest {
             JWTClaimsSet claimsSet = encryptedJWT.getJWTClaimsSet();
 
             assertNotNull(claimsSet.getExpirationTime(), "Token should have an expiration time");
-            assertTrue(claimsSet.getExpirationTime().after(new Date()), "Token expiration time should be in the future");
+            assertTrue(claimsSet.getExpirationTime().after(new Date()),
+                    "Token expiration time should be in the future");
         } catch (Exception e) {
             fail("Parsing the generated token failed", e);
         }

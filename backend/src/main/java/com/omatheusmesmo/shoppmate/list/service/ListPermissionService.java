@@ -47,7 +47,7 @@ public class ListPermissionService {
         userService.isUserValid(listPermission.getUser());
         shoppingListService.isListValid(listPermission.getShoppingList());
     }
-    
+
     public Optional<ListPermission> findListItem(ListPermission listPermission) {
         Optional<ListPermission> foundList = listPermissionRepository.findById(listPermission.getId());
         if (foundList.isPresent()) {

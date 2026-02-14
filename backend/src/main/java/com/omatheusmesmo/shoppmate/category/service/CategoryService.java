@@ -18,23 +18,22 @@ public class CategoryService {
     @Autowired
     private AuditService auditService;
 
-    public Category saveCategory(Category category){
+    public Category saveCategory(Category category) {
         isCategoryValid(category);
-        auditService.setAuditData(category,true);
+        auditService.setAuditData(category, true);
         categoryRepository.save(category);
         return category;
     }
 
-    public Category findCategoryById(Long id){
-        return categoryRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Category not found"));
+    public Category findCategoryById(Long id) {
+        return categoryRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Category not found"));
     }
 
-    public Optional<Category> findCategoryByName(String name){
+    public Optional<Category> findCategoryByName(String name) {
         return categoryRepository.findByName(name);
     }
 
-    public void removeCategory(Long id){
+    public void removeCategory(Long id) {
         Category category = categoryRepository.findById(id).orElseThrow();
         auditService.softDelete(category);
         saveCategory(category);

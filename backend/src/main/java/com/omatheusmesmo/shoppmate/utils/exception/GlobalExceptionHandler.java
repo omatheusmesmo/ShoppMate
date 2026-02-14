@@ -24,34 +24,35 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiError> handleBadCredentials(BadCredentialsException ex) {
         log.warn("Authentication failed: {}", ex.getMessage());
-        ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED,
-                "Authentication Failed", "The username or password is incorrect");
+        ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED, "Authentication Failed",
+                "The username or password is incorrect");
         return new ResponseEntity<>(apiError, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(AccountStatusException.class)
     public ResponseEntity<ApiError> handleAccountStatus(AccountStatusException ex) {
         log.warn("Account status issue: {}", ex.getMessage());
-        ApiError apiError = new ApiError(HttpStatus.FORBIDDEN,
-                "Account Status Issue", "The account is locked or disabled");
+        ApiError apiError = new ApiError(HttpStatus.FORBIDDEN, "Account Status Issue",
+                "The account is locked or disabled");
         return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiError> handleAccessDenied(AccessDeniedException ex) {
         log.warn("Access denied: {}", ex.getMessage());
-        ApiError apiError = new ApiError(HttpStatus.FORBIDDEN, "Access Denied", "You are not authorized to access this resource");
+        ApiError apiError = new ApiError(HttpStatus.FORBIDDEN, "Access Denied",
+                "You are not authorized to access this resource");
         return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(SignatureException.class)
     public ResponseEntity<ApiError> handleJwtSignature(SignatureException ex) {
         log.warn("Invalid JWT signature: {}", ex.getMessage());
-        ApiError apiError = new ApiError(HttpStatus.FORBIDDEN, "Invalid Token Signature", "The JWT signature is invalid");
+        ApiError apiError = new ApiError(HttpStatus.FORBIDDEN, "Invalid Token Signature",
+                "The JWT signature is invalid");
         return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
     }
 
@@ -61,7 +62,6 @@ public class GlobalExceptionHandler {
         ApiError apiError = new ApiError(HttpStatus.FORBIDDEN, "Expired Token", "The JWT token has expired");
         return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
     }
-
 
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<ApiError> handleNoSuchElement(NoSuchElementException ex) {
@@ -74,8 +74,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleValidationExceptions(MethodArgumentNotValidException ex) {
         log.warn("Validation failed: {}", ex.getMessage());
         List<String> errors = ex.getBindingResult().getFieldErrors().stream()
-                .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
-                .toList();
+                .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage()).toList();
 
         String errorDetails = String.join(", ", errors);
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, "Validation Failed", errorDetails);
@@ -103,7 +102,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
     }
 
-    //TODO -> InvalidDataAccessApiUsageException
+    // TODO -> InvalidDataAccessApiUsageException
 
     // TODO: Tratar DataIntegrityViolationException
 
@@ -111,8 +110,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleAllUncaughtException(Exception ex) {
         log.error("An unexpected error occurred: {}", ex.getMessage(), ex);
 
-        ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR,
-                "An unexpected error occurred", "Internal Server Error - Please contact support.");
+        ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred",
+                "Internal Server Error - Please contact support.");
         return new ResponseEntity<>(apiError, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

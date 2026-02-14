@@ -23,7 +23,6 @@ public class ItemMapper {
     @Autowired
     private UnitRepository unitRepository;
 
-
     public Item toEntity(ItemRequestDTO dto) {
         Category category = categoryRepository.findById(dto.idCategory())
                 .orElseThrow(() -> new NoSuchElementException("Category not found with id: " + dto.idCategory()));
@@ -38,18 +37,13 @@ public class ItemMapper {
         return item;
     }
 
-
     public ItemResponseDTO toResponseDTO(Item entity) {
 
-        CategoryResponseDTO categoryDto = new CategoryResponseDTO(entity.getCategory().getId(), entity.getCategory().getName());
+        CategoryResponseDTO categoryDto = new CategoryResponseDTO(entity.getCategory().getId(),
+                entity.getCategory().getName());
         UnitResponseDTO unitDto = new UnitResponseDTO(entity.getUnit().getId(), entity.getUnit().getSymbol());
 
-        return new ItemResponseDTO(
-                entity.getId(),
-                entity.getName(),
-                categoryDto,
-                unitDto
-        );
+        return new ItemResponseDTO(entity.getId(), entity.getName(), categoryDto, unitDto);
     }
 
 }

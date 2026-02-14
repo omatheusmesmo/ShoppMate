@@ -15,7 +15,7 @@ public class ListPermissionMapper {
 
     @Autowired
     private ListMapper listMapper;
-    
+
     public ListPermission toEntity(ListPermissionRequestDTO dto, ShoppingList shoppingList, User user) {
         ListPermission listPermission = new ListPermission();
         listPermission.setShoppingList(shoppingList);
@@ -25,25 +25,16 @@ public class ListPermissionMapper {
     }
 
     public ListPermissionResponseDTO toResponseDTO(ListPermission listPermission) {
-        UserResponseDTO userResponseDTO = new UserResponseDTO(
-                listPermission.getUser().getId(),
-                listPermission.getUser().getFullName(),
-                listPermission.getUser().getEmail());
+        UserResponseDTO userResponseDTO = new UserResponseDTO(listPermission.getUser().getId(),
+                listPermission.getUser().getFullName(), listPermission.getUser().getEmail());
 
-        return new ListPermissionResponseDTO(
-                listPermission.getId(),
-                listMapper.toResponseDTO(listPermission.getShoppingList()),
-                userResponseDTO,
-                listPermission.getPermission()
-        );
+        return new ListPermissionResponseDTO(listPermission.getId(),
+                listMapper.toResponseDTO(listPermission.getShoppingList()), userResponseDTO,
+                listPermission.getPermission());
     }
 
-    public ListPermissionSummaryDTO toSummaryDTO(ListPermission listPermission){
-        return new ListPermissionSummaryDTO(
-                listPermission.getId(),
-                listPermission.getUser().getFullName(),
-                listPermission.getUser().getEmail(),
-                listPermission.getPermission()
-        );
+    public ListPermissionSummaryDTO toSummaryDTO(ListPermission listPermission) {
+        return new ListPermissionSummaryDTO(listPermission.getId(), listPermission.getUser().getFullName(),
+                listPermission.getUser().getEmail(), listPermission.getPermission());
     }
 }

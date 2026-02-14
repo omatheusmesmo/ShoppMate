@@ -50,15 +50,15 @@ public class ListItemService {
         checkQuantity(ListItem);
     }
 
-    private void checkQuantity(ListItem ListItem){
-        if (ListItem.getQuantity() == null || ListItem.getQuantity() <= 0){
+    private void checkQuantity(ListItem ListItem) {
+        if (ListItem.getQuantity() == null || ListItem.getQuantity() <= 0) {
             throw new IllegalArgumentException("Quantity must be informed and greater than 0!");
         }
     }
 
     public ListItem findListItemById(Long id) {
         return ListItemRepository.findByIdAndDeletedFalse(id)
-                .orElseThrow(()-> new NoSuchElementException("ListItem not found"));
+                .orElseThrow(() -> new NoSuchElementException("ListItem not found"));
     }
 
     public void removeList(Long id) {

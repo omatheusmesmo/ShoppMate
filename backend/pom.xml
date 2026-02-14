@@ -191,7 +191,31 @@
 					</execution>
 				</executions>
 			</plugin>
-		</plugins>
-	</build>
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>11.0.0</version>
+				<configuration>
+					<url>${DB_URL}</url>
+					<user>${DB_USERNAME}</user>
+					<password>${DB_PASSWORD}</password>
+				</configuration>
+			</plugin>
 
+			<plugin>
+				<groupId>net.revelc.code.formatter</groupId>
+				<artifactId>formatter-maven-plugin</artifactId>
+				<version>2.29.0</version>
+				<executions>
+					<execution>
+        				<id>validate-format</id>
+        				<phase>verify</phase>
+        				<goals>
+           			 	<goal>validate</goal>
+       				 	</goals>
+    				</execution>
+				</executions>
+			</plugin>			
+		</plugins>		
+	</build>
 </project>

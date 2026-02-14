@@ -110,7 +110,9 @@ public class JwtService {
             throw e;
         } catch (JOSEException e) {
 
-            logger.error("Failed to decrypt token. Check if the correct private key is used and token format is valid. Error: {}", e.getMessage());
+            logger.error(
+                    "Failed to decrypt token. Check if the correct private key is used and token format is valid. Error: {}",
+                    e.getMessage());
             throw e;
         } catch (Exception e) {
             logger.error("Unexpected error during token decryption: {}", e.getMessage(), e);
@@ -130,18 +132,13 @@ public class JwtService {
     }
 
     private JWEHeader buildHeader() {
-        return new JWEHeader
-                .Builder(JWEAlgorithm.RSA_OAEP_256, EncryptionMethod.A128GCM)
-                .build();
+        return new JWEHeader.Builder(JWEAlgorithm.RSA_OAEP_256, EncryptionMethod.A128GCM).build();
     }
 
     private JWTClaimsSet buildToken(UserDetails userDetails) {
-        return new JWTClaimsSet.Builder()
-                .subject(userDetails.getUsername())
-                .expirationTime(new Date(new Date().getTime() + tokenExpiration))
-                .notBeforeTime(new Date())
-                .jwtID(UUID.randomUUID().toString())
-                .build();
+        return new JWTClaimsSet.Builder().subject(userDetails.getUsername())
+                .expirationTime(new Date(new Date().getTime() + tokenExpiration)).notBeforeTime(new Date())
+                .jwtID(UUID.randomUUID().toString()).build();
     }
 
     public KeyPair generateRSAKeys() {

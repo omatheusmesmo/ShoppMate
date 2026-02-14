@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="units")
+@Table(name = "units")
 @Getter
 @Setter
 public class Unit extends DomainEntity {
