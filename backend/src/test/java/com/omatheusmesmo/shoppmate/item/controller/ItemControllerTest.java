@@ -1,9 +1,13 @@
 package com.omatheusmesmo.shoppmate.item.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.omatheusmesmo.shoppmate.category.dto.CategoryResponseDTO;
 import com.omatheusmesmo.shoppmate.category.entity.Category;
+import com.omatheusmesmo.shoppmate.item.dto.ItemRequestDTO;
+import com.omatheusmesmo.shoppmate.item.dto.ItemResponseDTO;
 import com.omatheusmesmo.shoppmate.item.entity.Item;
 import com.omatheusmesmo.shoppmate.item.mapper.ItemMapper;
+import com.omatheusmesmo.shoppmate.unit.dto.UnitResponseDTO;
 import com.omatheusmesmo.shoppmate.unit.entity.Unit;
 import com.omatheusmesmo.shoppmate.item.service.ItemService;
 import com.omatheusmesmo.shoppmate.auth.service.JwtService;
@@ -55,12 +59,15 @@ class ItemControllerTest {
     private Item item2;
     private Category category;
     private Unit unit;
+    private ItemResponseDTO itemResponseDTO1;
+    private ItemResponseDTO itemResponseDTO2;
 
     @BeforeEach
     void setUp() {
         unit = new Unit();
         unit.setId(1L);
         unit.setName("kg");
+        unit.setSymbol("kg");
 
         category = new Category();
         category.setId(1L);
@@ -77,36 +84,46 @@ class ItemControllerTest {
         item2.setName("Arroz");
         item2.setUnit(unit);
         item2.setCategory(category);
+
+        CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO(1L, "Food");
+        UnitResponseDTO unitResponseDTO = new UnitResponseDTO(1L, "kg");
+
+        itemResponseDTO1 = new ItemResponseDTO(1L, "Feijão", categoryResponseDTO, unitResponseDTO);
+        itemResponseDTO2 = new ItemResponseDTO(2L, "Arroz", categoryResponseDTO, unitResponseDTO);
     }
 
     @Test
     @WithMockUser
     void testGetAllItems() throws Exception {
         List<Item> allItems = Arrays.asList(item1, item2);
+        List<ItemResponseDTO> allItemDTOs = Arrays.asList(itemResponseDTO1, itemResponseDTO2);
 
         when(itemService.findAll()).thenReturn(allItems);
+        when(itemMapper.toResponseDTO(any(Item.class))).thenAnswer(invocation -> {
+            Item item = invocation.getArgument(0);
+            if (item.getId().equals(1L)) return itemResponseDTO1;
+            return itemResponseDTO2;
+        });
 
         mockMvc.perform(get("/item"))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(allItems)));
+                .andExpect(content().json(objectMapper.writeValueAsString(allItemDTOs)));
     }
 
     @Test
     @WithMockUser
     void testPostAddItem() throws Exception {
-        Item newItem = new Item();
-        newItem.setId(1L);
-        newItem.setName("Feijão");
-        newItem.setUnit(unit);
-        newItem.setCategory(category);
+        ItemRequestDTO requestDTO = new ItemRequestDTO("Feijão", 1L, 1L);
 
-        when(itemService.addItem(any(Item.class))).thenReturn(newItem);
+        when(itemMapper.toEntity(any(ItemRequestDTO.class))).thenReturn(item1);
+        when(itemService.addItem(any(Item.class))).thenReturn(item1);
+        when(itemMapper.toResponseDTO(any(Item.class))).thenReturn(itemResponseDTO1);
 
         mockMvc.perform(post("/item")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newItem)))
+                        .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isCreated())
-                .andExpect(content().json(objectMapper.writeValueAsString(newItem)));
+                .andExpect(content().json(objectMapper.writeValueAsString(itemResponseDTO1)));
     }
 
     @Test
@@ -125,30 +142,25 @@ class ItemControllerTest {
     @Test
     @WithMockUser
     void testPutEditItem() throws Exception {
-        Item editedItem = new Item();
-        editedItem.setId(1L);
-        editedItem.setName("Feijão");
-        editedItem.setUnit(unit);
-        editedItem.setCategory(category);
+        ItemRequestDTO requestDTO = new ItemRequestDTO("Feijão", 1L, 1L);
 
-        when(itemService.editItem(any(Item.class))).thenReturn(editedItem);
+        when(itemMapper.toEntity(any(ItemRequestDTO.class))).thenReturn(item1);
+        when(itemService.editItem(any(Item.class))).thenReturn(item1);
+        when(itemMapper.toResponseDTO(any(Item.class))).thenReturn(itemResponseDTO1);
 
-        mockMvc.perform(put("/item")
+        mockMvc.perform(put("/item/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(editedItem)))
+                        .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(editedItem)));
+                .andExpect(content().json(objectMapper.writeValueAsString(itemResponseDTO1)));
     }
 
     @Test
     @WithMockUser
     void testPostAddItem_BadRequest() throws Exception {
-        when(itemService.addItem(any(Item.class))).thenThrow(new IllegalArgumentException());
+        when(itemMapper.toEntity(any(ItemRequestDTO.class))).thenThrow(new IllegalArgumentException("Invalid item"));
 
-        Item invalidItem = new Item();
-        invalidItem.setName("");
-        invalidItem.setUnit(unit);
-        invalidItem.setCategory(category);
+        ItemRequestDTO invalidItem = new ItemRequestDTO("", 1L, 1L);
 
         mockMvc.perform(post("/item")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -159,16 +171,14 @@ class ItemControllerTest {
     @Test
     @WithMockUser
     void testPutEditItem_NotFound() throws Exception {
+        ItemRequestDTO requestDTO = new ItemRequestDTO("Feijão", 1L, 1L);
+
+        when(itemMapper.toEntity(any(ItemRequestDTO.class))).thenReturn(item1);
         doThrow(new NoSuchElementException()).when(itemService).editItem(any(Item.class));
 
-        Item item = new Item();
-        item.setName("Feijão");
-        item.setUnit(unit);
-        item.setCategory(category);
-
-        mockMvc.perform(put("/item")
+        mockMvc.perform(put("/item/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(item)))
+                        .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isNotFound());
     }
 }
