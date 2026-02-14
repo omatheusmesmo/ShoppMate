@@ -59,8 +59,8 @@ class UserServiceTest {
 
     @Test
     void addUserWithEmailUsed() {
-        doThrow(new IllegalArgumentException("E-mail is already being used!"))
-                .when(userRepository).save(any(User.class));
+        doThrow(new IllegalArgumentException("E-mail is already being used!")).when(userRepository)
+                .save(any(User.class));
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> userService.addUser(userMock));
