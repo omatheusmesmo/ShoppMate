@@ -42,15 +42,14 @@ public class UserService {
     }
 
     public User findUserById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("User not found!"));
+        return userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("User not found!"));
     }
 
     public User findUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new NoSuchElementException("User not found!"));
+        return userRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("User not found!"));
     }
 
+    // TODO: create a method to validate new and old users to avoid duplicating
     public void isUserValid(User user) {
         validateIfDataIsNullOrEmpty(user);
 

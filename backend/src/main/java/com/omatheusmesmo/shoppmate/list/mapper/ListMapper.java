@@ -43,11 +43,7 @@ public class ListMapper {
 
         UserResponseDTO ownerDTO = userMapper.toResponseDTO(entity.getOwner());
 
-        return new ShoppingListResponseDTO(
-                entity.getId(),
-                entity.getName(),
-                ownerDTO
-        );
+        return new ShoppingListResponseDTO(entity.getId(), entity.getName(), ownerDTO);
     }
 
     public void updateEntityFromDto(ShoppingListUpdateRequestDTO dto, ShoppingList entity) {

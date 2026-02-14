@@ -27,7 +27,7 @@ public class ItemService {
 
     public Item addItem(Item item) {
         isItemValid(item);
-        auditService.setAuditData(item,true);
+        auditService.setAuditData(item, true);
         itemRepository.save(item);
         return item;
     }
@@ -47,14 +47,15 @@ public class ItemService {
         }
     }
 
-    public Item findById(Long id){
+    public Item findById(Long id) {
         return itemRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Item not found with id: " + id));
     }
-    //TODO remove item by item || Use soft delete
+
+    // TODO remove item by item || Use soft delete
     public void removeItem(Long id) {
         findById(id);
-        //auditService.softDelete(item);
+        // auditService.softDelete(item);
         itemRepository.deleteById(id);
     }
 

@@ -34,8 +34,8 @@ public class ShoppingListService {
         ShoppingList.checkName();
         getOwnerId(ShoppingList);
     }
-    
-    private User getOwnerId(ShoppingList ShoppingList){
+
+    private User getOwnerId(ShoppingList ShoppingList) {
         return userService.findUser(ShoppingList.getOwner().getId());
     }
 
@@ -50,8 +50,9 @@ public class ShoppingListService {
 
     public ShoppingList findListById(Long id) {
         return shoppingListRepository.findById(id)
-                .orElseThrow(()-> new NoSuchElementException("ShoppingList not found"));
+                .orElseThrow(() -> new NoSuchElementException("ShoppingList not found"));
     }
+
     // TODO: implement soft delete?
     public void removeList(Long id) {
         findListById(id);

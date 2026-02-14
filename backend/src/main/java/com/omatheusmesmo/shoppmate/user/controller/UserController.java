@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-
 // TODO: use DTOs instead of entity
 @RestController
 @RequestMapping("/users")

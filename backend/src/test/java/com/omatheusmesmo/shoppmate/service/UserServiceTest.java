@@ -36,7 +36,7 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        userMock = new User("John Doe","John@Doe.com", "1234","USER");
+        userMock = new User("John Doe", "John@Doe.com", "1234", "USER");
         userMock.setId(1L);
     }
 
@@ -59,10 +59,11 @@ class UserServiceTest {
 
     @Test
     void addUserWithEmailUsed() {
-        doThrow(new IllegalArgumentException("E-mail is already being used!"))
-                .when(userRepository).save(any(User.class));
+        doThrow(new IllegalArgumentException("E-mail is already being used!")).when(userRepository)
+                .save(any(User.class));
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> userService.addUser(userMock));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> userService.addUser(userMock));
         assertEquals("E-mail is already being used!", exception.getMessage());
     }
 
@@ -76,7 +77,8 @@ class UserServiceTest {
     void validateIfUserExistsUserUsed() {
         when(userRepository.findByEmail(userMock.getEmail())).thenReturn(Optional.of(userMock));
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> userService.validateIfUserExists(userMock.getEmail()));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> userService.validateIfUserExists(userMock.getEmail()));
         assertEquals("E-mail is already being used!", exception.getMessage());
 
         verify(userRepository).findByEmail(userMock.getEmail());
@@ -88,7 +90,8 @@ class UserServiceTest {
     }
 
     private void assertValidationException(User user, String expectedMessage) {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> userService.validateIfDataIsNullOrEmpty(user));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> userService.validateIfDataIsNullOrEmpty(user));
         assertEquals(expectedMessage, exception.getMessage());
     }
 
@@ -134,7 +137,8 @@ class UserServiceTest {
     void editUserWithoutExistingId() {
         when(userRepository.findById(userMock.getId())).thenReturn(Optional.empty());
 
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> userService.editUser(userMock));
+        NoSuchElementException exception = assertThrows(NoSuchElementException.class,
+                () -> userService.editUser(userMock));
         assertEquals("User not found!", exception.getMessage());
 
         verify(userRepository, times(1)).findById(userMock.getId());
@@ -144,7 +148,8 @@ class UserServiceTest {
     void editUserWithEmailNull() {
         when(userRepository.findById(userMock.getId())).thenReturn(Optional.of(userMock));
         userMock.setEmail(null);
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> userService.editUser(userMock));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> userService.editUser(userMock));
         assertEquals("E-mail is required!", exception.getMessage());
     }
 
@@ -152,7 +157,8 @@ class UserServiceTest {
     void editUserWithPasswordNull() {
         when(userRepository.findById(userMock.getId())).thenReturn(Optional.of(userMock));
         userMock.setPassword(null);
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> userService.editUser(userMock));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> userService.editUser(userMock));
         assertEquals("Password is required!", exception.getMessage());
     }
 
@@ -160,7 +166,8 @@ class UserServiceTest {
     void editUserWithEmailBlank() {
         when(userRepository.findById(userMock.getId())).thenReturn(Optional.of(userMock));
         userMock.setEmail(" ");
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> userService.editUser(userMock));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> userService.editUser(userMock));
         assertEquals("E-mail is required!", exception.getMessage());
     }
 
@@ -168,7 +175,8 @@ class UserServiceTest {
     void editUserWithPasswordBlank() {
         when(userRepository.findById(userMock.getId())).thenReturn(Optional.of(userMock));
         userMock.setPassword(" ");
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> userService.editUser(userMock));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> userService.editUser(userMock));
         assertEquals("Password is required!", exception.getMessage());
     }
 
@@ -185,7 +193,8 @@ class UserServiceTest {
     void testFindUserByIdThrowsExceptionWhenUserNotFound() {
         when(userRepository.findById(userMock.getId())).thenReturn(Optional.empty());
 
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> userService.findUserById(userMock.getId()));
+        NoSuchElementException exception = assertThrows(NoSuchElementException.class,
+                () -> userService.findUserById(userMock.getId()));
         assertEquals("User not found!", exception.getMessage());
 
         verify(userRepository, times(1)).findById(userMock.getId());

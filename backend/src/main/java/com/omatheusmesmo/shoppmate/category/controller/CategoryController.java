@@ -29,9 +29,7 @@ public class CategoryController {
     @GetMapping
     public ResponseEntity<List<CategoryResponseDTO>> getAllCategories() {
         List<Category> categories = categoryService.findAll();
-        List<CategoryResponseDTO> responseDTOS = categories.stream()
-                .map(categoryMapper::toResponseDTO)
-                .toList();
+        List<CategoryResponseDTO> responseDTOS = categories.stream().map(categoryMapper::toResponseDTO).toList();
         return ResponseEntity.ok(responseDTOS);
     }
 
@@ -43,11 +41,8 @@ public class CategoryController {
         Category savedCategory = categoryService.saveCategory(category);
         CategoryResponseDTO responseDTO = categoryMapper.toResponseDTO(savedCategory);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(savedCategory.getId())
-                .toUri();
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(savedCategory.getId()).toUri();
 
         return ResponseEntity.created(location).body(responseDTO);
     }
@@ -61,12 +56,13 @@ public class CategoryController {
 
     @Operation(summary = "Update a category")
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponseDTO> updateCategory(@PathVariable Long id, @RequestBody @Valid CategoryRequestDTO categoryDTO) {
+    public ResponseEntity<CategoryResponseDTO> updateCategory(@PathVariable Long id,
+            @RequestBody @Valid CategoryRequestDTO categoryDTO) {
         Category category = categoryService.findCategoryById(id);
         category.setName(categoryDTO.name());
         Category updatedCategory = categoryService.saveCategory(category);
         CategoryResponseDTO responseDTO = categoryMapper.toResponseDTO(updatedCategory);
 
-        return  ResponseEntity.ok(responseDTO);
+        return ResponseEntity.ok(responseDTO);
     }
 }

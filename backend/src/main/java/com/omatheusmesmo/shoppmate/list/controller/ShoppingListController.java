@@ -18,7 +18,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
-
 // TODO: return only lists owned by the user or that are shared with him
 @RestController
 @RequestMapping("/lists")
@@ -35,9 +34,7 @@ public class ShoppingListController {
     public ResponseEntity<List<ShoppingListResponseDTO>> getAllShoppingLists() {
         List<ShoppingList> shoppingLists = service.findAll();
 
-        List<ShoppingListResponseDTO> responseDTOs = shoppingLists.stream()
-                .map(listMapper::toResponseDTO)
-                .toList();
+        List<ShoppingListResponseDTO> responseDTOs = shoppingLists.stream().map(listMapper::toResponseDTO).toList();
         return HttpResponseUtil.ok(responseDTOs);
     }
 
@@ -56,10 +53,7 @@ public class ShoppingListController {
         ShoppingList savedList = service.saveList(shoppingList);
         ShoppingListResponseDTO responseDTO = listMapper.toResponseDTO(savedList);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(savedList.getId())
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedList.getId())
                 .toUri();
 
         return ResponseEntity.created(location).body(responseDTO);
@@ -69,15 +63,13 @@ public class ShoppingListController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteShoppingList(@PathVariable Long id) {
-            service.removeList(id);
+        service.removeList(id);
     }
 
     @Operation(summary = "Update a Shopping List")
     @PutMapping("/{id}")
-    public ResponseEntity<ShoppingListResponseDTO> updateShoppingList(
-            @PathVariable Long id,
-            @Valid @RequestBody ShoppingListUpdateRequestDTO requestDTO
-    ) {
+    public ResponseEntity<ShoppingListResponseDTO> updateShoppingList(@PathVariable Long id,
+            @Valid @RequestBody ShoppingListUpdateRequestDTO requestDTO) {
 
         ShoppingList existingList = service.findListById(id);
 

@@ -12,11 +12,7 @@ public class UserMapper {
             return null;
         }
 
-        return new UserResponseDTO(
-                user.getId(),
-                user.getFullName(),
-                user.getEmail()
-        );
+        return new UserResponseDTO(user.getId(), user.getFullName(), user.getEmail());
     }
 
 }

@@ -8,14 +8,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class CategoryMapper {
 
-    public Category toEntity(CategoryRequestDTO requestDTO){
+    public Category toEntity(CategoryRequestDTO requestDTO) {
         Category category = new Category();
         category.setName(requestDTO.name());
 
         return category;
     }
 
-    public Category toEntity(Long id, CategoryRequestDTO requestDTO){
+    public Category toEntity(Long id, CategoryRequestDTO requestDTO) {
         Category category = new Category();
         category.setName(requestDTO.name());
         category.setId(id);
@@ -23,7 +23,7 @@ public class CategoryMapper {
         return category;
     }
 
-    public CategoryResponseDTO toResponseDTO(Category category){
+    public CategoryResponseDTO toResponseDTO(Category category) {
         return new CategoryResponseDTO(category.getId(), category.getName());
     }
 }
