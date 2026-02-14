@@ -29,6 +29,21 @@ jobs:
       run:
         working-directory: backend   
 
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: shoppmate
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     env:
       POSTGRES_DB: ${{ secrets.POSTGRES_DB || 'shoppmate' }}
       POSTGRES_USER: ${{ secrets.POSTGRES_USER || 'user' }}
