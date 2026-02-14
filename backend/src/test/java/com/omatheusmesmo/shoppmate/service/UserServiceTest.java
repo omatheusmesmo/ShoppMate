@@ -48,25 +48,23 @@ class UserServiceTest {
 
     @Test
     void addUser() {
-        when(userRepository.findByEmail(userMock.getEmail())).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenReturn(userMock);
+        when(passwordEncoder.encode(anyString())).thenReturn("encoded123");
 
         User user = userService.addUser(userMock);
 
         assertEquals(userMock, user);
-        verify(userRepository, times(1)).findByEmail(userMock.getEmail());
         verify(userRepository, times(1)).save(userMock);
     }
 
     @Test
     void addUserWithEmailUsed() {
-        when(userRepository.findByEmail(userMock.getEmail())).thenReturn(Optional.of(userMock));
+        doThrow(new IllegalArgumentException("E-mail is already being used!"))
+                .when(userRepository).save(any(User.class));
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> userService.addUser(userMock));
         assertEquals("E-mail is already being used!", exception.getMessage());
-
-        verify(userRepository, times(1)).findByEmail(userMock.getEmail());
     }
 
     @Test

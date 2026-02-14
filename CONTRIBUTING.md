@@ -17,16 +17,24 @@ By participating in this project, you agree to abide by our Code of Conduct (sta
 - Open a new issue with a clear title and description of the benefits.
 
 ### Pull Requests
-1. **Fork the repository** and create your branch from `main`.
-2. **Install dependencies** using Maven: `./mvnw install`.
-3. **Follow the coding style**:
-   - Match the existing indentation (4 spaces for Java).
+1. **Fork the repository** and create your branch from `develop`.
+2. **Target your PR to the `develop` branch**. PRs targeting `main` will be automatically redirected.
+3. **Install dependencies** using Maven: `./mvnw install` (inside the `backend` folder).
+4. **Follow the coding style**:
+   - Match the existing indentation (4 spaces for Java, 2 for Angular/YAML).
    - Use meaningful variable and method names.
    - Adhere to SOLID principles and Clean Code practices.
-4. **Write tests**: If you're adding a feature or fixing a bug, please include tests.
-5. **Update documentation**: If you change how the API works, update the relevant README or Bruno collection.
-6. **Self-review**: Read through your changes before submitting.
-7. **Submit the PR**: Link it to the relevant issue (e.g., `Closes #15`).
+5. **Write tests**: If you're adding a feature or fixing a bug, please include tests.
+6. **Update documentation**: If you change how the API works, update the relevant README or Bruno collection.
+7. **Self-review**: Read through your changes before submitting.
+8. **Submit the PR**: Link it to the relevant issue (e.g., `Closes #15`).
+
+### Auto-Assignment Bot
+We use a bot to manage issue assignments. To work on an issue:
+- Comment **"Assign me"** or **"Eu quero trabalhar nisso"** on the issue.
+- The bot will assign you automatically if the issue is free.
+- If the issue is already assigned, the bot will ask the current assignee for a status update.
+- To unassign yourself, comment **"unassign me"** or **"no"**.
 
 ## Development Workflow
 

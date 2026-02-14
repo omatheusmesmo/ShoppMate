@@ -52,10 +52,24 @@ public class UserService {
     // TODO: create a method to validate new and old users to avoid duplicating
     public void isUserValid(User user) {
         validateIfDataIsNullOrEmpty(user);
-        // validateIfUserExists(user.getEmail());
+
+        if (user.getId() == null) {
+            validateIfUserExists(user.getEmail());
+        } else {
+            validateIfEmailBelongsToAnotherUser(user.getId(), user.getEmail());
+        }
+    }
+
+    private void validateIfEmailBelongsToAnotherUser(Long userId, String email) {
+        userRepository.findByEmail(email).ifPresent(existingUser -> {
+            if (!existingUser.getId().equals(userId)) {
+                throw new IllegalArgumentException("E-mail is already being used by another user!");
+            }
+        });
     }
 
     public void validateIfUserExists(String email) {
+        if (userRepository.findByEmail(email).isPresent()) {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new IllegalArgumentException("E-mail is already being used!");
         }
