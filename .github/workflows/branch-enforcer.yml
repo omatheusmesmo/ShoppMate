@@ -27,11 +27,13 @@ jobs:
               const isOwner = association === 'OWNER';
 
               if (targetBranch !== 'develop' && !isOwner) {
+                console.log(`⚠️ Redirecting PR from ${targetBranch} to develop`);
+                
                 await github.rest.issues.createComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: pr.number,
-                  body: `🤖 **Attention @${author}!** To keep our project organized, all external contributions must target the `develop` branch. I've automatically updated this PR for you. Thank you! 🚀`
+                  body: `🤖 **Attention @${author}!** To keep our project organized, all external contributions must target the 'develop' branch. I've automatically updated this PR for you. Thank you! 🚀`
                 });
                 
                 await github.rest.pulls.update({
