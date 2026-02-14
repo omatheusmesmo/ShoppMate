@@ -99,29 +99,29 @@ class ListItemServiceTest {
 
     @Test
     void findListItem() {
-        when(ListItemRepository.findById(listItem.getId())).thenReturn(Optional.of(listItem));
+        when(ListItemRepository.findByIdAndDeletedFalse(listItem.getId())).thenReturn(Optional.of(listItem));
 
         ListItem result = service.findListItemById(listItem.getId());
 
         assertNotNull(result);
 
-        verify(ListItemRepository, times(1)).findById(listItem.getId());
+        verify(ListItemRepository, times(1)).findByIdAndDeletedFalse(listItem.getId());
     }
 
     @Test
     void findListItemById() {
-        when(ListItemRepository.findById(listItem.getId())).thenReturn(Optional.of(listItem));
+        when(ListItemRepository.findByIdAndDeletedFalse(listItem.getId())).thenReturn(Optional.of(listItem));
 
         ListItem result = service.findListItemById(listItem.getId());
 
         assertNotNull(result);
 
-        verify(ListItemRepository, times(1)).findById(listItem.getId());
+        verify(ListItemRepository, times(1)).findByIdAndDeletedFalse(listItem.getId());
     }
 
     @Test
     void findListItemById_WhenItemNotFound() {
-        when(ListItemRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(ListItemRepository.findByIdAndDeletedFalse(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> service.findListItemById(999L));
 
@@ -130,7 +130,7 @@ class ListItemServiceTest {
 
     @Test
     void removeList_Ok() {
-        when(ListItemRepository.findById(listItem.getId())).thenReturn(Optional.of(listItem));
+        when(ListItemRepository.findByIdAndDeletedFalse(listItem.getId())).thenReturn(Optional.of(listItem));
 
         assertDoesNotThrow(() -> service.removeList(listItem.getId()));
 
@@ -140,7 +140,7 @@ class ListItemServiceTest {
 
     @Test
     void removeList_ItemNotFound() {
-        when(ListItemRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(ListItemRepository.findByIdAndDeletedFalse(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> service.removeList(999L));
 
@@ -151,7 +151,7 @@ class ListItemServiceTest {
     @Test
     void editList_Ok() {
         ListItemUpdateRequestDTO updateDTO = new ListItemUpdateRequestDTO(1L, 1L, 3, true);
-        when(ListItemRepository.findById(1L)).thenReturn(Optional.of(listItem));
+        when(ListItemRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.of(listItem));
 
         ListItem result = service.editList(1L, updateDTO);
 
@@ -166,23 +166,23 @@ class ListItemServiceTest {
     @Test
     void editList_WhenListItemNotFound() {
         ListItemUpdateRequestDTO updateDTO = new ListItemUpdateRequestDTO(1L, 1L, 3, true);
-        when(ListItemRepository.findById(1L)).thenReturn(Optional.empty());
+        when(ListItemRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> service.editList(1L, updateDTO));
 
-        verify(ListItemRepository, times(1)).findById(1L);
+        verify(ListItemRepository, times(1)).findByIdAndDeletedFalse(1L);
     }
 
     @Test
     void findAll() {
-        when(ListItemRepository.findByShoppListId(1L)).thenReturn(List.of(listItem));
+        when(ListItemRepository.findByShoppListIdAndDeletedFalse(1L)).thenReturn(List.of(listItem));
 
         List<ListItem> result = service.findAll(1L);
 
         assertNotNull(result);
         assertEquals(1, result.size());
 
-        verify(ListItemRepository, times(1)).findByShoppListId(1L);
+        verify(ListItemRepository, times(1)).findByShoppListIdAndDeletedFalse(1L);
     }
 
     private ListItemRequestDTO createSampleItem() {
