@@ -74,7 +74,6 @@ class ListPermissionServiceTest {
         verify(ListPermissionRepository, times(1)).save(any(ListPermission.class));
     }
 
-
     @Test
     void isListValid_ValidPermission_NoExceptionThrown() {
         ListPermission permission = createSamplePermission();
@@ -173,7 +172,6 @@ class ListPermissionServiceTest {
         verify(ListPermissionRepository, times(1)).save(permission);
     }
 
-
     @Test
     void editList_NonExistingPermission_ThrowsNoSuchElementException() {
         Long id = 1L;
@@ -213,7 +211,7 @@ class ListPermissionServiceTest {
         return permission;
     }
 
-    private ListPermissionRequestDTO createSamplePermissionRequest(){
+    private ListPermissionRequestDTO createSamplePermissionRequest() {
         return new ListPermissionRequestDTO(1L, 1L, Permission.READ);
     }
 }

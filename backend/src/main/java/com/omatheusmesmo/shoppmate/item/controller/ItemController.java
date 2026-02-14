@@ -29,9 +29,7 @@ public class ItemController {
     @GetMapping
     public ResponseEntity<List<ItemResponseDTO>> getAllItems() {
         List<Item> items = itemService.findAll();
-        List<ItemResponseDTO> responseDTOs = items.stream()
-                .map(itemMapper::toResponseDTO)
-                .toList();
+        List<ItemResponseDTO> responseDTOs = items.stream().map(itemMapper::toResponseDTO).toList();
         return ResponseEntity.ok(responseDTOs);
     }
 
@@ -43,10 +41,7 @@ public class ItemController {
         Item savedItem = itemService.addItem(item);
         ItemResponseDTO responseDTO = itemMapper.toResponseDTO(savedItem);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(savedItem.getId())
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedItem.getId())
                 .toUri();
 
         return ResponseEntity.created(location).body(responseDTO);
@@ -61,7 +56,8 @@ public class ItemController {
 
     @Operation(summary = "Update a item")
     @PutMapping("/{id}")
-    public ResponseEntity<ItemResponseDTO> updateItem(@PathVariable Long id, @Valid @RequestBody ItemRequestDTO itemDTO) {
+    public ResponseEntity<ItemResponseDTO> updateItem(@PathVariable Long id,
+            @Valid @RequestBody ItemRequestDTO itemDTO) {
 
         Item itemToUpdate = itemMapper.toEntity(itemDTO);
         itemToUpdate.setId(id);

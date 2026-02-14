@@ -86,8 +86,7 @@ class ItemControllerTest {
 
         when(itemService.findAll()).thenReturn(allItems);
 
-        mockMvc.perform(get("/item"))
-                .andExpect(status().isOk())
+        mockMvc.perform(get("/item")).andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(allItems)));
     }
 
@@ -102,11 +101,9 @@ class ItemControllerTest {
 
         when(itemService.addItem(any(Item.class))).thenReturn(newItem);
 
-        mockMvc.perform(post("/item")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newItem)))
-                .andExpect(status().isCreated())
-                .andExpect(content().json(objectMapper.writeValueAsString(newItem)));
+        mockMvc.perform(
+                post("/item").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(newItem)))
+                .andExpect(status().isCreated()).andExpect(content().json(objectMapper.writeValueAsString(newItem)));
     }
 
     @Test
@@ -116,8 +113,7 @@ class ItemControllerTest {
 
         Mockito.doNothing().when(itemService).removeItem(id);
 
-        mockMvc.perform(delete("/item/" + id))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/item/" + id)).andExpect(status().isNoContent());
 
         verify(itemService, times(1)).removeItem(id);
     }
@@ -133,10 +129,8 @@ class ItemControllerTest {
 
         when(itemService.editItem(any(Item.class))).thenReturn(editedItem);
 
-        mockMvc.perform(put("/item")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(editedItem)))
-                .andExpect(status().isOk())
+        mockMvc.perform(put("/item").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(editedItem))).andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(editedItem)));
     }
 
@@ -150,10 +144,8 @@ class ItemControllerTest {
         invalidItem.setUnit(unit);
         invalidItem.setCategory(category);
 
-        mockMvc.perform(post("/item")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidItem)))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/item").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidItem))).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -166,9 +158,8 @@ class ItemControllerTest {
         item.setUnit(unit);
         item.setCategory(category);
 
-        mockMvc.perform(put("/item")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(item)))
+        mockMvc.perform(
+                put("/item").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(item)))
                 .andExpect(status().isNotFound());
     }
 }

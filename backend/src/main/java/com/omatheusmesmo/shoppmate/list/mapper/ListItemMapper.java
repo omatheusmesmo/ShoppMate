@@ -28,22 +28,13 @@ public class ListItemMapper {
     }
 
     public ListItemResponseDTO toResponseDTO(ListItem listItem) {
-        return new ListItemResponseDTO(
-                listMapper.toResponseDTO(listItem.getShoppList()),
-                itemMapper.toResponseDTO(listItem.getItem()),
-                listItem.getId(),
-                listItem.getQuantity(),
-                listItem.getPurchased()
-        );
+        return new ListItemResponseDTO(listMapper.toResponseDTO(listItem.getShoppList()),
+                itemMapper.toResponseDTO(listItem.getItem()), listItem.getId(), listItem.getQuantity(),
+                listItem.getPurchased());
     }
 
     public ListItemSummaryDTO toSummaryDTO(ListItem listItem) {
-        return new ListItemSummaryDTO(
-            listItem.getId(),
-            listItem.getItem().getId(),
-            listItem.getItem().getName(),
-            listItem.getQuantity(),
-            listItem.getPurchased()
-        );
+        return new ListItemSummaryDTO(listItem.getId(), listItem.getItem().getId(), listItem.getItem().getName(),
+                listItem.getQuantity(), listItem.getPurchased());
     }
 }
