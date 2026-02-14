@@ -14,12 +14,12 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  POSTGRES_DB: shoppmate
-  POSTGRES_USER: user
-  POSTGRES_PASSWORD: password
-  DB_HOST: localhost
-  DB_PORT: 5432
-  JWT_TOKEN_EXPIRATION: 3600000
+  POSTGRES_DB: ${{ secrets.POSTGRES_DB || 'shoppmate' }}
+  POSTGRES_USER: ${{ secrets.POSTGRES_USER || 'user' }}
+  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD || 'password' }}
+  DB_HOST: ${{ secrets.DB_HOST || 'localhost' }}
+  DB_PORT: ${{ secrets.DB_PORT || '5432' }}
+  JWT_TOKEN_EXPIRATION: ${{ secrets.JWT_TOKEN_EXPIRATION || '3600000' }}
   
 jobs:
   backendBuildAndTest:
@@ -33,9 +33,9 @@ jobs:
       postgres:
         image: postgres:17
         env:
-          POSTGRES_DB: shoppmate
-          POSTGRES_USER: user
-          POSTGRES_PASSWORD: password
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
         ports:
           - 5432:5432
         options: >-
@@ -44,13 +44,6 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-    env:
-      POSTGRES_DB: ${{ secrets.POSTGRES_DB || 'shoppmate' }}
-      POSTGRES_USER: ${{ secrets.POSTGRES_USER || 'user' }}
-      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD || 'password' }}
-      DB_HOST: ${{ secrets.DB_HOST || 'localhost' }}
-      DB_PORT: ${{ secrets.DB_PORT || '5432' }}
-      JWT_TOKEN_EXPIRATION: ${{ secrets.JWT_TOKEN_EXPIRATION || '3600000' }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -72,4 +65,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
-          path: backend/target/site/jacoco 
+          path: backend/target/site/jacoco
