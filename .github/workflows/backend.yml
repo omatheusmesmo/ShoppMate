@@ -58,8 +58,8 @@ jobs:
       - name: Build
         run: mvn -B -ntp clean verify
 
-      - name: Validate Flyway Migrations       
-        run: mvn -B -ntp flyway:validate -Dflyway.url=jdbc:postgresql://${{ env.DB_HOST }}:${{ env.DB_PORT }}/${{ env.POSTGRES_DB }} -Dflyway.user=${{ env.POSTGRES_USER }} -Dflyway.password=${{ env.POSTGRES_PASSWORD }}
+      - name: Run Flyway Migrations       
+        run: mvn -B -ntp flyway:migrate -Dflyway.url=jdbc:postgresql://${{ env.DB_HOST }}:${{ env.DB_PORT }}/${{ env.POSTGRES_DB }} -Dflyway.user=${{ env.POSTGRES_USER }} -Dflyway.password=${{ env.POSTGRES_PASSWORD }}
 
       - name: Upload JaCoCo Report
         uses: actions/upload-artifact@v4
