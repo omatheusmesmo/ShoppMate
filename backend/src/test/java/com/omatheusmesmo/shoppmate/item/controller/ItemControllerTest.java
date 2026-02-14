@@ -101,12 +101,12 @@ class ItemControllerTest {
         when(itemService.findAll()).thenReturn(allItems);
         when(itemMapper.toResponseDTO(any(Item.class))).thenAnswer(invocation -> {
             Item item = invocation.getArgument(0);
-            if (item.getId().equals(1L)) return itemResponseDTO1;
+            if (item.getId().equals(1L))
+                return itemResponseDTO1;
             return itemResponseDTO2;
         });
 
-        mockMvc.perform(get("/item"))
-                .andExpect(status().isOk())
+        mockMvc.perform(get("/item")).andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(allItemDTOs)));
     }
 
@@ -119,10 +119,8 @@ class ItemControllerTest {
         when(itemService.addItem(any(Item.class))).thenReturn(item1);
         when(itemMapper.toResponseDTO(any(Item.class))).thenReturn(itemResponseDTO1);
 
-        mockMvc.perform(post("/item")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
-                .andExpect(status().isCreated())
+        mockMvc.perform(post("/item").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO))).andExpect(status().isCreated())
                 .andExpect(content().json(objectMapper.writeValueAsString(itemResponseDTO1)));
     }
 
@@ -147,17 +145,16 @@ class ItemControllerTest {
         when(itemService.editItem(any(Item.class))).thenReturn(item1);
         when(itemMapper.toResponseDTO(any(Item.class))).thenReturn(itemResponseDTO1);
 
-        mockMvc.perform(put("/item/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
-                .andExpect(status().isOk())
+        mockMvc.perform(put("/item/1").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO))).andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(itemResponseDTO1)));
     }
 
     @Test
     @WithMockUser
     void testPostAddItem_BadRequest() throws Exception {
-         when(itemMapper.toEntity(any(ItemRequestDTO.class))).thenThrow(new IllegalArgumentException("Invalid item"));;
+        when(itemMapper.toEntity(any(ItemRequestDTO.class))).thenThrow(new IllegalArgumentException("Invalid item"));
+        ;
 
         ItemRequestDTO invalidItem = new ItemRequestDTO("", 1L, 1L);
 
@@ -173,10 +170,7 @@ class ItemControllerTest {
         when(itemMapper.toEntity(any(ItemRequestDTO.class))).thenReturn(item1);
         doThrow(new NoSuchElementException()).when(itemService).editItem(any(Item.class));
 
-        mockMvc.perform(put("/item/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(put("/item/1").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO))).andExpect(status().isNotFound());
     }
 }
-

@@ -70,7 +70,6 @@ public class UserService {
 
     public void validateIfUserExists(String email) {
         if (userRepository.findByEmail(email).isPresent()) {
-        if (userRepository.findByEmail(email).isPresent()) {
             throw new IllegalArgumentException("E-mail is already being used!");
         }
     }
