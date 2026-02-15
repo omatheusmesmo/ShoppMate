@@ -1,3 +1,8 @@
+*.class
+*.log
+*.ctxt
+.mtj.tmp/
+
 # Created by https://www.toptal.com/developers/gitignore/api/java,windows,linux,macos,intellij,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,windows,linux,macos,intellij,visualstudiocode
 
@@ -15,6 +20,7 @@
 .mtj.tmp/
 
 # Package Files #
+
 *.jar
 *.war
 *.nar
@@ -22,6 +28,7 @@
 *.zip
 *.tar.gz
 *.rar
+
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
@@ -249,5 +256,3 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-
-# End of https://www.toptal.com/developers/gitignore/api/java,windows,linux,macos,intellij,visualstudiocode

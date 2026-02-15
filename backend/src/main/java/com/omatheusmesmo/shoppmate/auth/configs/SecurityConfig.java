@@ -84,21 +84,20 @@ public class SecurityConfig {
         return new ProviderManager(provider);
     }
 
-
-//    @Bean
-//    public UserDetailsService userDetailsService() {
-//        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-//        UserDetails user = User.withDefaultPasswordEncoder()
-//                .username("user")
-//                .password("password")
-//                .roles("USER")
-//                .build();
-//        manager.createUser(user);
-//        return manager;
-//    }
+    // @Bean
+    // public UserDetailsService userDetailsService() {
+    // InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+    // UserDetails user = User.withDefaultPasswordEncoder()
+    // .username("user")
+    // .password("password")
+    // .roles("USER")
+    // .build();
+    // manager.createUser(user);
+    // return manager;
+    // }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
