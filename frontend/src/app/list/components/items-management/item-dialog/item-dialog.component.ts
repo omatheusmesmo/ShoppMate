@@ -1,14 +1,13 @@
 import {
-  ChangeDetectionStrategy,
   Component,
-  Inject,
   OnInit,
   inject,
+  signal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
-  FormGroup,
   ReactiveFormsModule,
   Validators,
   AbstractControl,
@@ -75,33 +74,28 @@ export function duplicateNameValidator(
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ItemDialogComponent implements OnInit {
-  private fb = inject(FormBuilder);
-  private itemService = inject(ItemService);
-  private snackBar = inject(MatSnackBar);
+  private readonly fb = inject(FormBuilder);
+  private readonly itemService = inject(ItemService);
+  private readonly categoryService = inject(CategoryService);
+  private readonly unitService = inject(UnitService);
+  private readonly snackBar = inject(MatSnackBar);
+  readonly dialogRef = inject(MatDialogRef<ItemDialogComponent>);
+  readonly data = inject(MAT_DIALOG_DATA) as { item?: ItemRequestDTO };
 
-  itemForm: FormGroup;
-  categories: Category[] = [];
-  units: Unit[] = [];
-  existingItems: ItemResponseDTO[] = [];
+  readonly itemForm = this.fb.group({
+    name: ['', [Validators.required]],
+    idCategory: [null as number | null, [Validators.required]],
+    idUnit: [null as number | null, [Validators.required]],
+  });
 
-  constructor(
-    public dialogRef: MatDialogRef<ItemDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { item?: ItemRequestDTO },
-    private categoryService: CategoryService,
-    private unitService: UnitService,
-  ) {
-    this.itemForm = this.fb.group({
-      name: ['', [Validators.required]],
-      idCategory: [null, [Validators.required]],
-      idUnit: [null, [Validators.required]],
-    });
-
-    if (data.item) {
-      this.itemForm.patchValue(data.item);
-    }
-  }
+  readonly categories = signal<Category[]>([]);
+  readonly units = signal<Unit[]>([]);
+  readonly existingItems = signal<ItemResponseDTO[]>([]);
 
   ngOnInit(): void {
+    if (this.data.item) {
+      this.itemForm.patchValue(this.data.item);
+    }
     this.loadCategories();
     this.loadUnits();
     this.loadItems();
@@ -110,7 +104,7 @@ export class ItemDialogComponent implements OnInit {
   loadItems(): void {
     this.itemService.getAllItems().subscribe({
       next: (items) => {
-        this.existingItems = items;
+        this.existingItems.set(items);
         this.updateNameValidator();
       },
       error: () => {
@@ -122,7 +116,7 @@ export class ItemDialogComponent implements OnInit {
   }
 
   updateNameValidator(): void {
-    const names = this.existingItems.map((i) => i.name);
+    const names = this.existingItems().map((i) => i.name);
     const originalName = this.data.item ? this.data.item.name : undefined;
 
     this.itemForm
@@ -133,13 +127,13 @@ export class ItemDialogComponent implements OnInit {
 
   loadCategories(): void {
     this.categoryService.getAllCategories().subscribe((categories) => {
-      this.categories = categories;
+      this.categories.set(categories);
     });
   }
 
   loadUnits(): void {
     this.unitService.getAllUnits().subscribe((units) => {
-      this.units = units;
+      this.units.set(units);
     });
   }
 
