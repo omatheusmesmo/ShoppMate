@@ -34,6 +34,15 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
+
+      - name: Install Chromium and Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget gnupg
+          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
         
       - name: Check Formatting
         run: npm run prettier:check
@@ -46,7 +55,7 @@ jobs:
 
       - name: Run Tests with ChromeHeadless
         env:
-          CHROME_BIN: /usr/bin/google-chrome
+          CHROME_BIN: /usr/bin/google-chrome-stable
         run: npm run test:ci
 
       - name: Replace API URL Placeholder
