@@ -62,13 +62,28 @@ describe('ItemDialogComponent - Duplicate Validation', () => {
     expect(nameControl?.hasError('duplicateName')).toBeFalse();
   });
 
-  it('should be valid when editing and keeping its own name', () => {
-    component.data = { 
-      item: { name: 'Apple', idCategory: 1, idUnit: 1 } 
-    };
-    component.updateNameValidator();
+  it('should be valid when editing and keeping its own name', async () => {
+    // Reconfigure for Edit Mode
+    TestBed.resetTestingModule();
+    const originalItem = { name: 'Apple', idCategory: 1, idUnit: 1 };
     
-    const nameControl = component.itemForm.get('name');
+    await TestBed.configureTestingModule({
+      imports: [ItemDialogComponent, ReactiveFormsModule, NoopAnimationsModule],
+      providers: [
+        { provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } },
+        { provide: MAT_DIALOG_DATA, useValue: { item: originalItem } },
+        { provide: ItemService, useValue: itemServiceSpy },
+        { provide: CategoryService, useValue: categoryServiceSpy },
+        { provide: UnitService, useValue: unitServiceSpy },
+        { provide: MatSnackBar, useValue: { open: jasmine.createSpy('open') } }
+      ]
+    }).compileComponents();
+
+    const editFixture = TestBed.createComponent(ItemDialogComponent);
+    const editComponent = editFixture.componentInstance;
+    editFixture.detectChanges();
+
+    const nameControl = editComponent.itemForm.get('name');
     nameControl?.setValue('Apple');
     expect(nameControl?.hasError('duplicateName')).toBeFalse();
   });
