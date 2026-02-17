@@ -1,34 +1,42 @@
 import {
-  ChangeDetectionStrategy,
   Component,
-  OnInit,
   inject,
+  OnInit,
+  signal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+} from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import {
-  AbstractControl,
   FormBuilder,
-  FormGroup,
   ReactiveFormsModule,
+  Validators,
+  AbstractControl,
   ValidationErrors,
   ValidatorFn,
-  Validators,
 } from '@angular/forms';
 import { CategoryService } from '../../../shared/services/category.service';
 import { Category } from '../../../shared/interfaces/category.interface';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatDialogModule } from '@angular/material/dialog';
 
-export function duplicateNameValidator(existingNames: string[], originalName?: string): ValidatorFn {
+export function duplicateNameValidator(
+  existingNames: string[],
+  originalName?: string,
+): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     if (!control.value) return null;
     const name = control.value.trim().toLowerCase();
     if (originalName && name === originalName.trim().toLowerCase()) return null;
-    return existingNames.some(existingName => existingName.trim().toLowerCase() === name)
+    return existingNames.some(
+      (existingName) => existingName.trim().toLowerCase() === name,
+    )
       ? { duplicateName: true }
       : null;
   };
@@ -50,71 +58,73 @@ export function duplicateNameValidator(existingNames: string[], originalName?: s
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoryDialogComponent implements OnInit {
-  private dialogRef = inject(MatDialogRef<CategoryDialogComponent>);
-  private fb = inject(FormBuilder);
-  private categoryService = inject(CategoryService);
-  private snackBar = inject(MatSnackBar);
-  private data = inject(MAT_DIALOG_DATA) as {
+  private readonly dialogRef = inject(MatDialogRef<CategoryDialogComponent>);
+  private readonly fb = inject(FormBuilder);
+  private readonly categoryService = inject(CategoryService);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly data = inject(MAT_DIALOG_DATA) as {
     category?: Category;
     isEdit: boolean;
   };
 
-  categoryForm: FormGroup;
-  isEdit: boolean;
-  existingCategories: Category[] = [];
+  readonly categoryForm = this.fb.group({
+    name: ['', [Validators.required, Validators.minLength(3)]],
+  });
 
-  constructor() {
-    this.isEdit = this.data.isEdit;
-    this.categoryForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
-    });
+  readonly isEdit = signal(this.data.isEdit);
+  readonly existingCategories = signal<Category[]>([]);
 
-    if (this.isEdit && this.data.category) {
+  ngOnInit(): void {
+    if (this.isEdit() && this.data.category) {
       this.categoryForm.patchValue({
         name: this.data.category.name,
       });
     }
-  }
-
-  ngOnInit(): void {
     this.loadCategories();
   }
 
   loadCategories(): void {
     this.categoryService.getAllCategories().subscribe({
       next: (categories) => {
-        this.existingCategories = categories;
+        this.existingCategories.set(categories);
         this.updateNameValidator();
       },
       error: () => {
-        this.snackBar.open('Erro ao carregar categorias para validação', 'Fechar', { duration: 3000 });
-      }
+        this.snackBar.open(
+          'Erro ao carregar categorias para validação',
+          'Fechar',
+          { duration: 3000 },
+        );
+      },
     });
   }
 
   updateNameValidator(): void {
-    const names = this.existingCategories.map(c => c.name);
-    const originalName = this.isEdit && this.data.category ? this.data.category.name : undefined;
-    
-    this.categoryForm.get('name')?.addValidators(duplicateNameValidator(names, originalName));
+    const names = this.existingCategories().map((c) => c.name);
+    const originalName =
+      this.isEdit() && this.data.category ? this.data.category.name : undefined;
+
+    this.categoryForm
+      .get('name')
+      ?.addValidators(duplicateNameValidator(names, originalName));
     this.categoryForm.get('name')?.updateValueAndValidity();
   }
 
   onSubmit(): void {
     if (this.categoryForm.valid) {
       const categoryData: Category = {
-        ...this.categoryForm.value,
+        name: this.categoryForm.value.name ?? '',
         id:
-          this.isEdit && this.data.category ? this.data.category.id : undefined,
+          this.isEdit() && this.data.category ? this.data.category.id : undefined,
         createdAt:
-          this.isEdit && this.data.category
+          this.isEdit() && this.data.category
             ? this.data.category.createdAt
             : new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         deleted: false,
       };
 
-      if (this.isEdit && this.data.category) {
+      if (this.isEdit() && this.data.category) {
         this.categoryService.updateCategory(categoryData).subscribe({
           next: () => {
             this.snackBar.open('Categoria atualizada com sucesso', 'Fechar', {
