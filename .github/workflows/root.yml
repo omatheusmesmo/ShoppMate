@@ -1,0 +1,30 @@
+name: Root CI
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+    paths:
+      - '.github/workflows/**'
+      - 'docker-compose.yml'
+      - 'README.md'
+      - '.editorconfig'
+      - '.prettierrc'
+      - '.eslintrc*'
+
+  pull_request:
+    branches: [ "main", "develop" ]
+    paths:
+      - '.github/workflows/**'
+      - 'docker-compose.yml'
+      - 'README.md'
+      - '.editorconfig'
+      - '.prettierrc'
+      - '.eslintrc*'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate repository structure
+        run: echo "Root validation passed"

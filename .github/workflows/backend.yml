@@ -3,14 +3,20 @@ name: Backend CI
 on:
   push:
     branches: [ "main", "develop" ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
   pull_request:
     branches: [ "main", "develop" ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-backend-${{ github.ref }}
+  group: backend-${{ github.ref }}
   cancel-in-progress: true
 
 env:

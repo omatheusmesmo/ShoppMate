@@ -3,14 +3,20 @@ name: Frontend CI
 on:
   push:
     branches: [ "main", "develop" ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend.yml'
   pull_request:
     branches: [ "main", "develop" ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend.yml'
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-frontend-${{ github.ref }}
+  group: frontend-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
