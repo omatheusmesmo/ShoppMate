@@ -1,0 +1,46 @@
+<h2 mat-dialog-title>{{ data.item ? 'Editar' : 'Novo' }} Item</h2>
+<mat-dialog-content>
+  <form [formGroup]="itemForm">
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Nome</mat-label>
+      <input matInput formControlName="name" placeholder="Digite o nome do item" required>
+      <mat-error *ngIf="itemForm.get('name')?.hasError('required')">
+        Nome é obrigatório
+      </mat-error>
+      <mat-error *ngIf="itemForm.get('name')?.hasError('duplicateName')">
+        Já existe um item com este nome
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Categoria</mat-label>
+      <mat-select formControlName="idCategory" required>
+        <mat-option *ngFor="let category of categories" [value]="category.id">
+          {{category.name}}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="itemForm.get('idCategory')?.hasError('required')">
+        Categoria é obrigatória
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Unidade</mat-label>
+      <mat-select formControlName="idUnit" required>
+        <mat-option *ngFor="let unit of units" [value]="unit.id">
+          {{unit.name}} ({{unit.symbol}})
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="itemForm.get('idUnit')?.hasError('required')">
+        Unidade é obrigatória
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="onSave()"
+          [disabled]="itemForm.invalid">
+    Salvar
+  </button>
+</mat-dialog-actions>
