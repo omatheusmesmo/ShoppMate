@@ -1,4 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,14 +18,13 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { combineLatest, finalize, map, Observable, switchMap, tap } from 'rxjs';
+import { FormBuilder } from '@angular/forms';
+import { finalize, map, Observable, tap } from 'rxjs';
 
 import { ListItemService } from '../../../shared/services/list-item.service';
 import { ItemService } from '../../../shared/services/item.service';
 import { ShoppingListService } from '../../../shared/services/shopping-list.service';
 import { ListItemResponseDTO } from '../../../shared/interfaces/list-item.interface';
-import { ItemResponseDTO } from '../../../shared/interfaces/item.interface';
 import { ShoppingListResponseDTO } from '../../../shared/interfaces/shopping-list.interface';
 
 @Component({
@@ -38,10 +42,11 @@ import { ShoppingListResponseDTO } from '../../../shared/interfaces/shopping-lis
     MatProgressSpinnerModule,
     FormsModule,
     ReactiveFormsModule,
-    AsyncPipe
+    AsyncPipe,
   ],
   templateUrl: './list-details.component.html',
-  styleUrls: ['./list-details.component.scss']
+  styleUrls: ['./list-details.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListDetailsComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -67,15 +72,17 @@ export class ListDetailsComponent implements OnInit {
     this.loading = true;
 
     // Get the list details
-    this.list$ = this.shoppingListService.getAllShoppingLists().pipe(
-      map(lists => lists.find(list => list.idList === this.listId)!),
-    );
+    this.list$ = this.shoppingListService
+      .getAllShoppingLists()
+      .pipe(map((lists) => lists.find((list) => list.idList === this.listId)!));
 
     // Get list items
-    this.listItems$ = this.listItemService.getAllListItemsByListId(this.listId).pipe(
-      tap(() => this.loading = false),
-      finalize(() => this.loading = false)
-    );
+    this.listItems$ = this.listItemService
+      .getAllListItemsByListId(this.listId)
+      .pipe(
+        tap(() => (this.loading = false)),
+        finalize(() => (this.loading = false)),
+      );
   }
 
   togglePurchased(item: ListItemResponseDTO): void {
@@ -83,18 +90,19 @@ export class ListDetailsComponent implements OnInit {
       listId: this.listId,
       itemId: item.item.id,
       quantity: item.quantity,
-      purchased: !item.purchased
+      purchased: !item.purchased,
     };
 
-    this.listItemService.updateListItem(this.listId, item.idListItem, updatedItem)
+    this.listItemService
+      .updateListItem(this.listId, item.idListItem, updatedItem)
       .subscribe({
         next: () => this.loadData(),
         error: (error) => {
           console.error('Error updating item status:', error);
           this.snackBar.open('Erro ao atualizar status do item', 'Fechar', {
-            duration: 3000
+            duration: 3000,
           });
-        }
+        },
       });
   }
 
@@ -110,20 +118,21 @@ export class ListDetailsComponent implements OnInit {
 
   removeItem(item: ListItemResponseDTO): void {
     if (confirm(`Tem certeza que deseja remover ${item.item.name} da lista?`)) {
-      this.listItemService.deleteListItem(this.listId, item.idListItem)
+      this.listItemService
+        .deleteListItem(this.listId, item.idListItem)
         .subscribe({
           next: () => {
             this.loadData();
             this.snackBar.open('Item removido com sucesso', 'Fechar', {
-              duration: 3000
+              duration: 3000,
             });
           },
           error: (error) => {
             console.error('Error removing item:', error);
             this.snackBar.open('Erro ao remover item', 'Fechar', {
-              duration: 3000
+              duration: 3000,
             });
-          }
+          },
         });
     }
   }

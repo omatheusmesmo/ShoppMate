@@ -1,11 +1,13 @@
-@use '@angular/material' as mat;
+@use "@angular/material" as mat;
 
 html {
   color-scheme: light dark;
 
-  @include mat.theme((
-    color: mat.$violet-palette,
-    typography: Roboto,
-    density: 0
-  ));
+  @include mat.theme(
+    (
+      color: mat.$violet-palette,
+      typography: Roboto,
+      density: 0,
+    )
+  );
 }

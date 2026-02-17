@@ -7,7 +7,7 @@ import { catchError } from 'rxjs/operators';
 import { BaseService } from './base.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ItemService extends BaseService {
   private apiUrl = `${environment.apiUrl}/item`;
@@ -17,27 +17,32 @@ export class ItemService extends BaseService {
   }
 
   getAllItems(): Observable<ItemResponseDTO[]> {
-    return this.http.get<ItemResponseDTO[]>(this.apiUrl)
+    return this.http
+      .get<ItemResponseDTO[]>(this.apiUrl)
       .pipe(catchError(this.handleError));
   }
 
   getItemById(id: number): Observable<ItemResponseDTO> {
-    return this.http.get<ItemResponseDTO>(`${this.apiUrl}/${id}`)
+    return this.http
+      .get<ItemResponseDTO>(`${this.apiUrl}/${id}`)
       .pipe(catchError(this.handleError));
   }
 
   addItem(item: ItemRequestDTO): Observable<ItemResponseDTO> {
-    return this.http.post<ItemResponseDTO>(this.apiUrl, item)
+    return this.http
+      .post<ItemResponseDTO>(this.apiUrl, item)
       .pipe(catchError(this.handleError));
   }
 
   updateItem(id: number, item: ItemRequestDTO): Observable<ItemResponseDTO> {
-    return this.http.put<ItemResponseDTO>(`${this.apiUrl}/${id}`, item)
+    return this.http
+      .put<ItemResponseDTO>(`${this.apiUrl}/${id}`, item)
       .pipe(catchError(this.handleError));
   }
 
   deleteItem(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`)
+    return this.http
+      .delete<void>(`${this.apiUrl}/${id}`)
       .pipe(catchError(this.handleError));
   }
 }

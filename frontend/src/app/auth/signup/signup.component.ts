@@ -1,5 +1,10 @@
-import { Component, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,8 +30,9 @@ import { User } from '../../shared/interfaces/user.interface';
     MatCardModule,
     MatIconModule,
     RouterLink,
-    MatProgressSpinnerModule
-  ]
+    MatProgressSpinnerModule,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SignupComponent {
   private fb = inject(FormBuilder);
@@ -37,7 +43,7 @@ export class SignupComponent {
   signupForm: FormGroup = this.fb.group({
     fullName: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]]
+    password: ['', [Validators.required, Validators.minLength(6)]],
   });
 
   hidePassword = true;
@@ -52,13 +58,14 @@ export class SignupComponent {
     this.isLoading = true;
     const userData: User = this.signupForm.value;
 
-    this.authService.register(userData)
-      .pipe(
-        finalize(() => this.isLoading = false)
-      )
+    this.authService
+      .register(userData)
+      .pipe(finalize(() => (this.isLoading = false)))
       .subscribe({
         next: () => {
-          this.snackBar.open('Cadastro realizado com sucesso!', 'Fechar', { duration: 3000 });
+          this.snackBar.open('Cadastro realizado com sucesso!', 'Fechar', {
+            duration: 3000,
+          });
           this.router.navigate(['/login']);
         },
         error: (error) => {
@@ -66,9 +73,9 @@ export class SignupComponent {
           this.snackBar.open(
             'Falha ao realizar cadastro. Tente novamente.',
             'Fechar',
-            { duration: 5000 }
+            { duration: 5000 },
           );
-        }
+        },
       });
   }
 }

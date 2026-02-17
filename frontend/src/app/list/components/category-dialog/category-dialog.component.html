@@ -1,10 +1,14 @@
-<h2 mat-dialog-title>{{ isEdit ? 'Editar Categoria' : 'Nova Categoria' }}</h2>
+<h2 mat-dialog-title>{{ isEdit ? "Editar Categoria" : "Nova Categoria" }}</h2>
 
 <mat-dialog-content>
   <form [formGroup]="categoryForm">
     <mat-form-field appearance="outline" class="w-100">
       <mat-label>Nome da Categoria</mat-label>
-      <input matInput formControlName="name" placeholder="Digite o nome da categoria">
+      <input
+        matInput
+        formControlName="name"
+        placeholder="Digite o nome da categoria"
+      />
       <mat-error *ngIf="categoryForm.get('name')?.hasError('required')">
         Nome é obrigatório
       </mat-error>
@@ -17,7 +21,12 @@
 
 <mat-dialog-actions align="end">
   <button mat-button (click)="onCancel()">Cancelar</button>
-  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!categoryForm.valid">
-    {{ isEdit ? 'Atualizar' : 'Criar' }}
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSubmit()"
+    [disabled]="!categoryForm.valid"
+  >
+    {{ isEdit ? "Atualizar" : "Criar" }}
   </button>
 </mat-dialog-actions>

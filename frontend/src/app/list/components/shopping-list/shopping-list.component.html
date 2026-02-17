@@ -15,17 +15,31 @@
             <mat-card class="list-card">
               <mat-card-header>
                 <mat-card-title>{{ list.listName }}</mat-card-title>
-                <mat-card-subtitle>Criada por: {{ list.owner.fullName }}</mat-card-subtitle>
+                <mat-card-subtitle
+                  >Criada por: {{ list.owner.fullName }}</mat-card-subtitle
+                >
               </mat-card-header>
 
               <mat-card-actions>
-                <button mat-icon-button color="primary" (click)="openEditDialog(list)">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="openEditDialog(list)"
+                >
                   <mat-icon>edit</mat-icon>
                 </button>
-                <button mat-icon-button color="accent" [routerLink]="['/lists', list.idList]">
+                <button
+                  mat-icon-button
+                  color="accent"
+                  [routerLink]="['/lists', list.idList]"
+                >
                   <mat-icon>visibility</mat-icon>
                 </button>
-                <button mat-icon-button color="warn" (click)="deleteList(list.idList)">
+                <button
+                  mat-icon-button
+                  color="warn"
+                  (click)="deleteList(list.idList)"
+                >
                   <mat-icon>delete</mat-icon>
                 </button>
               </mat-card-actions>
@@ -33,7 +47,11 @@
           } @empty {
             <div class="no-lists">
               <p>Você ainda não tem nenhuma lista de compras</p>
-              <button mat-raised-button color="primary" (click)="openNewListDialog()">
+              <button
+                mat-raised-button
+                color="primary"
+                (click)="openNewListDialog()"
+              >
                 Criar Primeira Lista
               </button>
             </div>

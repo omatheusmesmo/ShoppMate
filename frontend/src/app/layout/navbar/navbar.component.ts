@@ -1,4 +1,9 @@
-import { Component, HostListener, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  HostListener,
+  inject,
+} from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
@@ -6,7 +11,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { NgClass } from '@angular/common';
 import { AsyncPipe } from '@angular/common';
 import { AuthService } from '../../shared/services/auth.service';
 
@@ -22,10 +26,11 @@ import { AuthService } from '../../shared/services/auth.service';
     MatMenuModule,
     RouterLink,
     RouterLinkActive,
-    AsyncPipe
+    AsyncPipe,
   ],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavbarComponent {
   private authService = inject(AuthService);
@@ -35,8 +40,8 @@ export class NavbarComponent {
   isLoggedIn$ = this.authService.isLoggedIn$;
 
   @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
-    this.isLargeScreen = event.target.innerWidth >= 768;
+  onResize(event: UIEvent) {
+    this.isLargeScreen = (event.target as Window).innerWidth >= 768;
   }
 
   logout(): void {
