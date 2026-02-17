@@ -3,9 +3,18 @@ import {
   Component,
   Inject,
   OnInit,
+  inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+  ValidatorFn,
+} from '@angular/forms';
 import {
   MatDialogModule,
   MatDialogRef,
@@ -15,60 +24,46 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
-import { ItemRequestDTO } from '../../../../shared/interfaces/item.interface';
+import {
+  ItemRequestDTO,
+  ItemResponseDTO,
+} from '../../../../shared/interfaces/item.interface';
 import { CategoryService } from '../../../../shared/services/category.service';
 import { UnitService } from '../../../../shared/services/unit.service';
+import { ItemService } from '../../../../shared/services/item.service';
 import { Category } from '../../../../shared/interfaces/category.interface';
 import { Unit } from '../../../../shared/interfaces/unit.interface';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
+export function duplicateNameValidator(
+  existingNames: string[],
+  originalName?: string,
+): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (!control.value) return null;
+    const name = control.value.trim().toLowerCase();
+    if (originalName && name === originalName.trim().toLowerCase()) return null;
+    return existingNames.some(
+      (existingName) => existingName.trim().toLowerCase() === name,
+    )
+      ? { duplicateName: true }
+      : null;
+  };
+}
 
 @Component({
   selector: 'app-item-dialog',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
+    ReactiveFormsModule,
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
     MatSelectModule,
   ],
-  template: `
-    <h2 mat-dialog-title>{{ data.item ? 'Editar' : 'Novo' }} Item</h2>
-    <mat-dialog-content>
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>Nome</mat-label>
-        <input matInput [(ngModel)]="item.name" required />
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>Categoria</mat-label>
-        <mat-select [(ngModel)]="item.idCategory" required>
-          <mat-option *ngFor="let category of categories" [value]="category.id">
-            {{ category.name }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>Unidade</mat-label>
-        <mat-select [(ngModel)]="item.idUnit" required>
-          <mat-option *ngFor="let unit of units" [value]="unit.id">
-            {{ unit.name }} ({{ unit.symbol }})
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </mat-dialog-content>
-    <mat-dialog-actions align="end">
-      <button mat-button (click)="onCancel()">Cancelar</button>
-      <button
-        mat-raised-button
-        color="primary"
-        (click)="onSave()"
-        [disabled]="!item.name || !item.idCategory || !item.idUnit"
-      >
-        Salvar
-      </button>
-    </mat-dialog-actions>
-  `,
+  templateUrl: './item-dialog.component.html',
   styles: [
     `
       .w-100 {
@@ -80,13 +75,14 @@ import { Unit } from '../../../../shared/interfaces/unit.interface';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ItemDialogComponent implements OnInit {
-  item: ItemRequestDTO = {
-    name: '',
-    idCategory: 0,
-    idUnit: 0,
-  };
+  private fb = inject(FormBuilder);
+  private itemService = inject(ItemService);
+  private snackBar = inject(MatSnackBar);
+
+  itemForm: FormGroup;
   categories: Category[] = [];
   units: Unit[] = [];
+  existingItems: ItemResponseDTO[] = [];
 
   constructor(
     public dialogRef: MatDialogRef<ItemDialogComponent>,
@@ -94,14 +90,45 @@ export class ItemDialogComponent implements OnInit {
     private categoryService: CategoryService,
     private unitService: UnitService,
   ) {
+    this.itemForm = this.fb.group({
+      name: ['', [Validators.required]],
+      idCategory: [null, [Validators.required]],
+      idUnit: [null, [Validators.required]],
+    });
+
     if (data.item) {
-      this.item = { ...data.item };
+      this.itemForm.patchValue(data.item);
     }
   }
 
   ngOnInit(): void {
     this.loadCategories();
     this.loadUnits();
+    this.loadItems();
+  }
+
+  loadItems(): void {
+    this.itemService.getAllItems().subscribe({
+      next: (items) => {
+        this.existingItems = items;
+        this.updateNameValidator();
+      },
+      error: () => {
+        this.snackBar.open('Erro ao carregar itens para validação', 'Fechar', {
+          duration: 3000,
+        });
+      },
+    });
+  }
+
+  updateNameValidator(): void {
+    const names = this.existingItems.map((i) => i.name);
+    const originalName = this.data.item ? this.data.item.name : undefined;
+
+    this.itemForm
+      .get('name')
+      ?.addValidators(duplicateNameValidator(names, originalName));
+    this.itemForm.get('name')?.updateValueAndValidity();
   }
 
   loadCategories(): void {
@@ -121,6 +148,8 @@ export class ItemDialogComponent implements OnInit {
   }
 
   onSave(): void {
-    this.dialogRef.close(this.item);
+    if (this.itemForm.valid) {
+      this.dialogRef.close(this.itemForm.value);
+    }
   }
 }
