@@ -9,6 +9,12 @@ export interface User {
   role?: string;
 }
 
+export interface UserResponseDTO {
+  id: number;
+  fullName: string;
+  email: string;
+}
+
 export interface LoginRequest {
   email: string;
   password: string;

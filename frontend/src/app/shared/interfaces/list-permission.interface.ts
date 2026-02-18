@@ -28,3 +28,10 @@ export interface ListPermissionResponseDTO {
   userResponseDTO: UserResponseDTO;
   permission: Permission;
 }
+
+export interface ListPermissionSummaryDTO {
+  id: number;
+  userFullName: string;
+  userEmail: string;
+  permission: Permission;
+}
