@@ -29,6 +29,7 @@ jobs:
   triage:
     runs-on: 'ubuntu-latest'
     timeout-minutes: 7
+    if: github.event.repository.fork == false || github.event_name == 'workflow_dispatch'
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -134,6 +135,7 @@ jobs:
     needs:
       - 'triage'
     if: |-
+      (github.event.repository.fork == false || github.event_name == 'workflow_dispatch') &&
       needs.triage.outputs.available_labels != '' &&
       needs.triage.outputs.available_labels != '[]' &&
       needs.triage.outputs.triaged_issues != '' &&
