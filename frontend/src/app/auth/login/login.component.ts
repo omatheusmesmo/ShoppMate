@@ -1,5 +1,10 @@
-import { Component, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -22,10 +27,11 @@ import { AuthService } from '../../shared/services/auth.service';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    RouterLink
+    RouterLink,
   ],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
   private fb = inject(FormBuilder);
@@ -35,7 +41,7 @@ export class LoginComponent {
 
   loginForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', Validators.required]
+    password: ['', Validators.required],
   });
 
   hidePassword = true;
@@ -50,10 +56,9 @@ export class LoginComponent {
     this.isLoading = true;
     const { email, password } = this.loginForm.value;
 
-    this.authService.login({ email, password })
-      .pipe(
-        finalize(() => this.isLoading = false)
-      )
+    this.authService
+      .login({ email, password })
+      .pipe(finalize(() => (this.isLoading = false)))
       .subscribe({
         next: () => {
           this.router.navigate(['/lists']);
@@ -61,14 +66,15 @@ export class LoginComponent {
         error: (error) => {
           console.error('Login error:', error);
           this.snackBar.open(
-            error.message || 'Falha ao fazer login. Verifique suas credenciais.',
+            error.message ||
+              'Falha ao fazer login. Verifique suas credenciais.',
             'Fechar',
             {
               duration: 5000,
-              panelClass: ['error-snackbar']
-            }
+              panelClass: ['error-snackbar'],
+            },
           );
-        }
+        },
       });
   }
 }

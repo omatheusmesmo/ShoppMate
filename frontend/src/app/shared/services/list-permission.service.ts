@@ -6,7 +6,7 @@ import { BaseService } from './base.service';
 import { catchError } from 'rxjs/operators';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ListPermissionService extends BaseService {
   constructor(override http: HttpClient) {
@@ -18,18 +18,33 @@ export class ListPermissionService extends BaseService {
       .pipe(catchError(this.handleError));
   }
 
-  addListPermission(listPermission: ListPermissionRequestDTO): Observable<ListPermissionResponseDTO> {
-    return this.http.post<ListPermissionResponseDTO>(`${this.baseUrl}/lists/${listPermission.idList}/permissions`, listPermission)
+  addListPermission(
+    listPermission: ListPermissionRequestDTO,
+  ): Observable<ListPermissionResponseDTO> {
+    return this.http
+      .post<ListPermissionResponseDTO>(
+        `${this.baseUrl}/lists/${listPermission.idList}/permissions`,
+        listPermission,
+      )
       .pipe(catchError(this.handleError));
   }
 
-  updateListPermission(listId: number, permissionId: number, listPermission: ListPermission): Observable<ListPermission> {
-    return this.http.put<ListPermission>(`${this.baseUrl}/lists/${listId}/permissions/${permissionId}`, listPermission)
+  updateListPermission(
+    listId: number,
+    permissionId: number,
+    listPermission: ListPermission,
+  ): Observable<ListPermission> {
+    return this.http
+      .put<ListPermission>(
+        `${this.baseUrl}/lists/${listId}/permissions/${permissionId}`,
+        listPermission,
+      )
       .pipe(catchError(this.handleError));
   }
 
   deleteListPermission(shoppingListId: number, id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/lists/${shoppingListId}/permissions/${id}`)
+    return this.http
+      .delete<void>(`${this.baseUrl}/lists/${shoppingListId}/permissions/${id}`)
       .pipe(catchError(this.handleError));
   }
 }

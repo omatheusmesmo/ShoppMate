@@ -28,6 +28,7 @@ ShoppMate is a modern, high-performance web application designed to simplify sho
 The project follows strict development guidelines to ensure scalability, maintainability, and accessibility.
 
 ### 🧩 Angular Best Practices
+
 - **Standalone Components**: All components are standalone, promoting better modularity.
 - **Signals for State**: Moving towards Signals-based state management for optimized change detection.
 - **OnPush Change Detection**: Components are configured with `ChangeDetectionStrategy.OnPush` for better performance.
@@ -35,11 +36,13 @@ The project follows strict development guidelines to ensure scalability, maintai
 - **Modern Control Flow**: Templates utilize `@if`, `@for`, and `@switch` syntax.
 
 ### ⌨️ TypeScript Standards
+
 - Strict type checking enabled.
 - Preference for type inference.
 - Avoidance of `any`, favoring `unknown` for uncertain types.
 
 ### ♿ Accessibility (a11y)
+
 - Designed to pass all **AXE checks**.
 - Adheres to **WCAG AA** minimums.
 - Careful focus management, color contrast, and ARIA attribute usage.
@@ -55,12 +58,14 @@ The project follows strict development guidelines to ensure scalability, maintai
 ### Installation
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://github.com/omatheusmesmo/ShoppMateFront.git
    cd shopp-mate-front
    ```
 
 2. **Install dependencies:**
+
    ```bash
    npm install
    ```
@@ -75,6 +80,7 @@ Run the following command to start the development server:
 ```bash
 ng serve
 ```
+
 Navigate to `http://localhost:4200/`.
 
 ## 📁 Project Structure
@@ -96,12 +102,12 @@ src/
 
 ## ⚙️ Available Commands
 
-| Command | Description |
-|---------|-------------|
-| `ng serve` | Runs the app in development mode |
+| Command    | Description                              |
+| ---------- | ---------------------------------------- |
+| `ng serve` | Runs the app in development mode         |
 | `ng build` | Builds the app for production in `dist/` |
-| `ng test` | Executes unit tests via Karma |
-| `ng lint` | Runs linting checks (if configured) |
+| `ng test`  | Executes unit tests via Karma            |
+| `ng lint`  | Runs linting checks (if configured)      |
 
 ## 🤝 Contributing
 
@@ -112,4 +118,5 @@ We welcome contributions! Please refer to the [CONTRIBUTING.md](../CONTRIBUTING.
 This project is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International Public License. See the [LICENSE.md](../LICENSE.md) file in the project root for details.
 
 ---
+
 Developed with ❤️ by [Matheus](https://github.com/omatheusmesmo)

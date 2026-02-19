@@ -6,7 +6,14 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadless",
+    "lint": "ng lint",
+    "lint:custom": "node scripts/check-signals.js",
+    "build:staging": "ng build --configuration=staging",
+    "build:production": "ng build --configuration=production",
+    "prettier": "prettier --write \"src/**/*.{html,ts,css,scss,json}\"",
+    "prettier:check": "prettier --check \"src/**/*.{html,ts,css,scss,json}\""
   },
   "private": true,
   "dependencies": {
@@ -20,6 +27,7 @@
     "@angular/platform-browser": "^19.2.0",
     "@angular/platform-browser-dynamic": "^19.2.0",
     "@angular/router": "^19.2.0",
+    "prettier": "^3.8.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
@@ -29,6 +37,8 @@
     "@angular/cli": "^19.2.7",
     "@angular/compiler-cli": "^19.2.0",
     "@types/jasmine": "~5.1.0",
+    "angular-eslint": "^19.8.1",
+    "eslint": "^9.39.2",
     "jasmine-core": "~5.6.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",

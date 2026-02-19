@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -18,10 +18,11 @@ import { CategoryDialogComponent } from '../category-dialog/category-dialog.comp
     MatCardModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
   ],
   templateUrl: './categories-management.component.html',
-  styleUrls: ['./categories-management.component.scss']
+  styleUrls: ['./categories-management.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoriesManagementComponent implements OnInit {
   categories: Category[] = [];
@@ -30,7 +31,7 @@ export class CategoriesManagementComponent implements OnInit {
   constructor(
     private categoryService: CategoryService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
   ) {}
 
   ngOnInit(): void {
@@ -44,20 +45,22 @@ export class CategoriesManagementComponent implements OnInit {
         this.categories = categories;
         this.isLoading = false;
       },
-      error: (error) => {
-        this.snackBar.open('Erro ao carregar categorias', 'Fechar', { duration: 3000 });
+      error: () => {
+        this.snackBar.open('Erro ao carregar categorias', 'Fechar', {
+          duration: 3000,
+        });
         this.isLoading = false;
-      }
+      },
     });
   }
 
   openEditDialog(category: Category): void {
     const dialogRef = this.dialog.open(CategoryDialogComponent, {
       width: '400px',
-      data: { category, isEdit: true }
+      data: { category, isEdit: true },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.loadCategories();
       }
@@ -67,10 +70,10 @@ export class CategoriesManagementComponent implements OnInit {
   openNewCategoryDialog(): void {
     const dialogRef = this.dialog.open(CategoryDialogComponent, {
       width: '400px',
-      data: { isEdit: false }
+      data: { isEdit: false },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.loadCategories();
       }
@@ -81,12 +84,16 @@ export class CategoriesManagementComponent implements OnInit {
     if (confirm('Tem certeza que deseja excluir esta categoria?')) {
       this.categoryService.deleteCategory(id).subscribe({
         next: () => {
-          this.snackBar.open('Categoria excluída com sucesso', 'Fechar', { duration: 3000 });
+          this.snackBar.open('Categoria excluída com sucesso', 'Fechar', {
+            duration: 3000,
+          });
           this.loadCategories();
         },
-        error: (error) => {
-          this.snackBar.open('Erro ao excluir categoria', 'Fechar', { duration: 3000 });
-        }
+        error: () => {
+          this.snackBar.open('Erro ao excluir categoria', 'Fechar', {
+            duration: 3000,
+          });
+        },
       });
     }
   }

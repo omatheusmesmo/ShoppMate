@@ -26,8 +26,11 @@ By participating in this project, you agree to abide by our Code of Conduct (sta
    - Adhere to SOLID principles and Clean Code practices.
 5. **Write tests**: If you're adding a feature or fixing a bug, please include tests.
 6. **Update documentation**: If you change how the API works, update the relevant README or Bruno collection.
-7. **Self-review**: Read through your changes before submitting.
-8. **Submit the PR**: Link it to the relevant issue (e.g., `Closes #15`).
+7. **Run verification scripts**: Ensure your code passes all checks before pushing.
+   - **Frontend**: Run `npm run prettier`, `npm run lint`, and `npm run test:ci` inside the `frontend` folder.
+   - **Backend**: Ensure the project builds and tests pass using `./mvnw test`.
+8. **Self-review**: Read through your changes before submitting.
+9. **Submit the PR**: Link it to the relevant issue (e.g., `Closes #15`).
 
 ### Auto-Assignment Bot
 We use a bot to manage issue assignments. To work on an issue:

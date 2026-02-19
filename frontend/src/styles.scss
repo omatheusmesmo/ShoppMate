@@ -1,4 +1,4 @@
-@use '@angular/material' as mat;
+@use "@angular/material" as mat;
 
 // Define variables for colors based on Design Tokens
 $primary-token: var(--mat-sys-color-primary);
@@ -7,11 +7,13 @@ $warn-token: var(--mat-sys-color-error);
 
 html {
   color-scheme: light dark;
-  @include mat.theme((
-    color: mat.$violet-palette,
-    typography: Roboto,
-    density: 0
-  ));
+  @include mat.theme(
+    (
+      color: mat.$violet-palette,
+      typography: Roboto,
+      density: 0,
+    )
+  );
 }
 
 body {
@@ -57,17 +59,39 @@ body {
   flex: 1;
 }
 
-.mt-1 { margin-top: 8px; }
-.mt-2 { margin-top: 16px; }
-.mt-3 { margin-top: 24px; }
+.mt-1 {
+  margin-top: 8px;
+}
+.mt-2 {
+  margin-top: 16px;
+}
+.mt-3 {
+  margin-top: 24px;
+}
 
-.mb-1 { margin-bottom: 8px; }
-.mb-2 { margin-bottom: 16px; }
-.mb-3 { margin-bottom: 24px; }
+.mb-1 {
+  margin-bottom: 8px;
+}
+.mb-2 {
+  margin-bottom: 16px;
+}
+.mb-3 {
+  margin-bottom: 24px;
+}
 
 // Helpers
-.text-center { text-align: center; }
-.text-right { text-align: right; }
-.text-primary { color: $primary-token; }
-.text-accent { color: $accent-token; }
-.text-warn { color: $warn-token; }
+.text-center {
+  text-align: center;
+}
+.text-right {
+  text-align: right;
+}
+.text-primary {
+  color: $primary-token;
+}
+.text-accent {
+  color: $accent-token;
+}
+.text-warn {
+  color: $warn-token;
+}
