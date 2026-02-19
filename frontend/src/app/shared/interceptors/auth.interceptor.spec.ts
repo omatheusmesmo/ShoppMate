@@ -3,7 +3,6 @@ import {
   HttpClient,
   provideHttpClient,
   withInterceptors,
-  HttpErrorResponse,
 } from '@angular/common/http';
 import {
   HttpTestingController,
