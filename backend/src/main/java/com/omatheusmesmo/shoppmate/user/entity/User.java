@@ -3,7 +3,6 @@ package com.omatheusmesmo.shoppmate.user.entity;
 import com.omatheusmesmo.shoppmate.shared.domain.BaseAuditableEntity;
 import com.omatheusmesmo.shoppmate.user.dtos.RegisterUserDTO;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
