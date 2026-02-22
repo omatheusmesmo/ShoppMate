@@ -1,11 +1,13 @@
 package com.omatheusmesmo.shoppmate.auth.controller;
 
+import com.omatheusmesmo.shoppmate.user.dtos.RegisterUserDTO;
 import com.omatheusmesmo.shoppmate.user.dtos.UserResponseDTO;
 import com.omatheusmesmo.shoppmate.auth.dtos.LoginRequest;
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import com.omatheusmesmo.shoppmate.auth.service.JwtService;
 import com.omatheusmesmo.shoppmate.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,9 +31,9 @@ public class AuthController {
 
     @Operation(summary = "Register a User")
     @PostMapping("/sign")
-    public ResponseEntity<User> registerUser(@RequestBody User user) {
-        userService.addUser(user);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<User> registerUser(@Valid @RequestBody RegisterUserDTO dto) {
+        var registeredUser = userService.addUser(dto);
+        return ResponseEntity.ok(registeredUser);
     }
 
     @Operation(summary = "User's login")

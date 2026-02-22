@@ -1,7 +1,9 @@
 package com.omatheusmesmo.shoppmate.user.entity;
 
 import com.omatheusmesmo.shoppmate.shared.domain.BaseAuditableEntity;
+import com.omatheusmesmo.shoppmate.user.dtos.RegisterUserDTO;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,4 +25,9 @@ public class User extends BaseAuditableEntity {
     private String password;
     private String role = "USER";
 
+    public User(RegisterUserDTO dto) {
+        this.email = dto.email();
+        this.fullName = dto.fullName();
+        this.password = dto.password();
+    }
 }
