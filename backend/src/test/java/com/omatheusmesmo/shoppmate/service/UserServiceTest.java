@@ -55,7 +55,7 @@ class UserServiceTest {
         var user = new RegisterUserDTO(userMock.getEmail(), userMock.getFullName(), userMock.getPassword());
         User result = userService.addUser(user);
 
-    //    assertEquals(userMock, user); Now, because of the dto, a new instance is created
+        // assertEquals(userMock, user); Now, because of the dto, a new instance is created
         assertEquals("John@Doe.com", result.getEmail());
         assertEquals("John Doe", result.getFullName());
         assertEquals("encoded123", result.getPassword());
@@ -68,8 +68,8 @@ class UserServiceTest {
         doThrow(new IllegalArgumentException("E-mail is already being used!")).when(userRepository)
                 .save(any(User.class));
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> userService.addUser(new RegisterUserDTO(userMock.getEmail(), userMock.getFullName(), userMock.getPassword())));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> userService
+                .addUser(new RegisterUserDTO(userMock.getEmail(), userMock.getFullName(), userMock.getPassword())));
         assertEquals("E-mail is already being used!", exception.getMessage());
     }
 
