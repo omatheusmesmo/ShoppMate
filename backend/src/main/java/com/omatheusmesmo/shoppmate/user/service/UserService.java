@@ -1,5 +1,6 @@
 package com.omatheusmesmo.shoppmate.user.service;
 
+import com.omatheusmesmo.shoppmate.user.dtos.RegisterUserDTO;
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import com.omatheusmesmo.shoppmate.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,9 @@ public class UserService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    public User addUser(User user) {
+    public User addUser(RegisterUserDTO dto) {
+        var user = new User(dto);
+
         isUserValid(user);
         encryptPassword(user);
         userRepository.save(user);
