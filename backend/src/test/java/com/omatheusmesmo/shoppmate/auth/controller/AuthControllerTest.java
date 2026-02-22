@@ -42,62 +42,42 @@ public class AuthControllerTest {
 
     @Test
     void ShouldReturnOk_WhenPasswordFollowsRequirements() throws Exception {
-        var dto = new RegisterUserDTO(
-                "anakin@skywalker.com",
-                "Anakin Skywalker",
-                "CorrectPass@123"
-        );
+        var dto = new RegisterUserDTO("anakin@skywalker.com", "Anakin Skywalker", "CorrectPass@123");
 
-        mockMvc.perform(post("/auth/sign")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk());
+        mockMvc.perform(post("/auth/sign").contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(dto))).andExpect(status().isOk());
     }
 
     @Test
     void ShouldReturnBadRequest_WhenPasswordDoesNotContainUppercaseLetters() throws Exception {
-        var dto = new RegisterUserDTO(
-                "anakin@skywalker.com",
-                "Anakin Skywalker",
-                "password-123"
-        );
+        var dto = new RegisterUserDTO("anakin@skywalker.com", "Anakin Skywalker", "password-123");
 
-        mockMvc.perform(post("/auth/sign")
-                .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isBadRequest())
+        mockMvc.perform(post("/auth/sign").contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(dto))).andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Bad Request"))
-                .andExpect(jsonPath("$.message").value("Validation Failed"))
-                .andExpect(jsonPath("$.details").value("password: Password must contain at least one uppercase letter, one special character and a number!"));
+                .andExpect(jsonPath("$.message").value("Validation Failed")).andExpect(jsonPath("$.details").value(
+                        "password: Password must contain at least one uppercase letter, one special character and a number!"));
     }
 
     @Test
     void ShouldReturnBadRequest_WhenPasswordDoesNotContainSpecialCharacters() throws Exception {
-        var dto = new RegisterUserDTO(
-                "anakin@skywalker.com",
-                "Anakin Skywalker",
-                "Password123"
-        );
+        var dto = new RegisterUserDTO("anakin@skywalker.com", "Anakin Skywalker", "Password123");
 
-        mockMvc.perform(post("/auth/sign")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isBadRequest())
+        mockMvc.perform(post("/auth/sign").contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(dto))).andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Bad Request"))
-                .andExpect(jsonPath("$.message").value("Validation Failed"))
-                .andExpect(jsonPath("$.details").value("password: Password must contain at least one uppercase letter, one special character and a number!"));
+                .andExpect(jsonPath("$.message").value("Validation Failed")).andExpect(jsonPath("$.details").value(
+                        "password: Password must contain at least one uppercase letter, one special character and a number!"));
     }
 
     @Test
     void ShouldReturnBadRequest_WhenPasswordDoesNotContainNumbers() throws Exception {
-        var dto = new RegisterUserDTO(
-                "anakin@skywalker.com",
-                "Anakin Skywalker",
-                "Password@"
-        );
+        var dto = new RegisterUserDTO("anakin@skywalker.com", "Anakin Skywalker", "Password@");
 
-        mockMvc.perform(post("/auth/sign")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isBadRequest())
+        mockMvc.perform(post("/auth/sign").contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(dto))).andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Bad Request"))
-                .andExpect(jsonPath("$.message").value("Validation Failed"))
-                .andExpect(jsonPath("$.details").value("password: Password must contain at least one uppercase letter, one special character and a number!"));
+                .andExpect(jsonPath("$.message").value("Validation Failed")).andExpect(jsonPath("$.details").value(
+                        "password: Password must contain at least one uppercase letter, one special character and a number!"));
     }
 }
