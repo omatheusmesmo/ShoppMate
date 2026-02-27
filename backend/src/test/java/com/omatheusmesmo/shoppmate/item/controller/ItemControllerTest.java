@@ -154,7 +154,6 @@ class ItemControllerTest {
     @WithMockUser
     void testPostAddItem_BadRequest() throws Exception {
         when(itemMapper.toEntity(any(ItemRequestDTO.class))).thenThrow(new IllegalArgumentException("Invalid item"));
-        ;
 
         ItemRequestDTO invalidItem = new ItemRequestDTO("", 1L, 1L);
 
