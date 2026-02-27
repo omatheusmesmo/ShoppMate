@@ -34,8 +34,8 @@ export class ShoppingListComponent implements OnInit {
   constructor(
     private shoppingListService: ShoppingListService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
-  ) { }
+    private snackBar: MatSnackBar,
+  ) {}
 
   ngOnInit(): void {
     this.loadLists();
@@ -104,7 +104,7 @@ export class ShoppingListComponent implements OnInit {
   openShareDialog(list: ShoppingListResponseDTO): void {
     this.dialog.open(ListShareDialogComponent, {
       width: '600px',
-      data: { listId: list.idList, listName: list.listName }
+      data: { listId: list.idList, listName: list.listName },
     });
   }
 }

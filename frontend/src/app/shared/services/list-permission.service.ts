@@ -1,7 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ListPermission, ListPermissionRequestDTO, ListPermissionResponseDTO, ListPermissionSummaryDTO } from '../interfaces/list-permission.interface';
+import {
+  ListPermission,
+  ListPermissionRequestDTO,
+  ListPermissionResponseDTO,
+  ListPermissionSummaryDTO,
+} from '../interfaces/list-permission.interface';
 import { BaseService } from './base.service';
 import { catchError } from 'rxjs/operators';
 
@@ -13,8 +18,13 @@ export class ListPermissionService extends BaseService {
     super();
   }
 
-  getAllListPermissions(shoppingListId: number): Observable<ListPermissionSummaryDTO[]> {
-    return this.http.get<ListPermissionSummaryDTO[]>(`${this.baseUrl}/lists/${shoppingListId}/permissions`)
+  getAllListPermissions(
+    shoppingListId: number,
+  ): Observable<ListPermissionSummaryDTO[]> {
+    return this.http
+      .get<
+        ListPermissionSummaryDTO[]
+      >(`${this.baseUrl}/lists/${shoppingListId}/permissions`)
       .pipe(catchError(this.handleError));
   }
 
