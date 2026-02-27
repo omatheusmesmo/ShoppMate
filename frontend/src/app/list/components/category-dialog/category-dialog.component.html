@@ -11,12 +11,14 @@
         formControlName="name"
         placeholder="Digite o nome da categoria"
       />
-      @if (categoryForm.get('name')?.hasError('required')) {
-      <mat-error> Nome é obrigatório </mat-error>
-      } @if (categoryForm.get('name')?.hasError('minlength')) {
-      <mat-error> Nome deve ter pelo menos 3 caracteres </mat-error>
-      } @if (categoryForm.get('name')?.hasError('duplicateName')) {
-      <mat-error> Já existe uma categoria com este nome </mat-error>
+      @if (categoryForm.get("name")?.hasError("required")) {
+        <mat-error> Nome é obrigatório </mat-error>
+      }
+      @if (categoryForm.get("name")?.hasError("minlength")) {
+        <mat-error> Nome deve ter pelo menos 3 caracteres </mat-error>
+      }
+      @if (categoryForm.get("name")?.hasError("duplicateName")) {
+        <mat-error> Já existe uma categoria com este nome </mat-error>
       }
     </mat-form-field>
   </mat-dialog-content>
