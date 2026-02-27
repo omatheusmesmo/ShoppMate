@@ -1,4 +1,10 @@
-import { Component, Inject, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Inject,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -19,10 +25,10 @@ import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ListPermissionService } from '../../../shared/services/list-permission.service';
 import { UserService } from '../../../shared/services/user.service';
 import {
-  ListPermission,
   ListPermissionSummaryDTO,
   Permission,
 } from '../../../shared/interfaces/list-permission.interface';
@@ -42,9 +48,11 @@ import { User } from '../../../shared/interfaces/user.interface';
     MatTableModule,
     MatIconModule,
     MatDividerModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './list-share-dialog.component.html',
   styleUrls: ['./list-share-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListShareDialogComponent implements OnInit {
   private fb = inject(FormBuilder);
