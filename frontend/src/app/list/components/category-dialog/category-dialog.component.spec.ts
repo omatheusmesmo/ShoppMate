@@ -14,25 +14,32 @@ describe('CategoryDialogComponent - Duplicate Validation', () => {
 
   const mockCategories = [
     { id: 1, name: 'Fruits', createdAt: '', updatedAt: '', deleted: false },
-    { id: 2, name: 'Dairy', createdAt: '', updatedAt: '', deleted: false }
+    { id: 2, name: 'Dairy', createdAt: '', updatedAt: '', deleted: false },
   ];
 
   beforeEach(async () => {
-    categoryServiceSpy = jasmine.createSpyObj('CategoryService', ['getAllCategories', 'addCategory', 'updateCategory']);
+    categoryServiceSpy = jasmine.createSpyObj('CategoryService', [
+      'getAllCategories',
+      'addCategory',
+      'updateCategory',
+    ]);
     categoryServiceSpy.getAllCategories.and.returnValue(of(mockCategories));
 
     await TestBed.configureTestingModule({
       imports: [
         CategoryDialogComponent,
         ReactiveFormsModule,
-        NoopAnimationsModule
+        NoopAnimationsModule,
       ],
       providers: [
-        { provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } },
+        {
+          provide: MatDialogRef,
+          useValue: { close: jasmine.createSpy('close') },
+        },
         { provide: MAT_DIALOG_DATA, useValue: { isEdit: false } },
         { provide: CategoryService, useValue: categoryServiceSpy },
-        { provide: MatSnackBar, useValue: { open: jasmine.createSpy('open') } }
-      ]
+        { provide: MatSnackBar, useValue: { open: jasmine.createSpy('open') } },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CategoryDialogComponent);
@@ -42,7 +49,7 @@ describe('CategoryDialogComponent - Duplicate Validation', () => {
 
   it('should be invalid if name is a duplicate (case-insensitive and whitespace)', () => {
     const nameControl = component.categoryForm.get('name');
-    
+
     nameControl?.setValue('Fruits');
     expect(nameControl?.hasError('duplicateName')).toBeTrue();
 
@@ -54,7 +61,9 @@ describe('CategoryDialogComponent - Duplicate Validation', () => {
   });
 
   it('should disable the submit button when the form is invalid', () => {
-    const submitBtn = fixture.nativeElement.querySelector('button[color="primary"]');
+    const submitBtn = fixture.nativeElement.querySelector(
+      'button[color="primary"]',
+    );
     const nameControl = component.categoryForm.get('name');
 
     // Case: Empty name
@@ -77,15 +86,25 @@ describe('CategoryDialogComponent - Duplicate Validation', () => {
     // Reconfigure for Edit Mode
     TestBed.resetTestingModule();
     const originalCategory = mockCategories[0]; // "Fruits"
-    
+
     await TestBed.configureTestingModule({
-      imports: [CategoryDialogComponent, ReactiveFormsModule, NoopAnimationsModule],
+      imports: [
+        CategoryDialogComponent,
+        ReactiveFormsModule,
+        NoopAnimationsModule,
+      ],
       providers: [
-        { provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } },
-        { provide: MAT_DIALOG_DATA, useValue: { isEdit: true, category: originalCategory } },
+        {
+          provide: MatDialogRef,
+          useValue: { close: jasmine.createSpy('close') },
+        },
+        {
+          provide: MAT_DIALOG_DATA,
+          useValue: { isEdit: true, category: originalCategory },
+        },
         { provide: CategoryService, useValue: categoryServiceSpy },
-        { provide: MatSnackBar, useValue: { open: jasmine.createSpy('open') } }
-      ]
+        { provide: MatSnackBar, useValue: { open: jasmine.createSpy('open') } },
+      ],
     }).compileComponents();
 
     const editFixture = TestBed.createComponent(CategoryDialogComponent);
@@ -93,7 +112,7 @@ describe('CategoryDialogComponent - Duplicate Validation', () => {
     editFixture.detectChanges();
 
     const nameControl = editComponent.categoryForm.get('name');
-    
+
     // Should be valid with its own name
     nameControl?.setValue('Fruits');
     expect(nameControl?.hasError('duplicateName')).toBeFalse();

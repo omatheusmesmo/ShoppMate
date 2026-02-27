@@ -8,6 +8,7 @@ import { UnitService } from '../../../../shared/services/unit.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { of } from 'rxjs';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { ItemResponseDTO } from '../../../../shared/interfaces/item.interface';
 
 describe('ItemDialogComponent - Duplicate Validation', () => {
   let component: ItemDialogComponent;
@@ -16,13 +17,20 @@ describe('ItemDialogComponent - Duplicate Validation', () => {
   let categoryServiceSpy: jasmine.SpyObj<CategoryService>;
   let unitServiceSpy: jasmine.SpyObj<UnitService>;
 
-  const mockItems = [
-    { id: 1, name: 'Apple', category: { id: 1, name: 'Fruits' }, unit: { id: 1, name: 'kg', symbol: 'kg' } }
-  ] as any;
+  const mockItems: ItemResponseDTO[] = [
+    {
+      id: 1,
+      name: 'Apple',
+      category: { id: 1, name: 'Fruits' } as any,
+      unit: { id: 1, name: 'kg', symbol: 'kg' } as any,
+    },
+  ];
 
   beforeEach(async () => {
     itemServiceSpy = jasmine.createSpyObj('ItemService', ['getAllItems']);
-    categoryServiceSpy = jasmine.createSpyObj('CategoryService', ['getAllCategories']);
+    categoryServiceSpy = jasmine.createSpyObj('CategoryService', [
+      'getAllCategories',
+    ]);
     unitServiceSpy = jasmine.createSpyObj('UnitService', ['getAllUnits']);
 
     itemServiceSpy.getAllItems.and.returnValue(of(mockItems));
@@ -30,19 +38,18 @@ describe('ItemDialogComponent - Duplicate Validation', () => {
     unitServiceSpy.getAllUnits.and.returnValue(of([]));
 
     await TestBed.configureTestingModule({
-      imports: [
-        ItemDialogComponent,
-        ReactiveFormsModule,
-        NoopAnimationsModule
-      ],
+      imports: [ItemDialogComponent, ReactiveFormsModule, NoopAnimationsModule],
       providers: [
-        { provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } },
+        {
+          provide: MatDialogRef,
+          useValue: { close: jasmine.createSpy('close') },
+        },
         { provide: MAT_DIALOG_DATA, useValue: { isEdit: false } },
         { provide: ItemService, useValue: itemServiceSpy },
         { provide: CategoryService, useValue: categoryServiceSpy },
         { provide: UnitService, useValue: unitServiceSpy },
-        { provide: MatSnackBar, useValue: { open: jasmine.createSpy('open') } }
-      ]
+        { provide: MatSnackBar, useValue: { open: jasmine.createSpy('open') } },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ItemDialogComponent);
@@ -66,17 +73,20 @@ describe('ItemDialogComponent - Duplicate Validation', () => {
     // Reconfigure for Edit Mode
     TestBed.resetTestingModule();
     const originalItem = { name: 'Apple', idCategory: 1, idUnit: 1 };
-    
+
     await TestBed.configureTestingModule({
       imports: [ItemDialogComponent, ReactiveFormsModule, NoopAnimationsModule],
       providers: [
-        { provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } },
+        {
+          provide: MatDialogRef,
+          useValue: { close: jasmine.createSpy('close') },
+        },
         { provide: MAT_DIALOG_DATA, useValue: { item: originalItem } },
         { provide: ItemService, useValue: itemServiceSpy },
         { provide: CategoryService, useValue: categoryServiceSpy },
         { provide: UnitService, useValue: unitServiceSpy },
-        { provide: MatSnackBar, useValue: { open: jasmine.createSpy('open') } }
-      ]
+        { provide: MatSnackBar, useValue: { open: jasmine.createSpy('open') } },
+      ],
     }).compileComponents();
 
     const editFixture = TestBed.createComponent(ItemDialogComponent);

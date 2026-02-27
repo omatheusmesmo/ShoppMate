@@ -115,7 +115,9 @@ export class CategoryDialogComponent implements OnInit {
       const categoryData: Category = {
         name: this.categoryForm.value.name ?? '',
         id:
-          this.isEdit() && this.data.category ? this.data.category.id : undefined,
+          this.isEdit() && this.data.category
+            ? this.data.category.id
+            : undefined,
         createdAt:
           this.isEdit() && this.data.category
             ? this.data.category.createdAt

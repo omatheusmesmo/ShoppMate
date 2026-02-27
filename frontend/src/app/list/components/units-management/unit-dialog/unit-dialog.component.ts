@@ -55,7 +55,7 @@ export function duplicateNameValidator(
   ],
   template: `
     <form [formGroup]="unitForm" (ngSubmit)="onSave()">
-      <h2 mat-dialog-title>{{ data.unit ? "Editar" : "Nova" }} Unidade</h2>
+      <h2 mat-dialog-title>{{ data.unit ? 'Editar' : 'Nova' }} Unidade</h2>
       <mat-dialog-content>
         <mat-form-field appearance="outline" class="w-100">
           <mat-label>Nome</mat-label>
@@ -66,9 +66,10 @@ export function duplicateNameValidator(
             required
           />
           @if (unitForm.get('name')?.hasError('required')) {
-          <mat-error> Nome é obrigatório </mat-error>
-          } @if (unitForm.get('name')?.hasError('duplicateName')) {
-          <mat-error> Já existe uma unidade com este nome </mat-error>
+            <mat-error> Nome é obrigatório </mat-error>
+          }
+          @if (unitForm.get('name')?.hasError('duplicateName')) {
+            <mat-error> Já existe uma unidade com este nome </mat-error>
           }
         </mat-form-field>
         <mat-form-field appearance="outline" class="w-100">
@@ -80,7 +81,7 @@ export function duplicateNameValidator(
             required
           />
           @if (unitForm.get('symbol')?.hasError('required')) {
-          <mat-error> Símbolo é obrigatório </mat-error>
+            <mat-error> Símbolo é obrigatório </mat-error>
           }
         </mat-form-field>
       </mat-dialog-content>
