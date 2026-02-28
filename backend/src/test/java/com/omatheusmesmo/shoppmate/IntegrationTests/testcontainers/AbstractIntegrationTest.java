@@ -18,6 +18,7 @@ public class AbstractIntegrationTest {
 
     static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
+        // Minimum required Docker Engine API version is 1.24 - "min-api-version": "1.24"
         static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:18");
 
         private static void startContainers() {
