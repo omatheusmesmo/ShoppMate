@@ -70,7 +70,6 @@ export class ItemComponent implements OnInit {
 
   private confirmDialog = inject(ConfirmDialogService);
   private feedback = inject(FeedbackService);
-  
 
   ngOnInit(): void {
     this.loadInitialData();

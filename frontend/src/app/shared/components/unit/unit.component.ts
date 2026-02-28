@@ -77,7 +77,7 @@ export class UnitComponent implements OnInit {
   onSubmit(): void {
     if (this.unitForm.invalid) return;
 
-    const editingId = this.editingUnitId(); 
+    const editingId = this.editingUnitId();
 
     const { name, symbol } = this.unitForm.getRawValue();
     const unitData: Unit = { name, symbol };

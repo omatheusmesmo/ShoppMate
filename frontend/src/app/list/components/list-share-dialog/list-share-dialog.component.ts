@@ -78,7 +78,6 @@ export class ListShareDialogComponent implements OnInit {
   permissionTypes = Object.values(Permission);
   readonly isLoading = signal(false);
   isLoading = false;
-  
 
   ngOnInit(): void {
     this.loadPermissions();

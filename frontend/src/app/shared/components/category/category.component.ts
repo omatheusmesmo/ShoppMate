@@ -53,7 +53,7 @@ export class CategoryComponent implements OnInit {
   readonly editingCategoryId = signal<number | null>(null);
 
   private confirmDialog = inject(ConfirmDialogService);
-  private feedback = inject(FeedbackService);  
+  private feedback = inject(FeedbackService);
 
   ngOnInit(): void {
     this.loadCategories();
