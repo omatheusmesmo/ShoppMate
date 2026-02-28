@@ -1,8 +1,10 @@
 package com.omatheusmesmo.shoppmate.list.mapper;
 
 import com.omatheusmesmo.shoppmate.list.dtos.ShoppingListRequestDTO;
+import java.math.BigDecimal;
 import com.omatheusmesmo.shoppmate.list.dtos.ShoppingListResponseDTO;
 import com.omatheusmesmo.shoppmate.list.dtos.ShoppingListUpdateRequestDTO;
+import com.omatheusmesmo.shoppmate.list.entity.ListItem;
 import com.omatheusmesmo.shoppmate.list.entity.ShoppingList;
 import com.omatheusmesmo.shoppmate.user.dtos.UserResponseDTO;
 import com.omatheusmesmo.shoppmate.user.entity.User;
@@ -42,8 +44,23 @@ public class ListMapper {
         }
 
         UserResponseDTO ownerDTO = userMapper.toResponseDTO(entity.getOwner());
+        BigDecimal totalValue = calculateTotalValue(entity);
 
-        return new ShoppingListResponseDTO(entity.getId(), entity.getName(), ownerDTO);
+        return new ShoppingListResponseDTO(entity.getId(), entity.getName(), ownerDTO, totalValue);
+    }
+
+    private BigDecimal calculateTotalValue(ShoppingList entity) {
+        if (entity.getItems() == null) {
+            return BigDecimal.ZERO;
+        }
+        return entity.getItems().stream().filter(item -> !item.getDeleted()).map(this::calculateItemTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private BigDecimal calculateItemTotal(ListItem item) {
+        BigDecimal price = item.getUnitPrice() != null ? item.getUnitPrice() : BigDecimal.ZERO;
+        Integer quantity = item.getQuantity() != null ? item.getQuantity() : 0;
+        return price.multiply(BigDecimal.valueOf(quantity));
     }
 
     public void updateEntityFromDto(ShoppingListUpdateRequestDTO dto, ShoppingList entity) {

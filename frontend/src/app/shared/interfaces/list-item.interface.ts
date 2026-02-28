@@ -5,6 +5,7 @@ export interface ListItemRequestDTO {
   listId: number;
   itemId: number;
   quantity?: number;
+  unitPrice?: number;
 }
 
 export interface ListItemResponseDTO {
@@ -13,4 +14,6 @@ export interface ListItemResponseDTO {
   idListItem: number;
   quantity: number;
   purchased: boolean;
+  unitPrice: number;
+  totalPrice: number;
 }

@@ -62,6 +62,7 @@ export class ListItemComponent implements OnInit {
     this.listItemForm = this.fb.group({
       itemId: ['', Validators.required],
       quantity: [1, [Validators.required, Validators.min(1)]],
+      unitPrice: [0, [Validators.required, Validators.min(0)]],
       purchased: [false],
     });
 
@@ -75,7 +76,7 @@ export class ListItemComponent implements OnInit {
   loadInitialData(): void {
     this.isLoading = true;
     forkJoin({
-      listItems: this.listItemService.getAllListItems(this.listId),
+      listItems: this.listItemService.getListItemsByListId(this.listId),
       items: this.itemService.getAllItems(),
     }).subscribe({
       next: (data) => {
@@ -97,6 +98,7 @@ export class ListItemComponent implements OnInit {
       listId: this.listId,
       itemId: this.listItemForm.value.itemId,
       quantity: this.listItemForm.value.quantity,
+      unitPrice: this.listItemForm.value.unitPrice,
     };
 
     const operation = this.editingListItemId
@@ -105,7 +107,7 @@ export class ListItemComponent implements OnInit {
           this.editingListItemId,
           listItemData,
         )
-      : this.listItemService.addListItem(listItemData);
+      : this.listItemService.addListItem(this.listId, listItemData);
 
     operation.subscribe({
       next: () => {
@@ -132,6 +134,7 @@ export class ListItemComponent implements OnInit {
     this.listItemForm.patchValue({
       itemId: listItem.item.id,
       quantity: listItem.quantity,
+      unitPrice: listItem.unitPrice,
       purchased: listItem.purchased,
     });
   }
@@ -159,6 +162,7 @@ export class ListItemComponent implements OnInit {
       listId: this.listId,
       itemId: listItem.item.id,
       quantity: listItem.quantity,
+      unitPrice: listItem.unitPrice,
     };
 
     this.listItemService

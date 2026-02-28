@@ -3,6 +3,7 @@ package com.omatheusmesmo.shoppmate.list.entity;
 import com.omatheusmesmo.shoppmate.item.entity.Item;
 import com.omatheusmesmo.shoppmate.shared.domain.BaseAuditableEntity;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,4 +27,6 @@ public class ListItem extends BaseAuditableEntity {
 
     private Integer quantity;
     private Boolean purchased = false;
+
+    private BigDecimal unitPrice;
 }

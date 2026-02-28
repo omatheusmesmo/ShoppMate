@@ -1,6 +1,7 @@
 package com.omatheusmesmo.shoppmate.list.mapper;
 
 import com.omatheusmesmo.shoppmate.item.entity.Item;
+import java.math.BigDecimal;
 import com.omatheusmesmo.shoppmate.item.mapper.ItemMapper;
 import com.omatheusmesmo.shoppmate.list.dtos.ListItemRequestDTO;
 import com.omatheusmesmo.shoppmate.list.dtos.ListItemResponseDTO;
@@ -24,13 +25,28 @@ public class ListItemMapper {
         listItem.setShoppList(shoppingList);
         listItem.setItem(item);
         listItem.setQuantity(dto.quantity());
+        listItem.setUnitPrice(dto.unitPrice());
         return listItem;
     }
 
     public ListItemResponseDTO toResponseDTO(ListItem listItem) {
+        BigDecimal unitPrice = getSafeUnitPrice(listItem);
+        BigDecimal totalPrice = calculateTotalPrice(unitPrice, listItem.getQuantity());
+
         return new ListItemResponseDTO(listMapper.toResponseDTO(listItem.getShoppList()),
                 itemMapper.toResponseDTO(listItem.getItem()), listItem.getId(), listItem.getQuantity(),
-                listItem.getPurchased());
+                listItem.getPurchased(), unitPrice, totalPrice);
+    }
+
+    private BigDecimal getSafeUnitPrice(ListItem listItem) {
+        return listItem.getUnitPrice() != null ? listItem.getUnitPrice() : BigDecimal.ZERO;
+    }
+
+    private BigDecimal calculateTotalPrice(BigDecimal unitPrice, Integer quantity) {
+        if (unitPrice == null || quantity == null) {
+            return BigDecimal.ZERO;
+        }
+        return unitPrice.multiply(BigDecimal.valueOf(quantity));
     }
 
     public ListItemSummaryDTO toSummaryDTO(ListItem listItem) {

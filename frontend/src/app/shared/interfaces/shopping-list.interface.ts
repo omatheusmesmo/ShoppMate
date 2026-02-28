@@ -18,6 +18,7 @@ export interface ShoppingListResponseDTO {
   idList: number;
   listName: string;
   owner: UserResponseDTO;
+  totalValue: number;
 }
 
 export interface ListItemResponseDTO {

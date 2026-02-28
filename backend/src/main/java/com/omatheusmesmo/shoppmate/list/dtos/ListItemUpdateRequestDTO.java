@@ -3,7 +3,9 @@ package com.omatheusmesmo.shoppmate.list.dtos;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
+import java.math.BigDecimal;
+
 public record ListItemUpdateRequestDTO(@NotNull(message = "List ID cannot be null") Long listId,
         @NotNull(message = "Item ID cannot be null") Long itemId, @Min(1) Integer quantity,
-        @NotNull(message = "Purchased field cannot be null") Boolean purchased) {
+        @NotNull(message = "Purchased field cannot be null") Boolean purchased, BigDecimal unitPrice) {
 }

@@ -2,5 +2,7 @@ package com.omatheusmesmo.shoppmate.list.dtos;
 
 import com.omatheusmesmo.shoppmate.user.dtos.UserResponseDTO;
 
-public record ShoppingListResponseDTO(Long idList, String listName, UserResponseDTO owner) {
+import java.math.BigDecimal;
+
+public record ShoppingListResponseDTO(Long idList, String listName, UserResponseDTO owner, BigDecimal totalValue) {
 }

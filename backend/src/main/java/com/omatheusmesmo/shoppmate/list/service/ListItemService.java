@@ -77,6 +77,7 @@ public class ListItemService {
 
         existingListItem.setQuantity(listItemUpdateRequestDTO.quantity());
         existingListItem.setPurchased(listItemUpdateRequestDTO.purchased());
+        existingListItem.setUnitPrice(listItemUpdateRequestDTO.unitPrice());
 
         auditService.setAuditData(existingListItem, false);
         ListItemRepository.save(existingListItem);

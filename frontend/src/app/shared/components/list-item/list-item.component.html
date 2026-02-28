@@ -71,15 +71,27 @@
         <p>No items in this list</p>
       </mat-card-content>
     </mat-card>
-  } @else {
+    <mat-card class="list-summary-card">
+      <mat-card-content>
+        <div class="summary-row">
+          <span class="summary-label">Total List Value:</span>
+          <span class="summary-value">{{
+            listItems[0]?.shoppingList?.totalValue | currency
+          }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
     <div class="list-items-grid">
       @for (listItem of listItems; track listItem.idListItem) {
         <mat-card class="list-item-card" [class.purchased]="listItem.purchased">
           <mat-card-header>
             <mat-card-title>{{ listItem.item.name }}</mat-card-title>
             <mat-card-subtitle>
-              {{ listItem.quantity }} {{ listItem.item.unit.symbol }} |
-              Category: {{ listItem.item.category.name }}
+              {{ listItem.quantity }} {{ listItem.item.unit.symbol }} x
+              {{ listItem.unitPrice | currency }} =
+              {{ listItem.totalPrice | currency }} | Category:
+              {{ listItem.item.category.name }}
             </mat-card-subtitle>
           </mat-card-header>
           <mat-card-actions>

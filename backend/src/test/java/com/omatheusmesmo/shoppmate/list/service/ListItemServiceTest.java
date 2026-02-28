@@ -1,6 +1,7 @@
 package com.omatheusmesmo.shoppmate.list.service;
 
 import com.omatheusmesmo.shoppmate.item.entity.Item;
+import java.math.BigDecimal;
 import com.omatheusmesmo.shoppmate.item.service.ItemService;
 import com.omatheusmesmo.shoppmate.list.dtos.ListItemRequestDTO;
 import com.omatheusmesmo.shoppmate.list.dtos.ListItemUpdateRequestDTO;
@@ -150,7 +151,7 @@ class ListItemServiceTest {
 
     @Test
     void editList_Ok() {
-        ListItemUpdateRequestDTO updateDTO = new ListItemUpdateRequestDTO(1L, 1L, 3, true);
+        ListItemUpdateRequestDTO updateDTO = new ListItemUpdateRequestDTO(1L, 1L, 3, true, BigDecimal.valueOf(10.0));
         when(ListItemRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.of(listItem));
 
         ListItem result = service.editList(1L, updateDTO);
@@ -165,7 +166,7 @@ class ListItemServiceTest {
 
     @Test
     void editList_WhenListItemNotFound() {
-        ListItemUpdateRequestDTO updateDTO = new ListItemUpdateRequestDTO(1L, 1L, 3, true);
+        ListItemUpdateRequestDTO updateDTO = new ListItemUpdateRequestDTO(1L, 1L, 3, true, BigDecimal.valueOf(20.0));
         when(ListItemRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> service.editList(1L, updateDTO));
@@ -186,6 +187,6 @@ class ListItemServiceTest {
     }
 
     private ListItemRequestDTO createSampleItem() {
-        return new ListItemRequestDTO(1L, 1L, 2);
+        return new ListItemRequestDTO(1L, 1L, 2, BigDecimal.valueOf(10.0));
     }
 }
