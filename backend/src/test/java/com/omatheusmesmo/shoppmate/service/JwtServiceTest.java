@@ -1,7 +1,7 @@
 package com.omatheusmesmo.shoppmate.service;
 
-import com.nimbusds.jwt.EncryptedJWT;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import com.omatheusmesmo.shoppmate.auth.service.JwtService;
 import com.omatheusmesmo.shoppmate.auth.service.JwtServiceException;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,8 +10,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import java.security.KeyPair;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,6 +28,10 @@ class JwtServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         jwtService = Mockito.spy(new JwtService()); // instanciando a classe que será testada
+
+        ReflectionTestUtils.setField(jwtService, "secretKey", "test-secret-key-for-jwt-signing-very-long-and-secure");
+        ReflectionTestUtils.setField(jwtService, "tokenExpiration", 3600000L);
+
         when(userDetails.getUsername()).thenReturn("testuser");
         when(userDetails.isCredentialsNonExpired()).thenReturn(true);
     }
@@ -69,35 +73,13 @@ class JwtServiceTest {
     }
 
     @Test
-    void shouldGenerateRSAKeyPair() {
-        // Teste para verificar se a geração da chave RSA ocorre corretamente
-        KeyPair keyPair = jwtService.generateRSAKeys();
-
-        assertNotNull(keyPair, "RSA KeyPair should not be null");
-        assertNotNull(keyPair.getPrivate(), "Private key should not be null");
-        assertNotNull(keyPair.getPublic(), "Public key should not be null");
-    }
-
-    void shouldThrowExceptionWhenKeyGenerationFails() {
-        // Simulando falha na geração de chave para testar o manejo de exceção
-        JwtService faultyJwtService = new JwtService() {
-            @Override
-            public KeyPair generateRSAKeys() {
-                throw new RuntimeException("Key generation failed");
-            }
-        };
-
-        assertThrows(JwtServiceException.class, faultyJwtService::generateRSAKeys,
-                "Key generation failure should throw exception");
-    }
-
     void shouldBuildTokenWithCorrectExpirationTime() {
         String token = jwtService.generateToken(userDetails);
 
-        EncryptedJWT encryptedJWT;
+        SignedJWT signedJWT;
         try {
-            encryptedJWT = EncryptedJWT.parse(token);
-            JWTClaimsSet claimsSet = encryptedJWT.getJWTClaimsSet();
+            signedJWT = SignedJWT.parse(token);
+            JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
 
             assertNotNull(claimsSet.getExpirationTime(), "Token should have an expiration time");
             assertTrue(claimsSet.getExpirationTime().after(new Date()),
@@ -107,12 +89,22 @@ class JwtServiceTest {
         }
     }
 
+    @Test
     void shouldValidateValidToken() {
         String token = jwtService.generateToken(userDetails);
 
         boolean isValid = jwtService.validateToken(token);
 
         assertTrue(isValid, "The token should be valid");
+    }
+
+    @Test
+    void shouldValidateInvalidToken() {
+        String invalidToken = "invalid_token";
+
+        boolean isValid = jwtService.validateToken(invalidToken);
+
+        assertFalse(isValid, "Invalid token should not be valid");
     }
 
 }
