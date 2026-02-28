@@ -60,7 +60,8 @@ export class UnitsManagementComponent implements OnInit {
         tap((response) => {
           this.unitsSubject.next(response || []);
         }),
-        catchError(() => {
+ 
+        catchError((error) => {
           this.error = true;
           this.unitsSubject.next([]);
           this.snackBar.open(
@@ -95,7 +96,8 @@ export class UnitsManagementComponent implements OnInit {
               duration: 3000,
             });
           },
-          error: () => {
+ 
+          error: (error) => {
             this.snackBar.open('Erro ao atualizar unidade', 'Fechar', {
               duration: 3000,
             });
@@ -114,31 +116,7 @@ export class UnitsManagementComponent implements OnInit {
             duration: 3000,
           });
         },
-        error: () => {
-          this.snackBar.open('Erro ao excluir unidade', 'Fechar', {
-            duration: 3000,
-          });
-        },
-      });
-    }
-  }
-
-  openNewUnitDialog(): void {
-    const dialogRef = this.dialog.open(UnitDialogComponent, {
-      width: '400px',
-      data: { unit: null },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.unitService.addUnit(result).subscribe({
-          next: () => {
-            this.loadUnits();
-            this.snackBar.open('Unidade adicionada com sucesso', 'Fechar', {
-              duration: 3000,
-            });
-          },
-          error: () => {
+          error: (error) => {
             this.snackBar.open('Erro ao adicionar unidade', 'Fechar', {
               duration: 3000,
             });
