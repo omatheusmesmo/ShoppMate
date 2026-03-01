@@ -1,7 +1,7 @@
 CREATE TABLE items (
-    id SERIAL PRIMARY KEY,
-    id_category INTEGER,
-    id_unit INTEGER,
+    id BIGINT PRIMARY KEY,
+    id_category BIGINT,
+    id_unit BIGINT,
     name VARCHAR(100) NOT NULL,
     created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,

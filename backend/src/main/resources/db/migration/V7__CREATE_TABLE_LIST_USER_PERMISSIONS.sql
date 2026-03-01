@@ -1,7 +1,7 @@
 CREATE TABLE list_user_permissions (
-    id SERIAL PRIMARY KEY,
-    id_list INTEGER NOT NULL,
-    id_user INTEGER NOT NULL,
+    id BIGINT PRIMARY KEY,
+    id_list BIGINT NOT NULL,
+    id_user BIGINT NOT NULL,
     permission_type VARCHAR(50) NOT NULL,
     created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,

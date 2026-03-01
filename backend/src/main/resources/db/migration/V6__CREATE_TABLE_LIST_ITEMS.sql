@@ -1,7 +1,7 @@
 CREATE TABLE list_items (
-    id SERIAL PRIMARY KEY,
-    id_list INTEGER NOT NULL,
-    id_item INTEGER NOT NULL,
+    id BIGINT PRIMARY KEY,
+    id_list BIGINT NOT NULL,
+    id_item BIGINT NOT NULL,
     quantity INTEGER NOT NULL,
     purchased BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
