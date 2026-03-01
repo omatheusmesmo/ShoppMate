@@ -1,14 +1,15 @@
-package com.omatheusmesmo.shoppmate.IntegrationTests.controller;
+package com.omatheusmesmo.shoppmate.item.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.omatheusmesmo.shoppmate.IntegrationTests.testcontainers.AbstractIntegrationTest;
-import com.omatheusmesmo.shoppmate.IntegrationTests.utils.TestUserFactory;
+import com.omatheusmesmo.shoppmate.category.entity.Category;
+import com.omatheusmesmo.shoppmate.category.repository.CategoryRepository;
+import com.omatheusmesmo.shoppmate.shared.testcontainers.AbstractIntegrationTest;
+import com.omatheusmesmo.shoppmate.shared.testcontainers.utils.TestUserFactory;
 import com.omatheusmesmo.shoppmate.config.TestConfigs;
 import com.omatheusmesmo.shoppmate.item.dto.ItemRequestDTO;
 import com.omatheusmesmo.shoppmate.item.dto.ItemResponseDTO;
-import com.omatheusmesmo.shoppmate.item.mapper.ItemMapper;
 import com.omatheusmesmo.shoppmate.unit.entity.Unit;
 import com.omatheusmesmo.shoppmate.unit.repository.UnitRepository;
 import io.restassured.builder.RequestSpecBuilder;
@@ -22,7 +23,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
 
@@ -34,13 +34,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
-    private ItemMapper itemMapper;
-
-    @Autowired
     private TestUserFactory testUserFactory;
 
     @Autowired
     private UnitRepository unitRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     private static RequestSpecification specification;
     private static ObjectMapper objectMapper;
@@ -50,7 +50,7 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
 
     @BeforeEach
     void init() {
-        String jwtToken = testUserFactory.obtainAccessToken();
+        String jwtToken = testUserFactory.createTokenForTestUser();
 
         Response response = given()
                 .port(TestConfigs.SERVER_PORT)
@@ -84,12 +84,17 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
     @Test
     @Order(1)
     void testPostAddItem() throws Exception {
+        Category categoryEntity = new Category();
+        categoryEntity.setName("Food");
+        categoryEntity = categoryRepository.save(categoryEntity);
+
+
         Unit unitEntity = new Unit();
         unitEntity.setSymbol("KG");
         unitEntity.setName("Kilogram");
         unitEntity = unitRepository.save(unitEntity);
 
-        ItemRequestDTO requestDTO = new ItemRequestDTO("Feijão", 1L, unitEntity.getId());
+        ItemRequestDTO requestDTO = new ItemRequestDTO("Feijão", categoryEntity.getId(), unitEntity.getId());
 
         var content = given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -110,8 +115,8 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
         assertTrue(createdItem.id() > 0);
 
         assertEquals("Feijão", createdItem.name());
-        assertEquals(1L, createdItem.category().id());
-        assertEquals(1L, createdItem.unit().id());
+        assertEquals(categoryEntity.getId(), createdItem.category().id());
+        assertEquals(unitEntity.getId(), createdItem.unit().id());
     }
 
     @Test
@@ -202,7 +207,7 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
 
         given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .pathParam("id", 2L)
+                .pathParam("id", 999L)
                 .body(invalidItem)
                 .when()
                 .put("/{id}")
