@@ -1,22 +1,33 @@
 <h2 mat-dialog-title>{{ data.unit ? "Editar" : "Nova" }} Unidade</h2>
-<mat-dialog-content>
-  <mat-form-field appearance="outline" class="w-100">
-    <mat-label>Nome</mat-label>
-    <input matInput [(ngModel)]="unit.name" required />
-  </mat-form-field>
-  <mat-form-field appearance="outline" class="w-100">
-    <mat-label>Símbolo</mat-label>
-    <input matInput [(ngModel)]="unit.symbol" required />
-  </mat-form-field>
-</mat-dialog-content>
-<mat-dialog-actions align="end">
-  <button mat-button (click)="onCancel()">Cancelar</button>
-  <button
-    mat-raised-button
-    color="primary"
-    (click)="onSave()"
-    [disabled]="!unit.name || !unit.symbol"
-  >
-    Salvar
-  </button>
-</mat-dialog-actions>
+<form [formGroup]="unitForm" (ngSubmit)="onSave()">
+  <mat-dialog-content>
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Nome</mat-label>
+      <input matInput formControlName="name" required />
+      <mat-error *ngIf="unitForm.get('name')?.hasError('required')">
+        O nome é obrigatório
+      </mat-error>
+      <mat-error *ngIf="unitForm.get('name')?.hasError('duplicateName')">
+        Esta unidade já existe
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Símbolo</mat-label>
+      <input matInput formControlName="symbol" required />
+      <mat-error *ngIf="unitForm.get('symbol')?.hasError('required')">
+        O símbolo é obrigatório
+      </mat-error>
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button type="button" mat-button (click)="onCancel()">Cancelar</button>
+    <button
+      type="submit"
+      mat-raised-button
+      color="primary"
+      [disabled]="unitForm.invalid"
+    >
+      Salvar
+    </button>
+  </mat-dialog-actions>
+</form>

@@ -112,7 +112,10 @@ export class UnitDialogComponent implements OnInit {
 
   onSave(): void {
     if (this.unitForm.valid) {
-      this.dialogRef.close(this.unitForm.value);
+      this.dialogRef.close({
+        ...this.data.unit,
+        ...this.unitForm.value,
+      });
     }
   }
 }
