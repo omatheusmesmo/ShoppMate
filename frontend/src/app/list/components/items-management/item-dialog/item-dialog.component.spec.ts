@@ -9,6 +9,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { of } from 'rxjs';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ItemResponseDTO } from '../../../../shared/interfaces/item.interface';
+import { CategoryResponseDTO } from '../../../../shared/interfaces/category.interface';
+import { UnitResponseDTO } from '../../../../shared/interfaces/unit.interface';
 
 describe('ItemDialogComponent - Duplicate Validation', () => {
   let component: ItemDialogComponent;
@@ -21,8 +23,8 @@ describe('ItemDialogComponent - Duplicate Validation', () => {
     {
       id: 1,
       name: 'Apple',
-      category: { id: 1, name: 'Fruits' } as any,
-      unit: { id: 1, name: 'kg', symbol: 'kg' } as any,
+      category: { id: 1, name: 'Fruits' } as CategoryResponseDTO,
+      unit: { id: 1, symbol: 'kg' } as UnitResponseDTO,
     },
   ];
 
