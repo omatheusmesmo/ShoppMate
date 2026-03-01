@@ -16,7 +16,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { ItemResponseDTO } from '../../../../shared/interfaces/item.interface';
-
+import { ListItemResponseDTO } from '../../../../shared/interfaces/list-item.interface';
 import { ItemService } from '../../../../shared/services/item.service';
 
 @Component({
@@ -38,19 +38,12 @@ import { ItemService } from '../../../../shared/services/item.service';
 export class ListItemDialogComponent implements OnInit {
   items: ItemResponseDTO[] = [];
   selectedItemId: number | null = null;
-
   quantity = 1;
 
   constructor(
     public dialogRef: MatDialogRef<ListItemDialogComponent>,
     @Inject(MAT_DIALOG_DATA)
     public data: { listItem?: ListItemResponseDTO; listId: number },
-=======
-  quantity: number = 1;
-
-  constructor(
-    public dialogRef: MatDialogRef<ListItemDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { listItem?: any; listId: number },
     private itemService: ItemService,
   ) {
     if (data.listItem) {

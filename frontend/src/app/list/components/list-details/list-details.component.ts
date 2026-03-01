@@ -95,8 +95,7 @@ export class ListDetailsComponent implements OnInit {
       .updateListItem(this.listId, item.idListItem, updatedItem)
       .subscribe({
         next: () => this.loadData(),
- 
-        error: (error) => {
+        error: () => {
           this.snackBar.open('Erro ao atualizar status do item', 'Fechar', {
             duration: 3000,
           });
@@ -119,7 +118,55 @@ export class ListDetailsComponent implements OnInit {
               duration: 3000,
             });
           },
-          error: (error) => {
+          error: () => {
+            this.snackBar.open('Erro ao adicionar item', 'Fechar', {
+              duration: 3000,
+            });
+          },
+        });
+      }
+    });
+  }
+
+  editItem(item: ListItemResponseDTO): void {
+    const dialogRef = this.dialog.open(ListItemDialogComponent, {
+      width: '400px',
+      data: { listItem: item, listId: this.listId },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.listItemService
+          .updateListItem(this.listId, item.idListItem, result)
+          .subscribe({
+            next: () => {
+              this.loadData();
+              this.snackBar.open('Item atualizado com sucesso', 'Fechar', {
+                duration: 3000,
+              });
+            },
+            error: () => {
+              this.snackBar.open('Erro ao atualizar item', 'Fechar', {
+                duration: 3000,
+              });
+            },
+          });
+      }
+    });
+  }
+
+  removeItem(item: ListItemResponseDTO): void {
+    if (confirm(`Tem certeza que deseja remover ${item.item.name} da lista?`)) {
+      this.listItemService
+        .deleteListItem(this.listId, item.idListItem)
+        .subscribe({
+          next: () => {
+            this.loadData();
+            this.snackBar.open('Item removido com sucesso', 'Fechar', {
+              duration: 3000,
+            });
+          },
+          error: () => {
             this.snackBar.open('Erro ao remover item', 'Fechar', {
               duration: 3000,
             });

@@ -95,7 +95,57 @@ export class ItemsManagementComponent implements OnInit {
               duration: 3000,
             });
           },
-        error: (error) => {
+          error: () => {
+            this.snackBar.open('Erro ao adicionar item', 'Fechar', {
+              duration: 3000,
+            });
+          },
+        });
+      }
+    });
+  }
+
+  editItem(item: ItemResponseDTO): void {
+    const dialogRef = this.dialog.open(ItemDialogComponent, {
+      width: '400px',
+      data: {
+        item: {
+          name: item.name,
+          idCategory: item.category.id,
+          idUnit: item.unit.id,
+        },
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.itemService.updateItem(item.id, result).subscribe({
+          next: () => {
+            this.loadData();
+            this.snackBar.open('Item atualizado com sucesso', 'Fechar', {
+              duration: 3000,
+            });
+          },
+          error: () => {
+            this.snackBar.open('Erro ao atualizar item', 'Fechar', {
+              duration: 3000,
+            });
+          },
+        });
+      }
+    });
+  }
+
+  deleteItem(item: ItemResponseDTO): void {
+    if (confirm(`Tem certeza que deseja excluir o item "${item.name}"?`)) {
+      this.itemService.deleteItem(item.id).subscribe({
+        next: () => {
+          this.loadData();
+          this.snackBar.open('Item excluído com sucesso', 'Fechar', {
+            duration: 3000,
+          });
+        },
+        error: () => {
           this.snackBar.open('Erro ao excluir item', 'Fechar', {
             duration: 3000,
           });
