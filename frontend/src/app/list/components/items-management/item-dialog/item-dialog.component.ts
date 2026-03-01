@@ -63,14 +63,7 @@ export function duplicateNameValidator(
     MatSelectModule,
   ],
   templateUrl: './item-dialog.component.html',
-  styles: [
-    `
-      .w-100 {
-        width: 100%;
-        margin-bottom: 1rem;
-      }
-    `,
-  ],
+  styleUrls: ['./item-dialog.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ItemDialogComponent implements OnInit {

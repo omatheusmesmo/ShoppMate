@@ -1,0 +1,18 @@
+<h2 mat-dialog-title>{{ data.list ? "Editar" : "Nova" }} Lista</h2>
+<mat-dialog-content>
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Nome</mat-label>
+    <input matInput [(ngModel)]="list.name" required />
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSave()"
+    [disabled]="!list.name"
+  >
+    Salvar
+  </button>
+</mat-dialog-actions>

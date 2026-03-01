@@ -22,34 +22,8 @@ import { ShoppingListRequestDTO } from '../../../../shared/interfaces/shopping-l
     MatInputModule,
     MatButtonModule,
   ],
-  template: `
-    <h2 mat-dialog-title>{{ data.list ? 'Editar' : 'Nova' }} Lista</h2>
-    <mat-dialog-content>
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>Nome</mat-label>
-        <input matInput [(ngModel)]="list.name" required />
-      </mat-form-field>
-    </mat-dialog-content>
-    <mat-dialog-actions align="end">
-      <button mat-button (click)="onCancel()">Cancelar</button>
-      <button
-        mat-raised-button
-        color="primary"
-        (click)="onSave()"
-        [disabled]="!list.name"
-      >
-        Salvar
-      </button>
-    </mat-dialog-actions>
-  `,
-  styles: [
-    `
-      .w-100 {
-        width: 100%;
-        margin-bottom: 1rem;
-      }
-    `,
-  ],
+  templateUrl: './list-dialog.component.html',
+  styleUrls: ['./list-dialog.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListDialogComponent {

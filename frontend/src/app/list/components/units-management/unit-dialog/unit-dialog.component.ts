@@ -53,59 +53,8 @@ export function duplicateNameValidator(
     MatInputModule,
     MatButtonModule,
   ],
-  template: `
-    <form [formGroup]="unitForm" (ngSubmit)="onSave()">
-      <h2 mat-dialog-title>{{ data.unit ? 'Editar' : 'Nova' }} Unidade</h2>
-      <mat-dialog-content>
-        <mat-form-field appearance="outline" class="w-100">
-          <mat-label>Nome</mat-label>
-          <input
-            matInput
-            formControlName="name"
-            placeholder="Ex: Quilograma"
-            required
-          />
-          @if (unitForm.get('name')?.hasError('required')) {
-            <mat-error> Nome é obrigatório </mat-error>
-          }
-          @if (unitForm.get('name')?.hasError('duplicateName')) {
-            <mat-error> Já existe uma unidade com este nome </mat-error>
-          }
-        </mat-form-field>
-        <mat-form-field appearance="outline" class="w-100">
-          <mat-label>Símbolo</mat-label>
-          <input
-            matInput
-            formControlName="symbol"
-            placeholder="Ex: kg"
-            required
-          />
-          @if (unitForm.get('symbol')?.hasError('required')) {
-            <mat-error> Símbolo é obrigatório </mat-error>
-          }
-        </mat-form-field>
-      </mat-dialog-content>
-      <mat-dialog-actions align="end">
-        <button mat-button type="button" (click)="onCancel()">Cancelar</button>
-        <button
-          mat-raised-button
-          color="primary"
-          type="submit"
-          [disabled]="unitForm.invalid"
-        >
-          Salvar
-        </button>
-      </mat-dialog-actions>
-    </form>
-  `,
-  styles: [
-    `
-      .w-100 {
-        width: 100%;
-        margin-bottom: 1rem;
-      }
-    `,
-  ],
+  templateUrl: './unit-dialog.component.html',
+  styleUrls: ['./unit-dialog.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UnitDialogComponent implements OnInit {
