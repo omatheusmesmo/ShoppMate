@@ -1,4 +1,4 @@
-package com.omatheusmesmo.shoppmate.IntegrationTests.testcontainers;
+package com.omatheusmesmo.shoppmate.shared.testcontainers;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContextInitializer;
@@ -18,7 +18,6 @@ public class AbstractIntegrationTest {
 
     static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-        // Minimum required Docker Engine API version is 1.24 - "min-api-version": "1.24"
         static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:18");
 
         private static void startContainers() {
