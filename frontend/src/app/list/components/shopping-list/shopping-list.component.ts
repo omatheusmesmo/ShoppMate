@@ -10,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ShoppingListService } from '../../../shared/services/shopping-list.service';
 import { ShoppingListResponseDTO } from '../../../shared/interfaces/shopping-list.interface';
 import { ShoppingListDialogComponent } from '../shopping-list-dialog/shopping-list-dialog.component';
+import { ListShareDialogComponent } from '../list-share-dialog/list-share-dialog.component';
 
 @Component({
   selector: 'app-shopping-list',
@@ -98,5 +99,12 @@ export class ShoppingListComponent implements OnInit {
         },
       });
     }
+  }
+
+  openShareDialog(list: ShoppingListResponseDTO): void {
+    this.dialog.open(ListShareDialogComponent, {
+      width: '600px',
+      data: { listId: list.idList, listName: list.listName },
+    });
   }
 }

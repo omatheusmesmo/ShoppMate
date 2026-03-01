@@ -43,8 +43,17 @@ jobs:
                 "i am no longer working on this", "/unassign", "não estou mais trabalhando",
                 "pode me remover", "desisto", "não vou mais fazer"
               ];
+              
+              const matchesKeyword = (text, keyword) => {
+                const regex = new RegExp(`(^|\\s)${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\s|$)`, 'i');
+                return regex.test(text);
+              };
+              
+              const isCommand = (text, keyword) => {
+                return text === keyword || text.startsWith(keyword + ' ');
+              };
 
-              if (unassignKeywords.some(k => comment === k || comment.startsWith(k))) {
+              if (unassignKeywords.some(k => isCommand(comment, k))) {
                 if (assignedUsers.includes(commenter)) {
                   await github.rest.issues.removeAssignees({
                     owner: repoOwner, repo: repoName, issue_number: issueNumber,
@@ -64,7 +73,7 @@ jobs:
                 return;
               }
 
-              if (assignKeywords.some(keyword => comment.includes(keyword))) {
+              if (assignKeywords.some(keyword => matchesKeyword(comment, keyword) || isCommand(comment, keyword))) {
                 if (assignedUsers.length > 0) {
                   if (assignedUsers.includes(commenter)) {
                     await github.rest.issues.createComment({

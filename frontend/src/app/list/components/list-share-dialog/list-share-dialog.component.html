@@ -1,0 +1,106 @@
+<h2 mat-dialog-title>Share "{{ data.listName }}"</h2>
+
+<mat-dialog-content>
+  <div class="share-section">
+    <form [formGroup]="shareForm" (ngSubmit)="onShare()" class="share-form">
+      <mat-form-field appearance="outline" class="email-field">
+        <mat-label>User Email</mat-label>
+        <input
+          matInput
+          formControlName="email"
+          placeholder="example@email.com"
+          type="email"
+        />
+        <mat-error *ngIf="shareForm.get('email')?.hasError('required')"
+          >Email is required</mat-error
+        >
+        <mat-error *ngIf="shareForm.get('email')?.hasError('email')"
+          >Invalid email</mat-error
+        >
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="permission-field">
+        <mat-label>Permission</mat-label>
+        <mat-select formControlName="permission">
+          <mat-option *ngFor="let type of permissionTypes" [value]="type">
+            {{ type }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="!shareForm.valid"
+        class="share-button"
+      >
+        Invite
+      </button>
+    </form>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="permissions-list">
+    <h3>Users with access</h3>
+
+    <table
+      mat-table
+      [dataSource]="permissions"
+      class="w-100"
+      *ngIf="permissions.length > 0"
+    >
+      <ng-container matColumnDef="user">
+        <th mat-header-cell *matHeaderCellDef>User</th>
+        <td mat-cell *matCellDef="let p">
+          <div class="user-cell">
+            <span class="full-name">{{ p.userFullName }}</span>
+            <span class="email">{{ p.userEmail }}</span>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="permission">
+        <th mat-header-cell *matHeaderCellDef>Access</th>
+        <td mat-cell *matCellDef="let p">
+          <span class="permission-tag" [class]="p.permission.toLowerCase()">
+            {{ p.permission }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let p">
+          <button
+            mat-icon-button
+            color="warn"
+            (click)="removePermission(p.id)"
+            title="Remove access"
+          >
+            <mat-icon>person_remove</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+
+    <div *ngIf="permissions.length === 0 && !isLoading" class="no-permissions">
+      No other users have access to this list yet.
+    </div>
+
+    <div *ngIf="isLoading" class="loading-container">
+      <mat-progress-spinner
+        mode="indeterminate"
+        diameter="40"
+      ></mat-progress-spinner>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onClose()">Close</button>
+</mat-dialog-actions>

@@ -5,6 +5,7 @@ import {
   ListPermission,
   ListPermissionRequestDTO,
   ListPermissionResponseDTO,
+  ListPermissionSummaryDTO,
 } from '../interfaces/list-permission.interface';
 import { BaseService } from './base.service';
 import { catchError } from 'rxjs/operators';
@@ -17,10 +18,12 @@ export class ListPermissionService extends BaseService {
     super();
   }
 
-  getAllListPermissions(shoppingListId: number): Observable<ListPermission[]> {
+  getAllListPermissions(
+    shoppingListId: number,
+  ): Observable<ListPermissionSummaryDTO[]> {
     return this.http
       .get<
-        ListPermission[]
+        ListPermissionSummaryDTO[]
       >(`${this.baseUrl}/lists/${shoppingListId}/permissions`)
       .pipe(catchError(this.handleError));
   }

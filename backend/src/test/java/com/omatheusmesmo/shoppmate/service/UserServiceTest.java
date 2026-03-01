@@ -1,5 +1,6 @@
 package com.omatheusmesmo.shoppmate.service;
 
+import com.omatheusmesmo.shoppmate.user.dtos.RegisterUserDTO;
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import com.omatheusmesmo.shoppmate.user.repository.UserRepository;
 import com.omatheusmesmo.shoppmate.user.service.UserService;
@@ -36,7 +37,7 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        userMock = new User("John Doe", "John@Doe.com", "1234", "USER");
+        userMock = new User("John@Doe.com", "John Doe", "1234", "USER");
         userMock.setId(1L);
     }
 
@@ -51,10 +52,15 @@ class UserServiceTest {
         when(userRepository.save(any(User.class))).thenReturn(userMock);
         when(passwordEncoder.encode(anyString())).thenReturn("encoded123");
 
-        User user = userService.addUser(userMock);
+        var user = new RegisterUserDTO(userMock.getEmail(), userMock.getFullName(), userMock.getPassword());
+        User result = userService.addUser(user);
 
-        assertEquals(userMock, user);
-        verify(userRepository, times(1)).save(userMock);
+        // assertEquals(userMock, user); Now, because of the dto, a new instance is created
+        assertEquals("John@Doe.com", result.getEmail());
+        assertEquals("John Doe", result.getFullName());
+        assertEquals("encoded123", result.getPassword());
+        assertEquals("USER", result.getRole());
+        verify(userRepository, times(1)).save(result);
     }
 
     @Test
@@ -62,8 +68,8 @@ class UserServiceTest {
         doThrow(new IllegalArgumentException("E-mail is already being used!")).when(userRepository)
                 .save(any(User.class));
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> userService.addUser(userMock));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> userService
+                .addUser(new RegisterUserDTO(userMock.getEmail(), userMock.getFullName(), userMock.getPassword())));
         assertEquals("E-mail is already being used!", exception.getMessage());
     }
 

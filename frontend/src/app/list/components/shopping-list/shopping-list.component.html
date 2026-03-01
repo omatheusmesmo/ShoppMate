@@ -25,6 +25,7 @@
                   mat-icon-button
                   color="primary"
                   (click)="openEditDialog(list)"
+                  title="Editar"
                 >
                   <mat-icon>edit</mat-icon>
                 </button>
@@ -32,13 +33,23 @@
                   mat-icon-button
                   color="accent"
                   [routerLink]="['/lists', list.idList]"
+                  title="Visualizar"
                 >
                   <mat-icon>visibility</mat-icon>
                 </button>
                 <button
                   mat-icon-button
+                  color="primary"
+                  (click)="openShareDialog(list)"
+                  title="Compartilhar"
+                >
+                  <mat-icon>share</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
                   color="warn"
                   (click)="deleteList(list.idList)"
+                  title="Excluir"
                 >
                   <mat-icon>delete</mat-icon>
                 </button>
