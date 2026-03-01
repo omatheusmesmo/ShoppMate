@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 public abstract class DomainEntity implements AuditableEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "snowflake")
+    @org.hibernate.annotations.GenericGenerator(name = "snowflake", type = com.omatheusmesmo.shoppmate.shared.utils.SnowflakeIdentifierGenerator.class)
     @Column(name = "id")
     private Long id;
 
