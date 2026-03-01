@@ -1,11 +1,10 @@
-package com.omatheusmesmo.shoppmate.IntegrationTests.controller;
+package com.omatheusmesmo.shoppmate.category.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.omatheusmesmo.shoppmate.IntegrationTests.testcontainers.AbstractIntegrationTest;
-import com.omatheusmesmo.shoppmate.IntegrationTests.utils.TestUserFactory;
-import com.omatheusmesmo.shoppmate.auth.service.JwtService;
+import com.omatheusmesmo.shoppmate.shared.testcontainers.AbstractIntegrationTest;
+import com.omatheusmesmo.shoppmate.shared.testcontainers.utils.TestUserFactory;
 import com.omatheusmesmo.shoppmate.category.dto.CategoryRequestDTO;
 import com.omatheusmesmo.shoppmate.category.dto.CategoryResponseDTO;
 import com.omatheusmesmo.shoppmate.config.TestConfigs;
@@ -20,7 +19,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
 
@@ -33,12 +31,6 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private TestUserFactory testUserFactory;
-
-    @Autowired
-    private UserDetailsService userDetailsService;
-
-    @Autowired
-    private JwtService jwtService;
 
     private static RequestSpecification specification;
     private static ObjectMapper objectMapper;
@@ -54,7 +46,7 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
 
     @BeforeEach
     void init() {
-        String jwtToken = testUserFactory.obtainAccessToken();
+        String jwtToken = testUserFactory.createTokenForTestUser();
 
         Response response = given()
                 .port(TestConfigs.SERVER_PORT)
@@ -149,6 +141,7 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
 
         assertNotNull(categoryOne.id());
         assertTrue(categoryOne.id() > 0);
+
         assertEquals("Book Putted", categoryOne.name());
     }
 
@@ -188,7 +181,7 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
 
         given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .pathParam("id", 2L)
+                .pathParam("id", 999L)
                 .body(invalidItem)
                 .when()
                 .put("/{id}")
