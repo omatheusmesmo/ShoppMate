@@ -77,10 +77,7 @@ class ShoppingListServiceTest {
     void testFindListByIdThrowsException() {
         when(shoppingListRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThrows(
-            NoSuchElementException.class,
-            () -> shoppingListService.findListById(999L)
-        );
+        assertThrows(NoSuchElementException.class, () -> shoppingListService.findListById(999L));
 
         verify(shoppingListRepository, times(1)).findById(999L);
     }
@@ -98,10 +95,7 @@ class ShoppingListServiceTest {
     void testRemoveListThrowsExceptionWhenNotFound() {
         when(shoppingListRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThrows(
-            NoSuchElementException.class,
-            () -> shoppingListService.removeList(999L)
-        );
+        assertThrows(NoSuchElementException.class, () -> shoppingListService.removeList(999L));
 
         verify(shoppingListRepository, never()).deleteById(999L);
     }
@@ -110,10 +104,7 @@ class ShoppingListServiceTest {
     void testSaveListThrowsExceptionWhenNameIsNull() {
         testList.setName(null);
 
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> shoppingListService.saveList(testList)
-        );
+        assertThrows(IllegalArgumentException.class, () -> shoppingListService.saveList(testList));
     }
 
     @Test
