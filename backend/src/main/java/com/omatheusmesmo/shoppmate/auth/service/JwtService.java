@@ -1,18 +1,21 @@
 package com.omatheusmesmo.shoppmate.auth.service;
 
+import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.crypto.MACVerifier;
-import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.JWEAlgorithm;
+import com.nimbusds.jose.JWEHeader;
+import com.nimbusds.jose.crypto.RSADecrypter;
+import com.nimbusds.jose.crypto.RSAEncrypter;
+import com.nimbusds.jwt.EncryptedJWT;
 import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.SignedJWT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.UUID;
@@ -22,52 +25,38 @@ public class JwtService {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
 
-    private MACSigner signer;
-    private MACVerifier verifier;
+    private final RSAEncrypter encrypter;
+    private final RSADecrypter decrypter;
+    private final long tokenExpiration;
 
-    @Value("${jwt.token.expiration}")
-    private long tokenExpiration;
-
-    @Value("${jwt.secret.key}")
-    private String secretKey;
-
-    public JwtService() {
-        // Signer and verifier will be initialized after secretKey is injected
-        this.signer = null;
-        this.verifier = null;
-    }
-
-    private void initSignerAndVerifier() throws JOSEException {
-        if (this.signer == null && this.verifier == null && this.secretKey != null) {
-            this.signer = new MACSigner(this.secretKey);
-            this.verifier = new MACVerifier(this.secretKey);
-        }
+    public JwtService(
+            RSAPublicKey publicKey,
+            RSAPrivateKey privateKey,
+            @Value("${jwt.token.expiration}") long tokenExpiration) {
+        this.encrypter = new RSAEncrypter(publicKey);
+        this.decrypter = new RSADecrypter(privateKey);
+        this.tokenExpiration = tokenExpiration;
+        logger.info("RSA keys loaded successfully for JWE token operations");
     }
 
     public String generateToken(UserDetails userDetails) {
+        return encryptToken(userDetails).serialize();
+    }
+
+    protected EncryptedJWT encryptToken(UserDetails userDetails) {
         try {
-            initSignerAndVerifier();
-            SignedJWT signedJWT = new SignedJWT(buildHeader(), buildToken(userDetails));
-            signedJWT.sign(signer);
-            return signedJWT.serialize();
+            EncryptedJWT encryptedJWT = new EncryptedJWT(buildHeader(), buildToken(userDetails));
+            encryptedJWT.encrypt(encrypter);
+            return encryptedJWT;
         } catch (JOSEException e) {
-            logger.error("Failed to sign token", e);
-            throw new JwtServiceException("Failed to sign token", e);
+            logger.error("Failed to encrypt token for user: {}", userDetails.getUsername(), e);
+            throw new JwtServiceException("Failed to encrypt token", e);
         }
     }
 
     public boolean validateToken(String token) {
         try {
-            initSignerAndVerifier();
-            SignedJWT signedJWT = SignedJWT.parse(token);
-
-            // Verify signature
-            if (!signedJWT.verify(verifier)) {
-                logger.warn("Token signature verification failed");
-                return false;
-            }
-
-            JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
+            JWTClaimsSet claims = decryptTokenInternal(token);
 
             Date expirationTime = claims.getExpirationTime();
             if (expirationTime == null || expirationTime.before(new Date())) {
@@ -85,11 +74,13 @@ public class JwtService {
             return true;
 
         } catch (ParseException e) {
-
             logger.error("Failed to parse JWT token string during validation: {}", e.getMessage());
             return false;
         } catch (JOSEException e) {
-            logger.error("Failed to verify JWT token signature during validation: {}", e.getMessage());
+            logger.error("Failed to decrypt JWT token during validation: {}", e.getMessage());
+            return false;
+        } catch (JwtServiceException e) {
+            logger.error("JWT Service Exception during validation: {}", e.getMessage());
             return false;
         } catch (Exception e) {
             logger.error("Unexpected error during JWT validation: {}", e.getMessage(), e);
@@ -97,25 +88,38 @@ public class JwtService {
         }
     }
 
-    public JWTClaimsSet decryptToken(String token) {
+    private JWTClaimsSet decryptTokenInternal(String token) throws ParseException, JOSEException, JwtServiceException {
         try {
-            initSignerAndVerifier();
-            SignedJWT signedJWT = SignedJWT.parse(token);
-
-            // Verify signature
-            if (!signedJWT.verify(verifier)) {
-                throw new JwtServiceException("Token signature verification failed", null);
-            }
-
-            return signedJWT.getJWTClaimsSet();
+            EncryptedJWT encryptedJWT = EncryptedJWT.parse(token);
+            encryptedJWT.decrypt(decrypter);
+            return encryptedJWT.getJWTClaimsSet();
+        } catch (ParseException e) {
+            logger.error("Failed to parse token string: {}", e.getMessage());
+            throw e;
+        } catch (JOSEException e) {
+            logger.error(
+                    "Failed to decrypt token. Check if the correct private key is used and token format is valid. Error: {}",
+                    e.getMessage());
+            throw e;
         } catch (Exception e) {
-            logger.error("Failed to verify and decrypt token", e);
-            throw new JwtServiceException("Failed to verify and decrypt token", e);
+            logger.error("Unexpected error during token decryption: {}", e.getMessage(), e);
+            throw new JwtServiceException("Unexpected error during token decryption", e);
         }
     }
 
-    private JWSHeader buildHeader() {
-        return new JWSHeader.Builder(JWSAlgorithm.HS256).build();
+    public JWTClaimsSet decryptToken(String token) {
+        try {
+            EncryptedJWT encryptedJWT = EncryptedJWT.parse(token);
+            encryptedJWT.decrypt(decrypter);
+            return encryptedJWT.getJWTClaimsSet();
+        } catch (Exception e) {
+            logger.error("Failed to decrypt token", e);
+            throw new JwtServiceException("Failed to decrypt token", e);
+        }
+    }
+
+    private JWEHeader buildHeader() {
+        return new JWEHeader.Builder(JWEAlgorithm.RSA_OAEP_256, EncryptionMethod.A128GCM).build();
     }
 
     private JWTClaimsSet buildToken(UserDetails userDetails) {

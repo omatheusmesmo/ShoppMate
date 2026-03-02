@@ -37,6 +37,10 @@ replay_pid*
 .env
 .idea/
 
+# JWT RSA Keys - Security: Keep certificates out of version control
+src/main/resources/certs/
+*.pem
+
 # Maven
 target/
 pom.xml.tag
