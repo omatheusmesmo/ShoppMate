@@ -26,4 +26,7 @@ public class ListItem extends BaseAuditableEntity {
 
     private Integer quantity;
     private Boolean purchased = false;
+
+    @Version
+    private Long version;
 }
