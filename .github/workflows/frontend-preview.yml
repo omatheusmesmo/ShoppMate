@@ -1,0 +1,221 @@
+name: Frontend Preview (Container)
+
+on:
+  workflow_run:
+    workflows: ["Frontend CI", "Backend CI", "Root CI"]
+    types:
+      - completed
+  pull_request:
+    types:
+      - closed
+
+permissions:
+  contents: read
+  packages: write
+  pull-requests: write
+
+concurrency:
+  group: frontend-preview-${{ github.event.workflow_run.head_branch || github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deployPreview:
+    name: Deploy PR Preview Container
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+
+    steps:
+      - name: Resolve PR metadata and CI gate
+        id: pr
+        uses: actions/github-script@v7
+        env:
+          PREVIEW_PUBLIC_HOST: ${{ secrets.PREVIEW_PUBLIC_HOST }}
+        with:
+          script: |
+            const prs = context.payload.workflow_run.pull_requests || [];
+            if (!prs.length) {
+              core.setFailed('No pull request found for this workflow_run event.');
+              return;
+            }
+
+            const prNumber = prs[0].number;
+            const host = process.env.PREVIEW_PUBLIC_HOST;
+            if (!host) {
+              core.setFailed('Missing PREVIEW_PUBLIC_HOST secret.');
+              return;
+            }
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const headSha = context.payload.workflow_run.head_sha;
+
+            const runs = await github.paginate(github.rest.actions.listWorkflowRunsForRepo, {
+              owner,
+              repo,
+              event: 'pull_request',
+              head_sha: headSha,
+              per_page: 100
+            });
+
+            const byName = new Map();
+            for (const run of runs) {
+              if (!byName.has(run.name)) {
+                byName.set(run.name, run);
+              }
+            }
+
+            const frontendRun = byName.get('Frontend CI');
+            if (!frontendRun || frontendRun.status !== 'completed' || frontendRun.conclusion !== 'success') {
+              core.setOutput('should_deploy', 'false');
+              core.setOutput('reason', 'Waiting for Frontend CI to finish successfully.');
+              core.setOutput('number', String(prNumber));
+              return;
+            }
+
+            const optionalChecks = ['Backend CI', 'Root CI'];
+            for (const checkName of optionalChecks) {
+              const run = byName.get(checkName);
+              if (run && (run.status !== 'completed' || run.conclusion !== 'success')) {
+                core.setOutput('should_deploy', 'false');
+                core.setOutput('reason', `Waiting for ${checkName} to finish successfully.`);
+                core.setOutput('number', String(prNumber));
+                return;
+              }
+            }
+
+            const previewPort = 20000 + (prNumber % 10000);
+            const image = `ghcr.io/${owner.toLowerCase()}/${repo.toLowerCase()}-frontend-preview:pr-${prNumber}-${headSha.slice(0, 7)}`;
+            const containerName = `shoppmate-preview-pr-${prNumber}`;
+            const previewUrl = `http://${host}:${previewPort}`;
+
+            core.setOutput('should_deploy', 'true');
+            core.setOutput('reason', 'All relevant CI workflows passed.');
+            core.setOutput('number', String(prNumber));
+            core.setOutput('port', String(previewPort));
+            core.setOutput('image', image);
+            core.setOutput('container_name', containerName);
+            core.setOutput('url', previewUrl);
+
+      - name: Skip deploy while CI is still running
+        if: steps.pr.outputs.should_deploy != 'true'
+        run: echo "${{ steps.pr.outputs.reason }}"
+
+      - name: Checkout PR head commit
+        if: steps.pr.outputs.should_deploy == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Set up Docker Buildx
+        if: steps.pr.outputs.should_deploy == 'true'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        if: steps.pr.outputs.should_deploy == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push frontend preview image
+        if: steps.pr.outputs.should_deploy == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile.preview
+          push: true
+          tags: ${{ steps.pr.outputs.image }}
+          build-args: |
+            BUILD_CONFIGURATION=staging
+            API_URL=${{ secrets.STAGING_API_URL }}
+
+      - name: Deploy preview container to remote host
+        if: steps.pr.outputs.should_deploy == 'true'
+        uses: appleboy/ssh-action@v1.2.2
+        env:
+          IMAGE: ${{ steps.pr.outputs.image }}
+          CONTAINER_NAME: ${{ steps.pr.outputs.container_name }}
+          PREVIEW_PORT: ${{ steps.pr.outputs.port }}
+          GHCR_USER: ${{ secrets.GHCR_PULL_USER }}
+          GHCR_TOKEN: ${{ secrets.GHCR_PULL_TOKEN }}
+        with:
+          host: ${{ secrets.PREVIEW_SSH_HOST }}
+          username: ${{ secrets.PREVIEW_SSH_USER }}
+          key: ${{ secrets.PREVIEW_SSH_KEY }}
+          port: ${{ secrets.PREVIEW_SSH_PORT || 22 }}
+          script_stop: true
+          envs: IMAGE,CONTAINER_NAME,PREVIEW_PORT,GHCR_USER,GHCR_TOKEN
+          script: |
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            docker pull "$IMAGE"
+            docker rm -f "$CONTAINER_NAME" || true
+            docker run -d \
+              --name "$CONTAINER_NAME" \
+              --restart unless-stopped \
+              -p "$PREVIEW_PORT:80" \
+              "$IMAGE"
+
+      - name: Comment preview URL on PR
+        if: steps.pr.outputs.should_deploy == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = Number('${{ steps.pr.outputs.number }}');
+            const marker = '<!-- frontend-container-preview-url -->';
+            const previewUrl = '${{ steps.pr.outputs.url }}';
+            const body = `${marker}\nPreview container publicado:\n${previewUrl}`;
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number: prNumber,
+              per_page: 100
+            });
+
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: prNumber,
+                body
+              });
+            }
+
+  cleanupPreview:
+    name: Cleanup PR Preview Container
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+
+    steps:
+      - name: Remove preview container from remote host
+        uses: appleboy/ssh-action@v1.2.2
+        env:
+          CONTAINER_NAME: shoppmate-preview-pr-${{ github.event.pull_request.number }}
+        with:
+          host: ${{ secrets.PREVIEW_SSH_HOST }}
+          username: ${{ secrets.PREVIEW_SSH_USER }}
+          key: ${{ secrets.PREVIEW_SSH_KEY }}
+          port: ${{ secrets.PREVIEW_SSH_PORT || 22 }}
+          script_stop: true
+          envs: CONTAINER_NAME
+          script: |
+            docker rm -f "$CONTAINER_NAME" || true
