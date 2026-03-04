@@ -45,10 +45,19 @@ jobs:
 
             let prNumber;
             let headSha;
+            let canComment = true;
 
             if (context.eventName === 'pull_request') {
               prNumber = context.payload.pull_request.number;
               headSha = context.payload.pull_request.head.sha;
+              const isForkPr = context.payload.pull_request.head.repo.full_name !== `${owner}/${repo}`;
+              if (isForkPr) {
+                core.setOutput('should_deploy', 'false');
+                core.setOutput('reason', 'Fork PR detected: waiting for workflow_run context to use repository secrets and write permissions.');
+                core.setOutput('number', String(prNumber));
+                core.setOutput('can_comment', 'false');
+                return;
+              }
             } else {
               const prs = context.payload.workflow_run.pull_requests || [];
               if (!prs.length) {
@@ -71,6 +80,7 @@ jobs:
               core.setOutput('should_deploy', 'false');
               core.setOutput('reason', `Preview disabled for base branch ${baseRef}.`);
               core.setOutput('number', String(prNumber));
+              core.setOutput('can_comment', String(canComment));
               return;
             }
 
@@ -79,6 +89,7 @@ jobs:
               core.setOutput('should_deploy', 'false');
               core.setOutput('reason', 'Missing PREVIEW_PUBLIC_HOST secret.');
               core.setOutput('number', String(prNumber));
+              core.setOutput('can_comment', String(canComment));
               return;
             }
 
@@ -102,6 +113,7 @@ jobs:
               core.setOutput('should_deploy', 'false');
               core.setOutput('reason', 'Waiting for Frontend CI to finish successfully.');
               core.setOutput('number', String(prNumber));
+              core.setOutput('can_comment', String(canComment));
               return;
             }
 
@@ -112,6 +124,7 @@ jobs:
                 core.setOutput('should_deploy', 'false');
                 core.setOutput('reason', `Waiting for ${checkName} to finish successfully.`);
                 core.setOutput('number', String(prNumber));
+                core.setOutput('can_comment', String(canComment));
                 return;
               }
             }
@@ -128,13 +141,14 @@ jobs:
             core.setOutput('image', image);
             core.setOutput('container_name', containerName);
             core.setOutput('url', previewUrl);
+            core.setOutput('can_comment', String(canComment));
 
       - name: Skip deploy while CI is still running
         if: steps.pr.outputs.should_deploy != 'true'
         run: echo "${{ steps.pr.outputs.reason }}"
 
       - name: Comment skip reason on PR
-        if: steps.pr.outputs.should_deploy != 'true' && steps.pr.outputs.number != ''
+        if: steps.pr.outputs.should_deploy != 'true' && steps.pr.outputs.number != '' && steps.pr.outputs.can_comment == 'true'
         uses: actions/github-script@v7
         with:
           script: |
@@ -227,7 +241,7 @@ jobs:
               "$IMAGE"
 
       - name: Comment preview URL on PR
-        if: steps.pr.outputs.should_deploy == 'true'
+        if: steps.pr.outputs.should_deploy == 'true' && steps.pr.outputs.can_comment == 'true'
         uses: actions/github-script@v7
         with:
           script: |
