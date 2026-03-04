@@ -7,6 +7,10 @@ on:
       - completed
   pull_request:
     types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
       - closed
 
 permissions:
@@ -23,9 +27,10 @@ jobs:
     name: Deploy PR Preview Container
     runs-on: ubuntu-latest
     if: >-
-      github.event_name == 'workflow_run' &&
+      (github.event_name == 'workflow_run' &&
       github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'pull_request'
+      github.event.workflow_run.event == 'pull_request') ||
+      (github.event_name == 'pull_request' && github.event.action != 'closed')
 
     steps:
       - name: Resolve PR metadata and CI gate
@@ -35,16 +40,24 @@ jobs:
           PREVIEW_PUBLIC_HOST: ${{ secrets.PREVIEW_PUBLIC_HOST }}
         with:
           script: |
-            const prs = context.payload.workflow_run.pull_requests || [];
-            if (!prs.length) {
-              core.setFailed('No pull request found for this workflow_run event.');
-              return;
-            }
-
-            const prNumber = prs[0].number;
             const owner = context.repo.owner;
             const repo = context.repo.repo;
-            const headSha = context.payload.workflow_run.head_sha;
+
+            let prNumber;
+            let headSha;
+
+            if (context.eventName === 'pull_request') {
+              prNumber = context.payload.pull_request.number;
+              headSha = context.payload.pull_request.head.sha;
+            } else {
+              const prs = context.payload.workflow_run.pull_requests || [];
+              if (!prs.length) {
+                core.setFailed('No pull request found for this workflow_run event.');
+                return;
+              }
+              prNumber = prs[0].number;
+              headSha = context.payload.workflow_run.head_sha;
+            }
 
             const pr = await github.rest.pulls.get({
               owner,
