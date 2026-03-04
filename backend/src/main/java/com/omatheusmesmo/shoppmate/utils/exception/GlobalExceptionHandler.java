@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -139,7 +139,7 @@ public class GlobalExceptionHandler {
             ObjectOptimisticLockingFailureException ex) {
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
-                "timestamp", LocalDateTime.now(),
+                "timestamp", Instant.now(),
                 "status", 409,
                 "error", "Conflict",
                 "message", "This resource was updated by another user. Please refresh and try again."
