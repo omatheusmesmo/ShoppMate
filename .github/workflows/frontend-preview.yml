@@ -52,9 +52,6 @@ jobs:
               pull_number: prNumber
             });
 
-            const headRepository = pr.data.head.repo.full_name;
-            core.setOutput('head_repository', headRepository);
-
             const allowedBaseBranches = ['main', 'develop'];
             const baseRef = pr.data.base.ref;
             if (!allowedBaseBranches.includes(baseRef)) {
@@ -66,7 +63,9 @@ jobs:
 
             const host = process.env.PREVIEW_PUBLIC_HOST;
             if (!host) {
-              core.setFailed('Missing PREVIEW_PUBLIC_HOST secret.');
+              core.setOutput('should_deploy', 'false');
+              core.setOutput('reason', 'Missing PREVIEW_PUBLIC_HOST secret.');
+              core.setOutput('number', String(prNumber));
               return;
             }
 
@@ -162,8 +161,7 @@ jobs:
         if: steps.pr.outputs.should_deploy == 'true'
         uses: actions/checkout@v4
         with:
-          repository: ${{ steps.pr.outputs.head_repository }}
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: refs/pull/${{ steps.pr.outputs.number }}/head
 
       - name: Set up Docker Buildx
         if: steps.pr.outputs.should_deploy == 'true'
