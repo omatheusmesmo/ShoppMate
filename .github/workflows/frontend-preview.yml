@@ -25,8 +25,7 @@ jobs:
     if: >-
       github.event_name == 'workflow_run' &&
       github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'pull_request' &&
-      github.event.workflow_run.head_repository.full_name == github.repository
+      github.event.workflow_run.event == 'pull_request'
 
     steps:
       - name: Resolve PR metadata and CI gate
@@ -43,15 +42,30 @@ jobs:
             }
 
             const prNumber = prs[0].number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const headSha = context.payload.workflow_run.head_sha;
+
+            const pr = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: prNumber
+            });
+
+            const allowedBaseBranches = ['main', 'develop'];
+            const baseRef = pr.data.base.ref;
+            if (!allowedBaseBranches.includes(baseRef)) {
+              core.setOutput('should_deploy', 'false');
+              core.setOutput('reason', `Preview disabled for base branch ${baseRef}.`);
+              core.setOutput('number', String(prNumber));
+              return;
+            }
+
             const host = process.env.PREVIEW_PUBLIC_HOST;
             if (!host) {
               core.setFailed('Missing PREVIEW_PUBLIC_HOST secret.');
               return;
             }
-
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            const headSha = context.payload.workflow_run.head_sha;
 
             const runs = await github.paginate(github.rest.actions.listWorkflowRunsForRepo, {
               owner,
@@ -202,8 +216,7 @@ jobs:
     runs-on: ubuntu-latest
     if: >-
       github.event_name == 'pull_request' &&
-      github.event.action == 'closed' &&
-      github.event.pull_request.head.repo.full_name == github.repository
+      github.event.action == 'closed'
 
     steps:
       - name: Remove preview container from remote host
