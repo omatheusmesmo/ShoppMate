@@ -21,20 +21,6 @@ export interface ShoppingListResponseDTO {
   totalValue: number;
 }
 
-export interface ListItemResponseDTO {
-  shoppingList: ShoppingListResponseDTO;
-  item: ItemResponseDTO;
-  idListItem: number;
-  quantity: number;
-  purchased: boolean;
-}
-
-export interface ListItemRequestDTO {
-  listId: number;
-  itemId: number;
-  quantity?: number;
-}
-
 export interface CategoryResponseDTO {
   id: number;
   name: string;

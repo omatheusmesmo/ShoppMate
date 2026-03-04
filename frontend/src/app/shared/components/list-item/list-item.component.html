@@ -42,6 +42,23 @@
           }
         </mat-form-field>
 
+        <mat-form-field appearance="outline">
+          <mat-label>Unit Price</mat-label>
+          <input matInput type="number" formControlName="unitPrice" min="0" />
+          @if (
+            listItemForm.get("unitPrice")?.errors?.["required"] &&
+            listItemForm.get("unitPrice")?.touched
+          ) {
+            <mat-error>Unit price is required</mat-error>
+          }
+          @if (
+            listItemForm.get("unitPrice")?.errors?.["min"] &&
+            listItemForm.get("unitPrice")?.touched
+          ) {
+            <mat-error>Unit price must be at least 0</mat-error>
+          }
+        </mat-form-field>
+
         <div class="form-actions">
           <button
             mat-raised-button
@@ -71,12 +88,13 @@
         <p>No items in this list</p>
       </mat-card-content>
     </mat-card>
+  } @else {
     <mat-card class="list-summary-card">
       <mat-card-content>
         <div class="summary-row">
           <span class="summary-label">Total List Value:</span>
           <span class="summary-value">{{
-            listItems[0]?.shoppingList?.totalValue | currency
+            listItems[0].shoppingList.totalValue | currency
           }}</span>
         </div>
       </mat-card-content>

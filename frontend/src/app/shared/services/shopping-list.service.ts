@@ -4,9 +4,11 @@ import { Observable } from 'rxjs';
 import {
   ShoppingListResponseDTO,
   ShoppingListRequestDTO,
-  ListItemResponseDTO,
-  ListItemRequestDTO,
 } from '../interfaces/shopping-list.interface';
+import {
+  ListItemRequestDTO,
+  ListItemResponseDTO,
+} from '../interfaces/list-item.interface';
 import { catchError } from 'rxjs/operators';
 import { BaseService } from './base.service';
 
