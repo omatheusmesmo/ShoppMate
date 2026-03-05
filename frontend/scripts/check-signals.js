@@ -17,6 +17,10 @@ console.log("--- Custom Lint: OnPush and Signals ---");
 walkDir(srcDir, (filePath) => {
   if (filePath.endsWith(".component.ts")) {
     const content = fs.readFileSync(filePath, "utf8");
+    const templatePath = filePath.replace(".component.ts", ".component.html");
+    const templateContent = fs.existsSync(templatePath)
+      ? fs.readFileSync(templatePath, "utf8")
+      : "";
 
     // Check for ChangeDetectionStrategy.OnPush
     if (!content.includes("ChangeDetectionStrategy.OnPush")) {
@@ -26,17 +30,32 @@ walkDir(srcDir, (filePath) => {
       hasErrors = true;
     }
 
-    // Optional: Check for signal usage (simple regex check for signal() or input.required(), etc.)
-    // This is a naive check but can be expanded.
     const signalPattern =
-      /\bsignal\s*\(|computed\s*\(|effect\s*\(|input\s*\(|input\.required\s*\(/;
+      /\bsignal\s*(?:<[^>]+>)?\s*\(|computed\s*(?:<[^>]+>)?\s*\(|effect\s*\(|input\s*\(|input\.required\s*\(/;
     const usesSignals = signalPattern.test(content);
+    const usesAsyncPipe =
+      /\bAsyncPipe\b/.test(content) || /\|\s*async\b/.test(templateContent);
 
-    // We might want to warn if a component doesn't use signals at all in Angular 19+
-    if (!usesSignals) {
-      console.warn(
-        `Warning: Component at ${filePath} might not be using Signals. Consider migrating.`,
+    const hasUiStateProperty =
+      /^\s*(?:public|private|protected)?\s*(?:isLoading|loading|shoppingLists|listItems|availableItems|items|categories|units|users|permissions|selected[A-Z]\w*|editing[A-Z]\w*|hidePassword|isLargeScreen|quantity)\s*(?::[^=\n]+)?=\s*.*;\s*$/m.test(
+        content,
       );
+
+    const mutableUiStatePattern =
+      /^\s*(?:public|private|protected)?\s*(?:isLoading|loading|shoppingLists|listItems|availableItems|items|categories|units|users|permissions|selected[A-Z]\w*|editing[A-Z]\w*|hidePassword|isLargeScreen|quantity)\s*(?::[^=\n]+)?=\s*(?!signal\s*(?:<[^>]+>)?\s*\().*;\s*$/m;
+
+    if (mutableUiStatePattern.test(content)) {
+      console.error(
+        `Error: Component at ${filePath} has mutable UI state not declared as signal().`,
+      );
+      hasErrors = true;
+    }
+
+    if (hasUiStateProperty && !usesSignals && !usesAsyncPipe) {
+      console.error(
+        `Error: Component at ${filePath} must use Signals or AsyncPipe for reactive state.`,
+      );
+      hasErrors = true;
     }
   }
 });

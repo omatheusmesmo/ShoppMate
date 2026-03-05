@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -34,10 +39,10 @@ import { CategoryService } from '../../services/category.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoryComponent implements OnInit {
-  categories: Category[] = [];
-  isLoading = false;
+  readonly categories = signal<Category[]>([]);
+  readonly isLoading = signal(false);
   categoryForm: FormGroup;
-  editingCategoryId: number | null = null;
+  readonly editingCategoryId = signal<number | null>(null);
 
   constructor(
     private categoryService: CategoryService,
@@ -54,17 +59,17 @@ export class CategoryComponent implements OnInit {
   }
 
   loadCategories(): void {
-    this.isLoading = true;
+    this.isLoading.set(true);
     this.categoryService.getAllCategories().subscribe({
       next: (categories: Category[]) => {
-        this.categories = categories;
-        this.isLoading = false;
+        this.categories.set(categories);
+        this.isLoading.set(false);
       },
       error: () => {
         this.snackBar.open('Error loading categories', 'Close', {
           duration: 3000,
         });
-        this.isLoading = false;
+        this.isLoading.set(false);
       },
     });
   }
@@ -76,19 +81,19 @@ export class CategoryComponent implements OnInit {
       name: this.categoryForm.value.name,
     };
 
-    if (this.editingCategoryId !== null) {
-      categoryData.id = this.editingCategoryId;
+    if (this.editingCategoryId() !== null) {
+      categoryData.id = this.editingCategoryId()!;
     }
 
     const operation =
-      this.editingCategoryId !== null
+      this.editingCategoryId() !== null
         ? this.categoryService.updateCategory(categoryData)
         : this.categoryService.addCategory(categoryData);
 
     operation.subscribe({
       next: () => {
         this.snackBar.open(
-          this.editingCategoryId !== null
+          this.editingCategoryId() !== null
             ? 'Category updated successfully'
             : 'Category created successfully',
           'Close',
@@ -106,7 +111,7 @@ export class CategoryComponent implements OnInit {
   }
 
   startEdit(category: Category): void {
-    this.editingCategoryId = category.id ?? null;
+    this.editingCategoryId.set(category.id ?? null);
     this.categoryForm.patchValue({
       name: category.name,
     });
@@ -132,6 +137,6 @@ export class CategoryComponent implements OnInit {
 
   resetForm(): void {
     this.categoryForm.reset();
-    this.editingCategoryId = null;
+    this.editingCategoryId.set(null);
   }
 }

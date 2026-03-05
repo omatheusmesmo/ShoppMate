@@ -47,9 +47,9 @@
 
     <table
       mat-table
-      [dataSource]="permissions"
+      [dataSource]="permissions()"
       class="w-100"
-      *ngIf="permissions.length > 0"
+      *ngIf="permissions().length > 0"
     >
       <ng-container matColumnDef="user">
         <th mat-header-cell *matHeaderCellDef>User</th>
@@ -88,11 +88,14 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
 
-    <div *ngIf="permissions.length === 0 && !isLoading" class="no-permissions">
+    <div
+      *ngIf="permissions().length === 0 && !isLoading()"
+      class="no-permissions"
+    >
       No other users have access to this list yet.
     </div>
 
-    <div *ngIf="isLoading" class="loading-container">
+    <div *ngIf="isLoading()" class="loading-container">
       <mat-progress-spinner
         mode="indeterminate"
         diameter="40"

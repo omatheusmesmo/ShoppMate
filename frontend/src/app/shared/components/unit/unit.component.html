@@ -2,7 +2,7 @@
   <mat-card class="form-card">
     <mat-card-header>
       <mat-card-title>{{
-        editingUnitId ? "Edit Unit" : "New Unit"
+        editingUnitId() ? "Edit Unit" : "New Unit"
       }}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
@@ -42,9 +42,9 @@
             type="submit"
             [disabled]="unitForm.invalid"
           >
-            {{ editingUnitId ? "Update" : "Create" }}
+            {{ editingUnitId() ? "Update" : "Create" }}
           </button>
-          @if (editingUnitId) {
+          @if (editingUnitId()) {
             <button mat-button type="button" (click)="resetForm()">
               Cancel
             </button>
@@ -54,11 +54,11 @@
     </mat-card-content>
   </mat-card>
 
-  @if (isLoading) {
+  @if (isLoading()) {
     <div class="loading-spinner">
       <mat-spinner></mat-spinner>
     </div>
-  } @else if (units.length === 0) {
+  } @else if (units().length === 0) {
     <mat-card class="empty-state">
       <mat-card-content>
         <p>No units found</p>
@@ -66,7 +66,7 @@
     </mat-card>
   } @else {
     <div class="units-grid">
-      @for (unit of units; track unit.id) {
+      @for (unit of units(); track unit.id) {
         <mat-card class="unit-card">
           <mat-card-header>
             <mat-card-title>{{ unit.name }}</mat-card-title>

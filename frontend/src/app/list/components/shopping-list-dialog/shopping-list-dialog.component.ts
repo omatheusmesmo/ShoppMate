@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -48,15 +53,15 @@ export class ShoppingListDialogComponent {
   };
 
   listForm: FormGroup;
-  isEdit: boolean;
+  readonly isEdit = signal(false);
 
   constructor() {
-    this.isEdit = this.data.isEdit;
+    this.isEdit.set(this.data.isEdit);
     this.listForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
     });
 
-    if (this.isEdit && this.data.list) {
+    if (this.isEdit() && this.data.list) {
       this.listForm.patchValue({
         name: this.data.list.listName,
       });
@@ -70,7 +75,7 @@ export class ShoppingListDialogComponent {
         idUser: this.authService.getCurrentUserId(), // Get from auth service
       };
 
-      if (this.isEdit && this.data.list) {
+      if (this.isEdit() && this.data.list) {
         this.shoppingListService
           .updateShoppingList(this.data.list.idList, listData)
           .subscribe({

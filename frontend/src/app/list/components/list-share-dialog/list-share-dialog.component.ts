@@ -4,6 +4,7 @@ import {
   Inject,
   OnInit,
   inject,
+  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -61,11 +62,11 @@ export class ListShareDialogComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
 
   shareForm: FormGroup;
-  permissions: ListPermissionSummaryDTO[] = [];
-  users: User[] = [];
+  readonly permissions = signal<ListPermissionSummaryDTO[]>([]);
+  readonly users = signal<User[]>([]);
   displayedColumns: string[] = ['user', 'permission', 'actions'];
   permissionTypes = Object.values(Permission);
-  isLoading = false;
+  readonly isLoading = signal(false);
 
   constructor(
     public dialogRef: MatDialogRef<ListShareDialogComponent>,
@@ -83,19 +84,19 @@ export class ListShareDialogComponent implements OnInit {
   }
 
   loadPermissions(): void {
-    this.isLoading = true;
+    this.isLoading.set(true);
     this.listPermissionService
       .getAllListPermissions(this.data.listId)
       .subscribe({
         next: (permissions: ListPermissionSummaryDTO[]) => {
-          this.permissions = permissions;
-          this.isLoading = false;
+          this.permissions.set(permissions);
+          this.isLoading.set(false);
         },
         error: () => {
           this.snackBar.open('Erro ao carregar permissões', 'Fechar', {
             duration: 3000,
           });
-          this.isLoading = false;
+          this.isLoading.set(false);
         },
       });
   }
@@ -103,7 +104,7 @@ export class ListShareDialogComponent implements OnInit {
   loadUsers(): void {
     this.userService.getAllUsers().subscribe({
       next: (users: User[]) => {
-        this.users = users;
+        this.users.set(users);
       },
       error: () => {
         console.error('Error loading users');
@@ -114,7 +115,7 @@ export class ListShareDialogComponent implements OnInit {
   onShare(): void {
     if (this.shareForm.valid) {
       const email = this.shareForm.value.email;
-      const user = this.users.find((u) => u.email === email);
+      const user = this.users().find((u) => u.email === email);
 
       if (!user) {
         this.snackBar.open('Usuário não encontrado com este e-mail', 'Fechar', {

@@ -3,6 +3,7 @@ import {
   Component,
   Inject,
   OnInit,
+  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -36,9 +37,9 @@ import { ItemService } from '../../../../shared/services/item.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListItemDialogComponent implements OnInit {
-  items: ItemResponseDTO[] = [];
-  selectedItemId: number | null = null;
-  quantity = 1;
+  readonly items = signal<ItemResponseDTO[]>([]);
+  readonly selectedItemId = signal<number | null>(null);
+  readonly quantity = signal(1);
 
   constructor(
     public dialogRef: MatDialogRef<ListItemDialogComponent>,
@@ -47,8 +48,8 @@ export class ListItemDialogComponent implements OnInit {
     private itemService: ItemService,
   ) {
     if (data.listItem) {
-      this.selectedItemId = data.listItem.item.id;
-      this.quantity = data.listItem.quantity;
+      this.selectedItemId.set(data.listItem.item.id);
+      this.quantity.set(data.listItem.quantity);
     }
   }
 
@@ -58,7 +59,7 @@ export class ListItemDialogComponent implements OnInit {
 
   loadItems(): void {
     this.itemService.getAllItems().subscribe((items) => {
-      this.items = items;
+      this.items.set(items);
     });
   }
 
@@ -68,8 +69,8 @@ export class ListItemDialogComponent implements OnInit {
 
   onSave(): void {
     this.dialogRef.close({
-      itemId: this.selectedItemId,
-      quantity: this.quantity,
+      itemId: this.selectedItemId(),
+      quantity: this.quantity(),
     });
   }
 }

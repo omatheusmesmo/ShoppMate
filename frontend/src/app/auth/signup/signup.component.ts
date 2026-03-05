@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -46,8 +51,8 @@ export class SignupComponent {
     password: ['', [Validators.required, Validators.minLength(6)]],
   });
 
-  hidePassword = true;
-  isLoading = false;
+  readonly hidePassword = signal(true);
+  readonly isLoading = signal(false);
 
   onSubmit() {
     if (this.signupForm.invalid) {
@@ -55,12 +60,12 @@ export class SignupComponent {
       return;
     }
 
-    this.isLoading = true;
+    this.isLoading.set(true);
     const userData: User = this.signupForm.value;
 
     this.authService
       .register(userData)
-      .pipe(finalize(() => (this.isLoading = false)))
+      .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: () => {
           this.snackBar.open('Cadastro realizado com sucesso!', 'Fechar', {

@@ -5,7 +5,7 @@
       <span class="spacer"></span>
 
       @if (isLoggedIn$ | async) {
-        <div class="nav-links" [class.hidden-mobile]="!isLargeScreen">
+        <div class="nav-links" [class.hidden-mobile]="!isLargeScreen()">
           <a mat-button routerLink="/lists" routerLinkActive="active-link">
             <mat-icon>list</mat-icon>
             <span>Minhas Listas</span>
@@ -24,7 +24,7 @@
           </a>
         </div>
 
-        @if (!isLargeScreen) {
+        @if (!isLargeScreen()) {
           <button mat-icon-button [matMenuTriggerFor]="navMenu">
             <mat-icon>menu</mat-icon>
           </button>

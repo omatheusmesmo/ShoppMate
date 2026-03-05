@@ -3,6 +3,7 @@ import {
   Component,
   OnInit,
   inject,
+  signal,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -55,10 +56,10 @@ export class ItemsManagementComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   private fb = inject(FormBuilder);
 
-  loading = true;
+  readonly loading = signal(true);
   items$!: Observable<ItemResponseDTO[]>;
-  categories: Category[] = [];
-  units: Unit[] = [];
+  readonly categories = signal<Category[]>([]);
+  readonly units = signal<Unit[]>([]);
   displayedColumns: string[] = ['name', 'category', 'unit', 'actions'];
 
   ngOnInit(): void {
@@ -66,17 +67,17 @@ export class ItemsManagementComponent implements OnInit {
   }
 
   loadData(): void {
-    this.loading = true;
+    this.loading.set(true);
     this.items$ = this.itemService
       .getAllItems()
-      .pipe(finalize(() => (this.loading = false)));
+      .pipe(finalize(() => this.loading.set(false)));
 
     this.categoryService.getAllCategories().subscribe((categories) => {
-      this.categories = categories;
+      this.categories.set(categories);
     });
 
     this.unitService.getAllUnits().subscribe((units) => {
-      this.units = units;
+      this.units.set(units);
     });
   }
 

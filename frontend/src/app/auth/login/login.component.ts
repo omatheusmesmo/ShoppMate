@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -44,8 +49,8 @@ export class LoginComponent {
     password: ['', Validators.required],
   });
 
-  hidePassword = true;
-  isLoading = false;
+  readonly hidePassword = signal(true);
+  readonly isLoading = signal(false);
 
   onSubmit(): void {
     if (this.loginForm.invalid) {
@@ -53,12 +58,12 @@ export class LoginComponent {
       return;
     }
 
-    this.isLoading = true;
+    this.isLoading.set(true);
     const { email, password } = this.loginForm.value;
 
     this.authService
       .login({ email, password })
-      .pipe(finalize(() => (this.isLoading = false)))
+      .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: () => {
           this.router.navigate(['/lists']);

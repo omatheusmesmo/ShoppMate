@@ -2,7 +2,12 @@
 <mat-dialog-content>
   <mat-form-field appearance="outline" class="w-100">
     <mat-label>Nome</mat-label>
-    <input matInput [(ngModel)]="list.name" required />
+    <input
+      matInput
+      [ngModel]="listName()"
+      (ngModelChange)="listName.set($event)"
+      required
+    />
   </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
@@ -11,7 +16,7 @@
     mat-raised-button
     color="primary"
     (click)="onSave()"
-    [disabled]="!list.name"
+    [disabled]="!listName()"
   >
     Salvar
   </button>

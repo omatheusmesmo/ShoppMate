@@ -48,17 +48,17 @@
             <mat-label>Senha</mat-label>
             <input
               matInput
-              [type]="hidePassword ? 'password' : 'text'"
+              [type]="hidePassword() ? 'password' : 'text'"
               formControlName="password"
             />
             <button
               type="button"
               mat-icon-button
               matSuffix
-              (click)="hidePassword = !hidePassword"
+              (click)="hidePassword.set(!hidePassword())"
             >
               <mat-icon>{{
-                hidePassword ? "visibility_off" : "visibility"
+                hidePassword() ? "visibility_off" : "visibility"
               }}</mat-icon>
             </button>
             @if (
@@ -80,9 +80,9 @@
               mat-raised-button
               color="primary"
               type="submit"
-              [disabled]="signupForm.invalid || isLoading"
+              [disabled]="signupForm.invalid || isLoading()"
             >
-              @if (isLoading) {
+              @if (isLoading()) {
                 <mat-spinner diameter="24"></mat-spinner>
               } @else {
                 Criar Conta

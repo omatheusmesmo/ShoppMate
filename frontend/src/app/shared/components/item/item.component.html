@@ -2,7 +2,7 @@
   <mat-card class="form-card">
     <mat-card-header>
       <mat-card-title>{{
-        editingItemId ? "Edit Item" : "New Item"
+        editingItemId() ? "Edit Item" : "New Item"
       }}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
@@ -27,7 +27,7 @@
         <mat-form-field appearance="outline">
           <mat-label>Category</mat-label>
           <mat-select formControlName="idCategory">
-            @for (category of categories; track category.id) {
+            @for (category of categories(); track category.id) {
               <mat-option [value]="category.id">{{ category.name }}</mat-option>
             }
           </mat-select>
@@ -42,7 +42,7 @@
         <mat-form-field appearance="outline">
           <mat-label>Unit</mat-label>
           <mat-select formControlName="idUnit">
-            @for (unit of units; track unit.id) {
+            @for (unit of units(); track unit.id) {
               <mat-option [value]="unit.id"
                 >{{ unit.name }} ({{ unit.symbol }})</mat-option
               >
@@ -63,9 +63,9 @@
             type="submit"
             [disabled]="itemForm.invalid"
           >
-            {{ editingItemId ? "Update" : "Create" }}
+            {{ editingItemId() ? "Update" : "Create" }}
           </button>
-          @if (editingItemId) {
+          @if (editingItemId()) {
             <button mat-button type="button" (click)="resetForm()">
               Cancel
             </button>
@@ -75,11 +75,11 @@
     </mat-card-content>
   </mat-card>
 
-  @if (isLoading) {
+  @if (isLoading()) {
     <div class="loading-spinner">
       <mat-spinner></mat-spinner>
     </div>
-  } @else if (items.length === 0) {
+  } @else if (items().length === 0) {
     <mat-card class="empty-state">
       <mat-card-content>
         <p>No items found</p>
@@ -87,7 +87,7 @@
     </mat-card>
   } @else {
     <div class="items-grid">
-      @for (item of items; track item.id) {
+      @for (item of items(); track item.id) {
         <mat-card class="item-card">
           <mat-card-header>
             <mat-card-title>{{ item.name }}</mat-card-title>

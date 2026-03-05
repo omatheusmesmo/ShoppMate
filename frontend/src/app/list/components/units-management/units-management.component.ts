@@ -2,8 +2,8 @@ import {
   Component,
   OnInit,
   inject,
-  ChangeDetectorRef,
   ChangeDetectionStrategy,
+  signal,
 } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,11 +12,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
-import { AsyncPipe } from '@angular/common';
 
 import { UnitService } from '../../../shared/services/unit.service';
 import { Unit } from '../../../shared/interfaces/unit.interface';
-import { finalize, catchError, of, tap, BehaviorSubject } from 'rxjs';
+import { finalize, catchError, of, tap } from 'rxjs';
 import { UnitDialogComponent } from './unit-dialog/unit-dialog.component';
 
 @Component({
@@ -28,7 +27,6 @@ import { UnitDialogComponent } from './unit-dialog/unit-dialog.component';
     MatIconModule,
     MatProgressSpinnerModule,
     MatCardModule,
-    AsyncPipe,
   ],
   templateUrl: './units-management.component.html',
   styleUrls: ['./units-management.component.scss'],
@@ -38,12 +36,10 @@ export class UnitsManagementComponent implements OnInit {
   private unitService = inject(UnitService);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
-  private cdr = inject(ChangeDetectorRef);
 
-  loading = true;
-  error = false;
-  private unitsSubject = new BehaviorSubject<Unit[]>([]);
-  units$ = this.unitsSubject.asObservable();
+  readonly loading = signal(true);
+  readonly error = signal(false);
+  readonly units = signal<Unit[]>([]);
   displayedColumns: string[] = ['name', 'symbol', 'actions'];
 
   ngOnInit(): void {
@@ -51,18 +47,18 @@ export class UnitsManagementComponent implements OnInit {
   }
 
   loadUnits(): void {
-    this.loading = true;
-    this.error = false;
+    this.loading.set(true);
+    this.error.set(false);
 
     this.unitService
       .getAllUnits()
       .pipe(
         tap((response) => {
-          this.unitsSubject.next(response || []);
+          this.units.set(response || []);
         }),
         catchError(() => {
-          this.error = true;
-          this.unitsSubject.next([]);
+          this.error.set(true);
+          this.units.set([]);
           this.snackBar.open(
             'Erro ao carregar unidades. Tente novamente mais tarde.',
             'Fechar',
@@ -73,8 +69,7 @@ export class UnitsManagementComponent implements OnInit {
           return of([]);
         }),
         finalize(() => {
-          this.loading = false;
-          this.cdr.detectChanges();
+          this.loading.set(false);
         }),
       )
       .subscribe();

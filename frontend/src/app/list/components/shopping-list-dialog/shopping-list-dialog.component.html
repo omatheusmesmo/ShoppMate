@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>{{ isEdit ? "Editar Lista" : "Nova Lista" }}</h2>
+<h2 mat-dialog-title>{{ isEdit() ? "Editar Lista" : "Nova Lista" }}</h2>
 
 <mat-dialog-content>
   <form [formGroup]="listForm">
@@ -27,6 +27,6 @@
     (click)="onSubmit()"
     [disabled]="!listForm.valid"
   >
-    {{ isEdit ? "Atualizar" : "Criar" }}
+    {{ isEdit() ? "Atualizar" : "Criar" }}
   </button>
 </mat-dialog-actions>

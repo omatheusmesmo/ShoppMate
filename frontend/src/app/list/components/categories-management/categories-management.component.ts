@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,8 +30,8 @@ import { CategoryDialogComponent } from '../category-dialog/category-dialog.comp
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoriesManagementComponent implements OnInit {
-  categories: Category[] = [];
-  isLoading = false;
+  readonly categories = signal<Category[]>([]);
+  readonly isLoading = signal(false);
 
   constructor(
     private categoryService: CategoryService,
@@ -39,17 +44,17 @@ export class CategoriesManagementComponent implements OnInit {
   }
 
   loadCategories(): void {
-    this.isLoading = true;
+    this.isLoading.set(true);
     this.categoryService.getAllCategories().subscribe({
       next: (categories) => {
-        this.categories = categories;
-        this.isLoading = false;
+        this.categories.set(categories);
+        this.isLoading.set(false);
       },
       error: () => {
         this.snackBar.open('Erro ao carregar categorias', 'Fechar', {
           duration: 3000,
         });
-        this.isLoading = false;
+        this.isLoading.set(false);
       },
     });
   }

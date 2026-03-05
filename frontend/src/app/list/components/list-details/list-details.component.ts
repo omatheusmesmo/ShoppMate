@@ -3,6 +3,7 @@ import {
   Component,
   OnInit,
   inject,
+  signal,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -59,7 +60,7 @@ export class ListDetailsComponent implements OnInit {
   private fb = inject(FormBuilder);
 
   listId!: number;
-  loading = true;
+  readonly loading = signal(true);
   list$!: Observable<ShoppingListResponseDTO>;
   listItems$!: Observable<ListItemResponseDTO[]>;
   displayedColumns: string[] = ['item', 'quantity', 'status', 'actions'];
@@ -70,7 +71,7 @@ export class ListDetailsComponent implements OnInit {
   }
 
   loadData(): void {
-    this.loading = true;
+    this.loading.set(true);
 
     // Get the list details
     this.list$ = this.shoppingListService
@@ -80,7 +81,7 @@ export class ListDetailsComponent implements OnInit {
     // Get list items
     this.listItems$ = this.listItemService
       .getAllListItemsByListId(this.listId)
-      .pipe(finalize(() => (this.loading = false)));
+      .pipe(finalize(() => this.loading.set(false)));
   }
 
   togglePurchased(item: ListItemResponseDTO): void {

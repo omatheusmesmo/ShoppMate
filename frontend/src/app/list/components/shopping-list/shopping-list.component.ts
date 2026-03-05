@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -28,8 +33,8 @@ import { ListShareDialogComponent } from '../list-share-dialog/list-share-dialog
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShoppingListComponent implements OnInit {
-  shoppingLists: ShoppingListResponseDTO[] = [];
-  isLoading = false;
+  readonly shoppingLists = signal<ShoppingListResponseDTO[]>([]);
+  readonly isLoading = signal(false);
 
   constructor(
     private shoppingListService: ShoppingListService,
@@ -42,17 +47,17 @@ export class ShoppingListComponent implements OnInit {
   }
 
   loadLists(): void {
-    this.isLoading = true;
+    this.isLoading.set(true);
     this.shoppingListService.getAllShoppingLists().subscribe({
       next: (lists) => {
-        this.shoppingLists = lists;
-        this.isLoading = false;
+        this.shoppingLists.set(lists);
+        this.isLoading.set(false);
       },
       error: () => {
         this.snackBar.open('Erro ao carregar listas', 'Fechar', {
           duration: 3000,
         });
-        this.isLoading = false;
+        this.isLoading.set(false);
       },
     });
   }

@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -34,10 +39,10 @@ import { UnitService } from '../../services/unit.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UnitComponent implements OnInit {
-  units: Unit[] = [];
-  isLoading = false;
+  readonly units = signal<Unit[]>([]);
+  readonly isLoading = signal(false);
   unitForm: FormGroup;
-  editingUnitId: number | null = null;
+  readonly editingUnitId = signal<number | null>(null);
 
   constructor(
     private unitService: UnitService,
@@ -55,15 +60,15 @@ export class UnitComponent implements OnInit {
   }
 
   loadUnits(): void {
-    this.isLoading = true;
+    this.isLoading.set(true);
     this.unitService.getAllUnits().subscribe({
       next: (units: Unit[]) => {
-        this.units = units;
-        this.isLoading = false;
+        this.units.set(units);
+        this.isLoading.set(false);
       },
       error: () => {
         this.snackBar.open('Error loading units', 'Close', { duration: 3000 });
-        this.isLoading = false;
+        this.isLoading.set(false);
       },
     });
   }
@@ -76,19 +81,19 @@ export class UnitComponent implements OnInit {
       symbol: this.unitForm.value.symbol,
     };
 
-    if (this.editingUnitId !== null) {
-      unitData.id = this.editingUnitId;
+    if (this.editingUnitId() !== null) {
+      unitData.id = this.editingUnitId()!;
     }
 
     const operation =
-      this.editingUnitId !== null
+      this.editingUnitId() !== null
         ? this.unitService.updateUnit(unitData)
         : this.unitService.addUnit(unitData);
 
     operation.subscribe({
       next: () => {
         this.snackBar.open(
-          this.editingUnitId !== null
+          this.editingUnitId() !== null
             ? 'Unit updated successfully'
             : 'Unit created successfully',
           'Close',
@@ -104,7 +109,7 @@ export class UnitComponent implements OnInit {
   }
 
   startEdit(unit: Unit): void {
-    this.editingUnitId = unit.id ?? null;
+    this.editingUnitId.set(unit.id ?? null);
     this.unitForm.patchValue({
       name: unit.name,
       symbol: unit.symbol,
@@ -131,6 +136,6 @@ export class UnitComponent implements OnInit {
 
   resetForm(): void {
     this.unitForm.reset();
-    this.editingUnitId = null;
+    this.editingUnitId.set(null);
   }
 }

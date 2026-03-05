@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Inject,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -27,17 +32,16 @@ import { ShoppingListRequestDTO } from '../../../../shared/interfaces/shopping-l
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListDialogComponent {
-  list: ShoppingListRequestDTO = {
-    name: '',
-    idUser: 0,
-  };
+  readonly listName = signal('');
+  readonly listUserId = signal(0);
 
   constructor(
     public dialogRef: MatDialogRef<ListDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { list?: ShoppingListRequestDTO },
   ) {
     if (data.list) {
-      this.list = { ...data.list };
+      this.listName.set(data.list.name);
+      this.listUserId.set(data.list.idUser);
     }
   }
 
@@ -46,6 +50,9 @@ export class ListDialogComponent {
   }
 
   onSave(): void {
-    this.dialogRef.close(this.list);
+    this.dialogRef.close({
+      name: this.listName(),
+      idUser: this.listUserId(),
+    } satisfies ShoppingListRequestDTO);
   }
 }

@@ -5,13 +5,13 @@
     </mat-card-header>
 
     <mat-card-content>
-      @if (isLoading) {
+      @if (isLoading()) {
         <div class="loading-spinner">
           <mat-spinner diameter="50"></mat-spinner>
         </div>
       } @else {
         <div class="categories-list">
-          @for (category of categories; track category.id) {
+          @for (category of categories(); track category.id) {
             <div class="category-item">
               <span>{{ category.name }}</span>
               <div class="category-actions">

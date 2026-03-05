@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -44,12 +49,12 @@ import { forkJoin } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ItemComponent implements OnInit {
-  items: ItemResponseDTO[] = [];
-  categories: Category[] = [];
-  units: Unit[] = [];
-  isLoading = false;
+  readonly items = signal<ItemResponseDTO[]>([]);
+  readonly categories = signal<Category[]>([]);
+  readonly units = signal<Unit[]>([]);
+  readonly isLoading = signal(false);
   itemForm: FormGroup;
-  editingItemId: number | null = null;
+  readonly editingItemId = signal<number | null>(null);
 
   constructor(
     private itemService: ItemService,
@@ -70,21 +75,21 @@ export class ItemComponent implements OnInit {
   }
 
   loadInitialData(): void {
-    this.isLoading = true;
+    this.isLoading.set(true);
     forkJoin({
       items: this.itemService.getAllItems(),
       categories: this.categoryService.getAllCategories(),
       units: this.unitService.getAllUnits(),
     }).subscribe({
       next: (data) => {
-        this.items = data.items;
-        this.categories = data.categories;
-        this.units = data.units;
-        this.isLoading = false;
+        this.items.set(data.items);
+        this.categories.set(data.categories);
+        this.units.set(data.units);
+        this.isLoading.set(false);
       },
       error: () => {
         this.snackBar.open('Error loading data', 'Close', { duration: 3000 });
-        this.isLoading = false;
+        this.isLoading.set(false);
       },
     });
   }
@@ -98,14 +103,14 @@ export class ItemComponent implements OnInit {
       idUnit: this.itemForm.value.idUnit,
     };
 
-    const operation = this.editingItemId
-      ? this.itemService.updateItem(this.editingItemId, itemData)
+    const operation = this.editingItemId()
+      ? this.itemService.updateItem(this.editingItemId()!, itemData)
       : this.itemService.addItem(itemData);
 
     operation.subscribe({
       next: () => {
         this.snackBar.open(
-          this.editingItemId
+          this.editingItemId()
             ? 'Item updated successfully'
             : 'Item created successfully',
           'Close',
@@ -121,7 +126,7 @@ export class ItemComponent implements OnInit {
   }
 
   startEdit(item: ItemResponseDTO): void {
-    this.editingItemId = item.id;
+    this.editingItemId.set(item.id);
     this.itemForm.patchValue({
       name: item.name,
       idCategory: item.category.id,
@@ -149,6 +154,6 @@ export class ItemComponent implements OnInit {
 
   resetForm(): void {
     this.itemForm.reset();
-    this.editingItemId = null;
+    this.editingItemId.set(null);
   }
 }

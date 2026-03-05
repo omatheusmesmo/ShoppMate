@@ -3,6 +3,7 @@ import {
   Component,
   HostListener,
   inject,
+  signal,
 } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -36,12 +37,12 @@ export class NavbarComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  isLargeScreen: boolean = window.innerWidth >= 768;
+  readonly isLargeScreen = signal(window.innerWidth >= 768);
   isLoggedIn$ = this.authService.isLoggedIn$;
 
   @HostListener('window:resize', ['$event'])
   onResize(event: UIEvent) {
-    this.isLargeScreen = (event.target as Window).innerWidth >= 768;
+    this.isLargeScreen.set((event.target as Window).innerWidth >= 768);
   }
 
   logout(): void {

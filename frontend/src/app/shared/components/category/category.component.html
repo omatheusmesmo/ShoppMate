@@ -2,7 +2,7 @@
   <mat-card class="form-card">
     <mat-card-header>
       <mat-card-title>{{
-        editingCategoryId ? "Edit Category" : "New Category"
+        editingCategoryId() ? "Edit Category" : "New Category"
       }}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
@@ -31,9 +31,9 @@
             type="submit"
             [disabled]="categoryForm.invalid"
           >
-            {{ editingCategoryId ? "Update" : "Create" }}
+            {{ editingCategoryId() ? "Update" : "Create" }}
           </button>
-          @if (editingCategoryId) {
+          @if (editingCategoryId()) {
             <button mat-button type="button" (click)="resetForm()">
               Cancel
             </button>
@@ -43,11 +43,11 @@
     </mat-card-content>
   </mat-card>
 
-  @if (isLoading) {
+  @if (isLoading()) {
     <div class="loading-spinner">
       <mat-spinner></mat-spinner>
     </div>
-  } @else if (categories.length === 0) {
+  } @else if (categories().length === 0) {
     <mat-card class="empty-state">
       <mat-card-content>
         <p>No categories found</p>
@@ -55,7 +55,7 @@
     </mat-card>
   } @else {
     <div class="categories-grid">
-      @for (category of categories; track category.id) {
+      @for (category of categories(); track category.id) {
         <mat-card class="category-card">
           <mat-card-header>
             <mat-card-title>{{ category.name }}</mat-card-title>
