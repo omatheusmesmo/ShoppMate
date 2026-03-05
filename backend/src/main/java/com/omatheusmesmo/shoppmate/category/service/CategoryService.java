@@ -3,7 +3,6 @@ package com.omatheusmesmo.shoppmate.category.service;
 import com.omatheusmesmo.shoppmate.category.entity.Category;
 import com.omatheusmesmo.shoppmate.category.repository.CategoryRepository;
 import com.omatheusmesmo.shoppmate.shared.service.AuditService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,10 +12,14 @@ import java.util.Optional;
 @Service
 public class CategoryService {
 
-    @Autowired
-    private CategoryRepository categoryRepository;
-    @Autowired
-    private AuditService auditService;
+    private final CategoryRepository categoryRepository;
+
+    private final AuditService auditService;
+
+    public CategoryService(CategoryRepository categoryRepository, AuditService auditService) {
+        this.categoryRepository = categoryRepository;
+        this.auditService = auditService;
+    }
 
     public Category saveCategory(Category category) {
         isCategoryValid(category);

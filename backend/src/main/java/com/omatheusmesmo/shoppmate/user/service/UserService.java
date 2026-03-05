@@ -3,7 +3,6 @@ package com.omatheusmesmo.shoppmate.user.service;
 import com.omatheusmesmo.shoppmate.user.dtos.RegisterUserDTO;
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import com.omatheusmesmo.shoppmate.user.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +12,14 @@ import java.util.NoSuchElementException;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public User addUser(RegisterUserDTO dto) {
         var user = new User(dto);

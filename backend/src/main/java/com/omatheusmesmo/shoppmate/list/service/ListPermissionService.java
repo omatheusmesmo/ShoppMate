@@ -9,7 +9,6 @@ import com.omatheusmesmo.shoppmate.list.repository.ListPermissionRepository;
 import com.omatheusmesmo.shoppmate.shared.service.AuditService;
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import com.omatheusmesmo.shoppmate.user.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,17 +18,25 @@ import java.util.Optional;
 @Service
 public class ListPermissionService {
 
-    @Autowired
-    private ListPermissionRepository listPermissionRepository;
+    private final ListPermissionRepository listPermissionRepository;
 
-    @Autowired
-    private ShoppingListService shoppingListService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private AuditService auditService;
-    @Autowired
-    private ListPermissionMapper listPermissionMapper;
+    private final ShoppingListService shoppingListService;
+
+    private final UserService userService;
+
+    private final AuditService auditService;
+
+    private final ListPermissionMapper listPermissionMapper;
+
+    public ListPermissionService(ListPermissionRepository listPermissionRepository,
+            ShoppingListService shoppingListService, UserService userService, AuditService auditService,
+            ListPermissionMapper listPermissionMapper) {
+        this.listPermissionRepository = listPermissionRepository;
+        this.shoppingListService = shoppingListService;
+        this.userService = userService;
+        this.auditService = auditService;
+        this.listPermissionMapper = listPermissionMapper;
+    }
 
     public ListPermission addListPermission(ListPermissionRequestDTO listPermissionRequestDTO) {
         ShoppingList shoppingList = shoppingListService.findListById(listPermissionRequestDTO.idList());

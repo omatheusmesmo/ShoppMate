@@ -9,7 +9,6 @@ import com.omatheusmesmo.shoppmate.list.service.ShoppingListService;
 import com.omatheusmesmo.shoppmate.utils.HttpResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,11 +22,14 @@ import java.util.List;
 @RequestMapping("/lists")
 public class ShoppingListController {
 
-    @Autowired
-    private ShoppingListService service;
+    private final ShoppingListService service;
 
-    @Autowired
-    private ListMapper listMapper;
+    private final ListMapper listMapper;
+
+    public ShoppingListController(ShoppingListService service, ListMapper listMapper) {
+        this.service = service;
+        this.listMapper = listMapper;
+    }
 
     @Operation(description = "Return all Shopping Lists")
     @GetMapping

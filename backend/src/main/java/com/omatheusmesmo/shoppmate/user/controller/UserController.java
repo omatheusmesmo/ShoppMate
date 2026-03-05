@@ -3,7 +3,6 @@ package com.omatheusmesmo.shoppmate.user.controller;
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import com.omatheusmesmo.shoppmate.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,10 +16,14 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-    @Autowired
-    UserService userService;
-    @Autowired
-    UserDetailsService userDetailsService;
+    private final UserService userService;
+
+    private final UserDetailsService userDetailsService;
+
+    public UserController(UserService userService, UserDetailsService userDetailsService) {
+        this.userService = userService;
+        this.userDetailsService = userDetailsService;
+    }
 
     // TODO: Corrigir erro: org.springframework.web.servlet.resource.NoResourceFoundException: No static resource users.
     // O mapeamento atual está gerando /users/users em vez de /users.

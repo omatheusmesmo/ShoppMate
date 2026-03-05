@@ -10,7 +10,6 @@ import com.omatheusmesmo.shoppmate.list.service.ListItemService;
 import com.omatheusmesmo.shoppmate.utils.HttpResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -22,11 +21,14 @@ import java.util.List;
 @RequestMapping("/lists/{listId}/items")
 public class ListItemController {
 
-    @Autowired
-    private ListItemService service;
+    private final ListItemService service;
 
-    @Autowired
-    ListItemMapper listItemMapper;
+    private final ListItemMapper listItemMapper;
+
+    public ListItemController(ListItemService service, ListItemMapper listItemMapper) {
+        this.service = service;
+        this.listItemMapper = listItemMapper;
+    }
 
     @Operation(summary = "Get a specific ListItem by its ID within a ShoppingList")
     @GetMapping("/{id}")

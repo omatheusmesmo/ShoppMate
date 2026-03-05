@@ -10,7 +10,6 @@ import com.omatheusmesmo.shoppmate.list.service.ListPermissionService;
 import com.omatheusmesmo.shoppmate.utils.HttpResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -22,11 +21,14 @@ import java.util.List;
 @RequestMapping("/lists/{listId}/permissions")
 public class ListPermissionController {
 
-    @Autowired
-    private ListPermissionService service;
+    private final ListPermissionService service;
 
-    @Autowired
-    private ListPermissionMapper listPermissionMapper;
+    private final ListPermissionMapper listPermissionMapper;
+
+    public ListPermissionController(ListPermissionService service, ListPermissionMapper listPermissionMapper) {
+        this.service = service;
+        this.listPermissionMapper = listPermissionMapper;
+    }
 
     @Operation(description = "Return all ListPermissions")
     @GetMapping

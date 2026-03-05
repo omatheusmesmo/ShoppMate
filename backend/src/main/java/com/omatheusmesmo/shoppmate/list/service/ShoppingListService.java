@@ -6,7 +6,6 @@ import com.omatheusmesmo.shoppmate.list.entity.ShoppingList;
 import com.omatheusmesmo.shoppmate.list.repository.ShoppingListRepository;
 import com.omatheusmesmo.shoppmate.user.service.UserService;
 import com.omatheusmesmo.shoppmate.shared.service.AuditService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,12 +15,18 @@ import java.util.Optional;
 @Service
 public class ShoppingListService {
 
-    @Autowired
-    private ShoppingListRepository shoppingListRepository;
-    @Autowired
-    private AuditService auditService;
-    @Autowired
-    private UserService userService;
+    private final ShoppingListRepository shoppingListRepository;
+
+    private final AuditService auditService;
+
+    private final UserService userService;
+
+    public ShoppingListService(ShoppingListRepository shoppingListRepository, AuditService auditService,
+            UserService userService) {
+        this.shoppingListRepository = shoppingListRepository;
+        this.auditService = auditService;
+        this.userService = userService;
+    }
 
     public ShoppingList saveList(ShoppingList ShoppingList) {
         isListValid(ShoppingList);

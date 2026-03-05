@@ -8,7 +8,6 @@ import com.omatheusmesmo.shoppmate.auth.service.JwtService;
 import com.omatheusmesmo.shoppmate.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,14 +19,21 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    UserService userService;
-    @Autowired
-    JwtService jwtService;
-    @Autowired
-    AuthenticationManager authenticationManager;
-    @Autowired
-    UserDetailsService userDetailsService;
+    private final UserService userService;
+
+    private final JwtService jwtService;
+
+    private final AuthenticationManager authenticationManager;
+
+    private final UserDetailsService userDetailsService;
+
+    public AuthController(UserService userService, JwtService jwtService, AuthenticationManager authenticationManager,
+            UserDetailsService userDetailsService) {
+        this.userService = userService;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
+        this.userDetailsService = userDetailsService;
+    }
 
     @Operation(summary = "Register a User")
     @PostMapping("/sign")

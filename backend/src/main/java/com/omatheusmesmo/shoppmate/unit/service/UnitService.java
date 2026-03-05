@@ -3,7 +3,6 @@ package com.omatheusmesmo.shoppmate.unit.service;
 import com.omatheusmesmo.shoppmate.unit.entity.Unit;
 import com.omatheusmesmo.shoppmate.unit.repository.UnitRepository;
 import com.omatheusmesmo.shoppmate.shared.service.AuditService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,10 +11,15 @@ import java.util.Optional;
 
 @Service
 public class UnitService {
-    @Autowired
-    private UnitRepository unitRepository;
-    @Autowired
-    private AuditService auditService;
+
+    private final UnitRepository unitRepository;
+
+    private final AuditService auditService;
+
+    public UnitService(UnitRepository unitRepository, AuditService auditService) {
+        this.unitRepository = unitRepository;
+        this.auditService = auditService;
+    }
 
     public Unit saveUnit(Unit unit) {
         isUnitValid(unit);

@@ -7,7 +7,6 @@ import com.omatheusmesmo.shoppmate.category.mapper.CategoryMapper;
 import com.omatheusmesmo.shoppmate.category.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +19,14 @@ import java.util.List;
 @RequestMapping("/category")
 public class CategoryController {
 
-    @Autowired
-    private CategoryService categoryService;
-    @Autowired
-    private CategoryMapper categoryMapper;
+    private final CategoryService categoryService;
+
+    private final CategoryMapper categoryMapper;
+
+    public CategoryController(CategoryService categoryService, CategoryMapper categoryMapper) {
+        this.categoryService = categoryService;
+        this.categoryMapper = categoryMapper;
+    }
 
     @Operation(summary = "Return all categories")
     @GetMapping

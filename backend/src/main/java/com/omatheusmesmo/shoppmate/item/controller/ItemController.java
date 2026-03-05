@@ -7,7 +7,6 @@ import com.omatheusmesmo.shoppmate.item.mapper.ItemMapper;
 import com.omatheusmesmo.shoppmate.item.service.ItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +19,14 @@ import java.util.List;
 @RequestMapping("/item")
 public class ItemController {
 
-    @Autowired
-    private ItemService itemService;
-    @Autowired
-    private ItemMapper itemMapper;
+    private final ItemService itemService;
+
+    private final ItemMapper itemMapper;
+
+    public ItemController(ItemService itemService, ItemMapper itemMapper) {
+        this.itemService = itemService;
+        this.itemMapper = itemMapper;
+    }
 
     @Operation(summary = "Return all items")
     @GetMapping

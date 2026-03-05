@@ -9,7 +9,6 @@ import com.omatheusmesmo.shoppmate.list.mapper.ListItemMapper;
 import com.omatheusmesmo.shoppmate.list.repository.ListItemRepository;
 import com.omatheusmesmo.shoppmate.item.service.ItemService;
 import com.omatheusmesmo.shoppmate.shared.service.AuditService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,18 +17,24 @@ import java.util.NoSuchElementException;
 @Service
 public class ListItemService {
 
-    @Autowired
-    private ListItemRepository ListItemRepository;
+    private final ListItemRepository ListItemRepository;
 
-    @Autowired
-    private ShoppingListService shoppingListService;
-    @Autowired
-    private ItemService itemService;
-    @Autowired
-    private AuditService auditService;
+    private final ShoppingListService shoppingListService;
 
-    @Autowired
-    private ListItemMapper listItemMapper;
+    private final ItemService itemService;
+
+    private final AuditService auditService;
+
+    private final ListItemMapper listItemMapper;
+
+    public ListItemService(ListItemRepository listItemRepository, ShoppingListService shoppingListService,
+            ItemService itemService, AuditService auditService, ListItemMapper listItemMapper) {
+        ListItemRepository = listItemRepository;
+        this.shoppingListService = shoppingListService;
+        this.itemService = itemService;
+        this.auditService = auditService;
+        this.listItemMapper = listItemMapper;
+    }
 
     public ListItem addShoppItemList(ListItemRequestDTO listItemRequestDTO) {
         Item item = itemService.findById(listItemRequestDTO.itemId());

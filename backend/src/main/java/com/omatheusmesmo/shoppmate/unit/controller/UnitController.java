@@ -4,7 +4,6 @@ import com.omatheusmesmo.shoppmate.unit.entity.Unit;
 import com.omatheusmesmo.shoppmate.unit.service.UnitService;
 import com.omatheusmesmo.shoppmate.utils.HttpResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,8 +14,11 @@ import java.util.NoSuchElementException;
 @RequestMapping("/unit")
 public class UnitController {
 
-    @Autowired
-    private UnitService unitService;
+    private final UnitService unitService;
+
+    public UnitController(UnitService unitService) {
+        this.unitService = unitService;
+    }
 
     @Operation(summary = "Return all units")
     @GetMapping
