@@ -3,6 +3,9 @@ package com.omatheusmesmo.shoppmate.category.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.omatheusmesmo.shoppmate.category.entity.Category;
+import com.omatheusmesmo.shoppmate.category.repository.CategoryRepository;
+import com.omatheusmesmo.shoppmate.item.repository.ItemRepository;
 import com.omatheusmesmo.shoppmate.shared.testcontainers.AbstractIntegrationTest;
 import com.omatheusmesmo.shoppmate.shared.testcontainers.utils.TestUserFactory;
 import com.omatheusmesmo.shoppmate.category.dto.CategoryRequestDTO;
@@ -32,6 +35,12 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
     @Autowired
     private TestUserFactory testUserFactory;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    private ItemRepository itemRepository;
+
     private static RequestSpecification specification;
     private static ObjectMapper objectMapper;
 
@@ -46,6 +55,8 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
 
     @BeforeEach
     void init() {
+        itemRepository.deleteAll();
+        categoryRepository.deleteAll();
         String jwtToken = testUserFactory.createTokenForTestUser();
 
         Response response = given()
@@ -72,7 +83,6 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Order(1)
     void testPostAddCategory() throws Exception {
         CategoryRequestDTO request = new CategoryRequestDTO("Book");
 
@@ -97,13 +107,13 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Order(2)
     void testPutEditCategory() throws Exception {
         CategoryRequestDTO categoryResponseDTOToUpdated = new CategoryRequestDTO("Book Putted");
+        Category categoryEntity = createCategoryToTest();
 
         var content = given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .pathParam("id", categoryResponseDTOCreated.id())
+                .pathParam("id", categoryEntity.getId())
                 .body(categoryResponseDTOToUpdated)
                 .when()
                 .put("{id}")
@@ -123,8 +133,9 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Order(3)
     void testGetAllCategories() throws Exception {
+        Category categoryEntity = createCategoryToTest();
+
         var content = given(specification)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when()
@@ -142,14 +153,15 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
         assertNotNull(categoryOne.id());
         assertTrue(categoryOne.id() > 0);
 
-        assertEquals("Book Putted", categoryOne.name());
+        assertEquals("Book", categoryOne.name());
     }
 
     @Test
-    @Order(4)
     void testDeleteRemoveCategory() {
+        Category categoryEntity = createCategoryToTest();
+
         given(specification)
-                .pathParam("id", categoryResponseDTOCreated.id())
+                .pathParam("id", categoryEntity.getId())
                 .when()
                 .delete("{id}")
                 .then()
@@ -157,7 +169,6 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Order(5)
     void IntegrationTestPostAddCategory_BadRequest() throws Exception {
         CategoryRequestDTO invalidItem = new CategoryRequestDTO("");
 
@@ -175,7 +186,6 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Order(6)
     void IntegrationTestPutEditCategory_NotFound() throws Exception {
         CategoryRequestDTO invalidItem = new CategoryRequestDTO("Toy");
 
@@ -191,5 +201,12 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
                 .extract()
                 .body()
                 .asString();
+    }
+
+    Category createCategoryToTest() {
+        Category categoryEntity = new Category();
+        categoryEntity.setName("Book");
+        categoryEntity = categoryRepository.save(categoryEntity);
+        return categoryEntity;
     }
 }

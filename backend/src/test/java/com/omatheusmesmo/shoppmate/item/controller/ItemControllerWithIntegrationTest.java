@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.omatheusmesmo.shoppmate.category.entity.Category;
 import com.omatheusmesmo.shoppmate.category.repository.CategoryRepository;
+import com.omatheusmesmo.shoppmate.item.entity.Item;
+import com.omatheusmesmo.shoppmate.item.repository.ItemRepository;
 import com.omatheusmesmo.shoppmate.shared.testcontainers.AbstractIntegrationTest;
 import com.omatheusmesmo.shoppmate.shared.testcontainers.utils.TestUserFactory;
 import com.omatheusmesmo.shoppmate.config.TestConfigs;
@@ -42,6 +44,9 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private ItemRepository itemRepository;
+
     private static RequestSpecification specification;
     private static ObjectMapper objectMapper;
 
@@ -50,6 +55,10 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
 
     @BeforeEach
     void init() {
+        itemRepository.deleteAll();
+        unitRepository.deleteAll();
+        categoryRepository.deleteAll();
+
         String jwtToken = testUserFactory.createTokenForTestUser();
 
         Response response = given()
@@ -82,17 +91,9 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Order(1)
     void testPostAddItem() throws Exception {
-        Category categoryEntity = new Category();
-        categoryEntity.setName("Food");
-        categoryEntity = categoryRepository.save(categoryEntity);
-
-
-        Unit unitEntity = new Unit();
-        unitEntity.setSymbol("KG");
-        unitEntity.setName("Kilogram");
-        unitEntity = unitRepository.save(unitEntity);
+        Category categoryEntity = createCategoryToTest();
+        Unit unitEntity = createUnitToTest();
 
         ItemRequestDTO requestDTO = new ItemRequestDTO("Feijão", categoryEntity.getId(), unitEntity.getId());
 
@@ -120,14 +121,16 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Order(2)
     void testPutEditItem() throws Exception {
-        ItemRequestDTO ItemRequestDTOToUpdated = new ItemRequestDTO("Arroz", 1L, 1L);
+        Item itemEntity = createItemToTest();
+
+        ItemRequestDTO requestDTO = new ItemRequestDTO("Arroz", itemEntity.getCategory().getId(), itemEntity.getUnit().getId());
+
 
         var content = given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .pathParam("id", itemResponseDTOCreated.id())
-                .body(ItemRequestDTOToUpdated)
+                .pathParam("id", itemEntity.getId())
+                .body(requestDTO)
                 .when()
                 .put("{id}")
                 .then()
@@ -144,13 +147,14 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
         assertTrue(updatedItem.id() > 0);
 
         assertEquals("Arroz", updatedItem.name());
-        assertEquals(1L, updatedItem.category().id());
-        assertEquals(1L, updatedItem.unit().id());
+        assertEquals(requestDTO.idCategory(), updatedItem.category().id());
+        assertEquals(requestDTO.idUnit(), updatedItem.unit().id());
     }
 
     @Test
-    @Order(3)
-    void testGetAllCategories() throws Exception {
+    void testGetAllItems() throws Exception {
+        createItemToTest();
+
         var content = given(specification)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when()
@@ -172,10 +176,11 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Order(4)
     void testDeleteRemoveCategory() throws Exception {
+        Item itemEntity = createItemToTest();
+
         given(specification)
-                .pathParam("id", itemResponseDTOCreated.id())
+                .pathParam("id", itemEntity.getId())
                 .when()
                 .delete("{id}")
                 .then()
@@ -183,9 +188,11 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Order(5)
     void IntegrationTestPostAddItem_BadRequest() throws Exception {
-        ItemRequestDTO invalidItem = new ItemRequestDTO("", 1L, 1L);
+        Category categoryEntity = createCategoryToTest();
+        Unit unitEntity = createUnitToTest();
+
+        ItemRequestDTO invalidItem = new ItemRequestDTO("", categoryEntity.getId(), unitEntity.getId());
 
         given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -201,9 +208,10 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Order(6)
     void IntegrationTestPutEditItem_NotFound() throws Exception {
-        ItemRequestDTO invalidItem = new ItemRequestDTO("Feijão", 1L, 1L);
+        Category categoryEntity = createCategoryToTest();
+        Unit unitEntity = createUnitToTest();
+        ItemRequestDTO invalidItem = new ItemRequestDTO("Feijão", categoryEntity.getId(), unitEntity.getId());
 
         given(specification)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -217,5 +225,29 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
                 .extract()
                 .body()
                 .asString();
+    }
+
+    Category createCategoryToTest() {
+        Category categoryEntity = new Category();
+        categoryEntity.setName("Food");
+        categoryEntity = categoryRepository.save(categoryEntity);
+        return categoryEntity;
+    }
+
+    Unit createUnitToTest() {
+        Unit unitEntity = new Unit();
+        unitEntity.setSymbol("KG");
+        unitEntity.setName("Kilogram");
+        unitEntity = unitRepository.save(unitEntity);
+        return unitEntity;
+    }
+
+    Item createItemToTest() {
+        Item itemEntity = new Item();
+        itemEntity.setName("Arroz");
+        itemEntity.setCategory(createCategoryToTest());
+        itemEntity.setUnit(createUnitToTest());
+        itemRepository.save(itemEntity);
+        return itemEntity;
     }
 }
