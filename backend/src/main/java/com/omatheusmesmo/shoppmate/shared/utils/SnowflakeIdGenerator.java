@@ -42,9 +42,7 @@ public class SnowflakeIdGenerator {
 
         lastTimestamp = currentTimestamp;
 
-        return ((currentTimestamp - CUSTOM_EPOCH) << TIMESTAMP_SHIFT)
-                | (workerId << WORKER_ID_SHIFT)
-                | sequence;
+        return ((currentTimestamp - CUSTOM_EPOCH) << TIMESTAMP_SHIFT) | (workerId << WORKER_ID_SHIFT) | sequence;
     }
 
     private long waitNextMillis(long lastTimestamp) {
