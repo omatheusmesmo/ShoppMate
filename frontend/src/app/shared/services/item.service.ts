@@ -11,10 +11,6 @@ import { BaseService } from './base.service';
 export class ItemService extends BaseService {
   private apiUrl = `${environment.apiUrl}/item`;
 
-  constructor() {
-    super();
-  }
-
   getAllItems(): Observable<ItemResponseDTO[]> {
     return this.http
       .get<ItemResponseDTO[]>(this.apiUrl)

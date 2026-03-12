@@ -63,15 +63,18 @@ export class ItemsManagementComponent implements OnInit {
   displayedColumns: string[] = ['name', 'category', 'unit', 'actions'];
 
   ngOnInit(): void {
-    this.loadData();
+    this.loadReferenceData();
+    this.loadItems();
   }
 
-  loadData(): void {
+  loadItems(): void {
     this.loading.set(true);
     this.items$ = this.itemService
       .getAllItems()
       .pipe(finalize(() => this.loading.set(false)));
+  }
 
+  loadReferenceData(): void {
     this.categoryService.getAllCategories().subscribe((categories) => {
       this.categories.set(categories);
     });
@@ -91,7 +94,7 @@ export class ItemsManagementComponent implements OnInit {
       if (result) {
         this.itemService.addItem(result).subscribe({
           next: () => {
-            this.loadData();
+            this.loadItems();
             this.snackBar.open('Item adicionado com sucesso', 'Fechar', {
               duration: 3000,
             });
@@ -122,7 +125,7 @@ export class ItemsManagementComponent implements OnInit {
       if (result) {
         this.itemService.updateItem(item.id, result).subscribe({
           next: () => {
-            this.loadData();
+            this.loadItems();
             this.snackBar.open('Item atualizado com sucesso', 'Fechar', {
               duration: 3000,
             });
@@ -141,7 +144,7 @@ export class ItemsManagementComponent implements OnInit {
     if (confirm(`Tem certeza que deseja excluir o item "${item.name}"?`)) {
       this.itemService.deleteItem(item.id).subscribe({
         next: () => {
-          this.loadData();
+          this.loadItems();
           this.snackBar.open('Item excluído com sucesso', 'Fechar', {
             duration: 3000,
           });

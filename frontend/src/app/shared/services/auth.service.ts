@@ -58,7 +58,8 @@ export class AuthService {
         }),
       })
       .pipe(
-        catchError(() => {
+        catchError((err: HttpErrorResponse) => {
+          console.error('Register error:', err);
           return throwError(
             () =>
               new Error(
@@ -83,9 +84,19 @@ export class AuthService {
     return !!this.getToken();
   }
 
-  getCurrentUserId(): number {
-    // TODO: Extract user ID from JWT token or user data
-    // For now, return 1 as placeholder
-    return 1;
+  getCurrentUserId(): number | null {
+    const token = this.getToken();
+    if (!token) return null;
+
+    try {
+      const payload = token.split('.')[1];
+      const decoded = JSON.parse(atob(payload));
+      // Try to find ID in common claims: sub, userId, id
+      const userId = decoded.userId || decoded.id || decoded.sub;
+      return userId ? Number(userId) : null;
+    } catch (e) {
+      console.error('Error decoding token:', e);
+      return null;
+    }
   }
 }

@@ -18,10 +18,6 @@ import { BaseService } from './base.service';
 export class ShoppingListService extends BaseService {
   private apiUrl = `${environment.apiUrl}/lists`;
 
-  constructor() {
-    super();
-  }
-
   getAllShoppingLists(): Observable<ShoppingListResponseDTO[]> {
     return this.http
       .get<ShoppingListResponseDTO[]>(this.apiUrl)

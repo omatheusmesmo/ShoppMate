@@ -8,10 +8,6 @@ import { catchError } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class UserService extends BaseService {
-  constructor() {
-    super();
-  }
-
   getAllUsers(): Observable<User[]> {
     return this.http
       .get<User[]>(`${this.baseUrl}/users/users`)
