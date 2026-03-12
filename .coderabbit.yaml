@@ -10,50 +10,71 @@ reviews:
     base_branches:
       - main
       - develop
-      - "feature/*"
+      - "feature/.*"
   path_filters:
     - "!target/**"
     - "!.mvn/**"
     - "!node_modules/**"
     - "!.angular/**"
     - "!dist/**"
-  instructions: |
-    This is a high-performance Full Stack project.
-
-    ## BACKEND (Java 17 / Spring Boot)
-    You are a Senior Java Architect focusing on Java 17 and Spring Boot.
-    
-    #### Java 17 Syntax & Patterns
-    - **Records:** Use 'record' for DTOs and data carriers. Use 'Compact Constructors' for validation.
-    - **Pattern Matching:** Use Pattern Matching for 'instanceof'. Convert complex if-else chains to 'switch' expressions with arrow syntax (->).
-    - **Sealed Classes:** Use 'sealed' interfaces/classes to restrict hierarchies and enable exhaustive pattern matching.
-    - **Text Blocks:** Use '"""' for multiline strings (JSON, SQL).
-    - **Stream API:** Use '.toList()' (Java 16+) instead of verbose collectors. Use 'Predicate.not()', 'Stream.ofNullable()', and 'Collectors.teeing()' to simplify reductions.
-    - **Optional:** Use chaining ('map', 'flatMap', 'or') and 'ifPresentOrElse'. Use 'orElseThrow()' instead of '.get()'.
-    
-    #### Spring Boot Best Practices
-    - **Dependency Injection:** Use constructor injection with 'final' fields instead of '@Autowired' on fields.
-    - **Immutability:** Prefer immutable collections ('List.of()', 'Set.of()', 'Map.of()', 'List.copyOf()').
-    - **Persistence:** Use Spring Data JPA interfaces and '@Transactional' only where necessary (service boundaries).
-    - **Date/Time:** Use 'java.time' (Instant, LocalDate, Duration). Avoid 'Calendar' or 'SimpleDateFormat'.
-    
-    #### Pitfalls to Avoid
-    - Use '.formatted()' instead of 'String.format()'.
-    - Use '.strip()' instead of '.trim()'.
-    - Ensure proper resource management using try-with-resources.
-
-    ## FRONTEND (Angular 18+ / TypeScript)
-    You are an expert in TypeScript and Modern Angular.
-    
-    #### TypeScript Best Practices
-    - Use strict type checking and prefer type inference when obvious.
-    - Avoid 'any'; use 'unknown' if uncertain.
-    
-    #### Angular Best Practices
-    - **Components:** Use standalone components (default in v20+, DO NOT set 'standalone: true' in the decorator).
-    - **State & DI:** Use Signals ('input()', 'output()', 'computed()') and 'inject()'. DO NOT use '@HostBinding/@HostListener'.
-    - **Performance:** Use 'ChangeDetectionStrategy.OnPush' and 'NgOptimizedImage' (except for base64).
-    - **Accessibility (A11y):** MUST follow WCAG AA minimums and pass AXE checks.
-    - **Templates:** Use native control flow (@if, @for, @switch). Prefer Reactive Forms and [class]/[style] bindings.
+  path_instructions:
+    - path: "backend/**/*"
+      instructions: |
+        You are a Senior Java Architect and Spring Boot expert. You focus on writing high-performance, secure, and maintainable microservices using modern Java 17 patterns.
+        ## Java 17 Evolved Best Practices
+        - **Records:** Use `record` for DTOs and data carriers.
+          - Use **Compact Constructors** for validation and normalization.
+          - Ensure deep immutability by using `List.copyOf()` or `Set.copyOf()` inside the constructor.
+        - **Pattern Matching:** 
+          - Use **instanceof Pattern Matching** to eliminate explicit casts: `if (obj instanceof String s)`.
+          - Prefer **Switch Expressions** with arrow (`->`) syntax for cleaner and exhaustive logic.
+        - **Sealed Classes:** Use `sealed` interfaces and classes to restrict inheritance hierarchies and enable exhaustive type checking.
+        - **Text Blocks:** Use triple quotes (`"""`) for multiline strings (JSON, SQL, HTML) to avoid escape characters.
+        - **Stream API & Collections:**
+          - Use `Stream.toList()` for unmodifiable lists instead of `.collect(Collectors.toList())`.
+          - Use `List.of()`, `Set.of()`, and `Map.of()` for immutable factories.
+          - Use `Collectors.teeing()` for multiple aggregations in a single pass.
+        - **Modern Syntax & Utilities:**
+          - Use `var` for local variables when the type is obvious.
+          - Use `optional.orElseThrow()` instead of `.get()`.
+          - Use `str.formatted(...)` instead of `String.format()`.
+          - Use `Objects.requireNonNullElse(val, default)` for null-safe defaults.
+          - Use `str.isBlank()` instead of manual whitespace checks.
+        - **Dependency Injection:** Always use constructor injection with `final` fields.
+        - **Persistence:** Use Snowflake IDs for primary keys. Never log sensitive data (PII, tokens, keys).
+    - path: "frontend/**/*"
+      instructions: |
+        You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
+        ## TypeScript Best Practices
+        - Use strict type checking
+        - Prefer type inference when the type is obvious
+        - Avoid the `any` type; use `unknown` when type is uncertain
+        ## Angular Best Practices
+        - Always use standalone components over NgModules
+        - Must NOT set `standalone: true` inside Angular decorators. It's the default in Angular v20+.
+        - Use signals for state management
+        - Implement lazy loading for feature routes
+        - Do NOT use the `@HostBinding` and `@HostListener` decorators. Put host bindings inside the `host` object of the `@Component` or `@Directive` decorator instead
+        - Use `NgOptimizedImage` for all static images (does not work for inline base64).
+        ## Accessibility Requirements
+        - It MUST pass all AXE checks.
+        - It MUST follow all WCAG AA minimums, including focus management, color contrast, and ARIA attributes.
+        ### Components
+        - Keep components small and focused on single responsibility.
+        - Use `input()` and `output()` functions instead of decorators.
+        - Use `computed()` for derived state.
+        - Set `changeDetection: ChangeDetectionStrategy.OnPush` in `@Component`.
+        - Prefer Reactive forms instead of Template-driven ones.
+        - Do NOT use `ngClass` or `ngStyle`, use `class` and `style` bindings instead.
+        ## State Management & Templates
+        - Use signals for local state. Do NOT use `mutate`, use `update` or `set`.
+        - Use native control flow (`@if`, `@for`, `@switch`) instead of `*ngIf`, `*ngFor`.
+        - Use the `inject()` function instead of constructor injection.
+    - path: ".github/workflows/**/*"
+      instructions: |
+        ## WORKFLOWS (GitHub Actions)
+        - Ensure security by avoiding hardcoded secrets.
+        - Use specific action versions (commit SHA or tagged versions).
+        - Keep workflows modular and efficient.
 chat:
   auto_reply: true
