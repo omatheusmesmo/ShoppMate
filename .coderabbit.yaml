@@ -1,0 +1,59 @@
+language: "en-US"
+early_access: false
+reviews:
+  profile: "chill"
+  request_changes_workflow: false
+  high_level_summary: true
+  review_status: true
+  auto_review:
+    enabled: true
+    base_branches:
+      - main
+      - develop
+      - "feature/*"
+  path_filters:
+    - "!target/**"
+    - "!.mvn/**"
+    - "!node_modules/**"
+    - "!.angular/**"
+    - "!dist/**"
+  instructions: |
+    This is a high-performance Full Stack project.
+
+    ## BACKEND (Java 17 / Spring Boot)
+    You are a Senior Java Architect focusing on Java 17 and Spring Boot.
+    
+    #### Java 17 Syntax & Patterns
+    - **Records:** Use 'record' for DTOs and data carriers. Use 'Compact Constructors' for validation.
+    - **Pattern Matching:** Use Pattern Matching for 'instanceof'. Convert complex if-else chains to 'switch' expressions with arrow syntax (->).
+    - **Sealed Classes:** Use 'sealed' interfaces/classes to restrict hierarchies and enable exhaustive pattern matching.
+    - **Text Blocks:** Use '"""' for multiline strings (JSON, SQL).
+    - **Stream API:** Use '.toList()' (Java 16+) instead of verbose collectors. Use 'Predicate.not()', 'Stream.ofNullable()', and 'Collectors.teeing()' to simplify reductions.
+    - **Optional:** Use chaining ('map', 'flatMap', 'or') and 'ifPresentOrElse'. Use 'orElseThrow()' instead of '.get()'.
+    
+    #### Spring Boot Best Practices
+    - **Dependency Injection:** Use constructor injection with 'final' fields instead of '@Autowired' on fields.
+    - **Immutability:** Prefer immutable collections ('List.of()', 'Set.of()', 'Map.of()', 'List.copyOf()').
+    - **Persistence:** Use Spring Data JPA interfaces and '@Transactional' only where necessary (service boundaries).
+    - **Date/Time:** Use 'java.time' (Instant, LocalDate, Duration). Avoid 'Calendar' or 'SimpleDateFormat'.
+    
+    #### Pitfalls to Avoid
+    - Use '.formatted()' instead of 'String.format()'.
+    - Use '.strip()' instead of '.trim()'.
+    - Ensure proper resource management using try-with-resources.
+
+    ## FRONTEND (Angular 18+ / TypeScript)
+    You are an expert in TypeScript and Modern Angular.
+    
+    #### TypeScript Best Practices
+    - Use strict type checking and prefer type inference when obvious.
+    - Avoid 'any'; use 'unknown' if uncertain.
+    
+    #### Angular Best Practices
+    - **Components:** Use standalone components (default in v20+, DO NOT set 'standalone: true' in the decorator).
+    - **State & DI:** Use Signals ('input()', 'output()', 'computed()') and 'inject()'. DO NOT use '@HostBinding/@HostListener'.
+    - **Performance:** Use 'ChangeDetectionStrategy.OnPush' and 'NgOptimizedImage' (except for base64).
+    - **Accessibility (A11y):** MUST follow WCAG AA minimums and pass AXE checks.
+    - **Templates:** Use native control flow (@if, @for, @switch). Prefer Reactive Forms and [class]/[style] bindings.
+chat:
+  auto_reply: true
