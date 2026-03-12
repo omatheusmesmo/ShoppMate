@@ -29,9 +29,7 @@ public class JwtService {
     private final RSADecrypter decrypter;
     private final long tokenExpiration;
 
-    public JwtService(
-            RSAPublicKey publicKey,
-            RSAPrivateKey privateKey,
+    public JwtService(RSAPublicKey publicKey, RSAPrivateKey privateKey,
             @Value("${jwt.token.expiration}") long tokenExpiration) {
         this.encrypter = new RSAEncrypter(publicKey);
         this.decrypter = new RSADecrypter(privateKey);
