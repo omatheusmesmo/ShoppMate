@@ -25,19 +25,15 @@ public class AbstractIntegrationTest {
         }
 
         private static Map<String, Object> createConnectionConfiguration() {
-            return Map.of(
-                    "spring.datasource.url", postgreSQLContainer.getJdbcUrl(),
-                    "spring.datasource.username", postgreSQLContainer.getUsername(),
-                    "spring.datasource.password", postgreSQLContainer.getPassword()
-            );
+            return Map.of("spring.datasource.url", postgreSQLContainer.getJdbcUrl(), "spring.datasource.username",
+                    postgreSQLContainer.getUsername(), "spring.datasource.password", postgreSQLContainer.getPassword());
         }
 
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
             startContainers();
             ConfigurableEnvironment environment = applicationContext.getEnvironment();
-            MapPropertySource testcontainers = new MapPropertySource("testcontainers",
-                    createConnectionConfiguration());
+            MapPropertySource testcontainers = new MapPropertySource("testcontainers", createConnectionConfiguration());
             environment.getPropertySources().addFirst(testcontainers);
         }
     }
