@@ -21,7 +21,7 @@ public class SnowflakeIdentifierGenerator implements IdentifierGenerator, Applic
     @Override
     public Serializable generate(SharedSessionContractImplementor session, Object object) {
         if (context == null) {
-            return new SnowflakeIdGenerator().nextId();
+            return new SnowflakeIdGenerator(1L).nextId();
         }
         return context.getBean(SnowflakeIdGenerator.class).nextId();
     }
