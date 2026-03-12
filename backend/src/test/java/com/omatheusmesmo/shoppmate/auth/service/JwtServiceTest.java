@@ -74,13 +74,12 @@ class JwtServiceTest {
     }
 
     @Test
-    void shouldNotValidateExpiredToken() throws InterruptedException {
-        JwtService shortLivedService = createServiceWithExpiration(1L);
+    void shouldNotValidateExpiredToken() {
+        // Use a negative expiration to create a token that is already expired
+        JwtService shortLivedService = createServiceWithExpiration(-1000L);
         String token = shortLivedService.generateToken(userDetails);
 
-        Thread.sleep(10);
-
-        assertFalse(shortLivedService.validateToken(token));
+        assertFalse(shortLivedService.validateToken(token), "Expired token should not be valid");
     }
 
     @Test
@@ -122,10 +121,7 @@ class JwtServiceTest {
 
     private JwtService createServiceWithExpiration(long expiration) {
         KeyPair keyPair = generateRSAKeys();
-        return new JwtService(
-                (RSAPublicKey) keyPair.getPublic(),
-                (RSAPrivateKey) keyPair.getPrivate(),
-                expiration);
+        return new JwtService((RSAPublicKey) keyPair.getPublic(), (RSAPrivateKey) keyPair.getPrivate(), expiration);
     }
 
     private KeyPair generateRSAKeys() {

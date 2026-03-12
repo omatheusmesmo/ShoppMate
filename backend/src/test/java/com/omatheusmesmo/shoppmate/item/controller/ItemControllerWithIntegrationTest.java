@@ -71,9 +71,7 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
 
         specification = new RequestSpecBuilder().setPort(port).setBasePath("/item")
                 .addHeader("Authorization", "Bearer " + jwtToken).addHeader("X-XSRF-TOKEN", csrfToken)
-                .addCookie("XSRF-TOKEN", csrfToken).setContentType(ContentType.JSON)
-                .addFilter(new RequestLoggingFilter(LogDetail.ALL)).addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-                .build();
+                .addCookie("XSRF-TOKEN", csrfToken).setContentType(ContentType.JSON).build();
     }
 
     @BeforeAll

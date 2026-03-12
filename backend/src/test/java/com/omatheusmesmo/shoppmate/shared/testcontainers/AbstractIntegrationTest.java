@@ -26,7 +26,9 @@ public class AbstractIntegrationTest {
 
         private static Map<String, Object> createConnectionConfiguration() {
             return Map.of("spring.datasource.url", postgreSQLContainer.getJdbcUrl(), "spring.datasource.username",
-                    postgreSQLContainer.getUsername(), "spring.datasource.password", postgreSQLContainer.getPassword());
+                    postgreSQLContainer.getUsername(), "spring.datasource.password", postgreSQLContainer.getPassword(),
+                    "jwt.private-key", "file:src/test/resources/certs/private_key.pem", "jwt.public-key",
+                    "file:src/test/resources/certs/public_key.pem");
         }
 
         @Override
