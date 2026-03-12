@@ -16,7 +16,7 @@
     mat-raised-button
     color="primary"
     (click)="onSave()"
-    [disabled]="!listName()"
+    [disabled]="!listName().trim()"
   >
     Salvar
   </button>

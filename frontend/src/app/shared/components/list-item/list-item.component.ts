@@ -186,7 +186,9 @@ export class ListItemComponent implements OnInit {
 
   resetForm(): void {
     this.listItemForm.reset({
+      itemId: '',
       quantity: 1,
+      unitPrice: 0,
       purchased: false,
     });
     this.editingListItemId.set(null);

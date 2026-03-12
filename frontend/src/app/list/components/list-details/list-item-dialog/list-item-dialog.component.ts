@@ -68,6 +68,10 @@ export class ListItemDialogComponent implements OnInit {
   }
 
   onSave(): void {
+    if (!this.selectedItemId() || !this.quantity() || this.quantity() <= 0) {
+      return;
+    }
+
     this.dialogRef.close({
       itemId: this.selectedItemId(),
       quantity: this.quantity(),

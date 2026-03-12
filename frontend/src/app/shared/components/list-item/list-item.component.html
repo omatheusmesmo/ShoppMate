@@ -94,7 +94,7 @@
         <div class="summary-row">
           <span class="summary-label">Total List Value:</span>
           <span class="summary-value">{{
-            listItems[0].shoppingList.totalValue | currency
+            listItems()[0]?.shoppingList?.totalValue | currency
           }}</span>
         </div>
       </mat-card-content>

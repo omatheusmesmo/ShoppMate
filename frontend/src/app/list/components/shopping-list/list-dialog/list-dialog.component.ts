@@ -50,8 +50,11 @@ export class ListDialogComponent {
   }
 
   onSave(): void {
+    const trimmedName = this.listName().trim();
+    if (!trimmedName) return;
+
     this.dialogRef.close({
-      name: this.listName(),
+      name: trimmedName,
       idUser: this.listUserId(),
     } satisfies ShoppingListRequestDTO);
   }

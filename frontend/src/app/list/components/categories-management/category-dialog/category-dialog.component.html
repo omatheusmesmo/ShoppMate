@@ -16,7 +16,7 @@
     mat-raised-button
     color="primary"
     (click)="onSave()"
-    [disabled]="!categoryName()"
+    [disabled]="!categoryName().trim()"
   >
     Salvar
   </button>

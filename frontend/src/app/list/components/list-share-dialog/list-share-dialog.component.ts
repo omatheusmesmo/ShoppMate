@@ -117,7 +117,7 @@ export class ListShareDialogComponent implements OnInit {
       const email = this.shareForm.value.email;
       const user = this.users().find((u) => u.email === email);
 
-      if (!user) {
+      if (!user || !user.id) {
         this.snackBar.open('Usuário não encontrado com este e-mail', 'Fechar', {
           duration: 3000,
         });
@@ -126,7 +126,7 @@ export class ListShareDialogComponent implements OnInit {
 
       const request = {
         idList: this.data.listId,
-        idUser: user.id!,
+        idUser: user.id,
         permission: this.shareForm.value.permission,
       };
 

@@ -58,7 +58,6 @@ export class UnitsManagementComponent implements OnInit {
         }),
         catchError(() => {
           this.error.set(true);
-          this.units.set([]);
           this.snackBar.open(
             'Erro ao carregar unidades. Tente novamente mais tarde.',
             'Fechar',

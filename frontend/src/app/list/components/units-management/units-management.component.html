@@ -7,6 +7,18 @@
     <div class="loading-container">
       <mat-spinner diameter="40"></mat-spinner>
     </div>
+  } @else if (error() && !units().length) {
+    <div class="error-container">
+      <mat-card appearance="outlined" class="error-card">
+        <mat-card-content>
+          <mat-icon color="warn">error</mat-icon>
+          <p>Erro ao carregar unidades. Tente novamente mais tarde.</p>
+          <button mat-stroked-button color="primary" (click)="loadUnits()">
+            Tentar Novamente
+          </button>
+        </mat-card-content>
+      </mat-card>
+    </div>
   } @else {
     <div class="add-unit-container mb-3">
       <button mat-raised-button color="primary" (click)="openNewUnitDialog()">
@@ -38,6 +50,7 @@
                   mat-icon-button
                   color="primary"
                   (click)="editUnit(element)"
+                  aria-label="Editar unidade"
                 >
                   <mat-icon>edit</mat-icon>
                 </button>
@@ -45,6 +58,7 @@
                   mat-icon-button
                   color="warn"
                   (click)="deleteUnit(element)"
+                  aria-label="Excluir unidade"
                 >
                   <mat-icon>delete</mat-icon>
                 </button>

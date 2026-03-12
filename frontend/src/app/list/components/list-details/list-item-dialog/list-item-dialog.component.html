@@ -11,7 +11,7 @@
       required
     >
       <mat-option *ngFor="let item of items()" [value]="item.id">
-        {{ item.name }} ({{ item.unit.symbol }})
+        {{ item.name }} ({{ item.unit?.symbol || "-" }})
       </mat-option>
     </mat-select>
   </mat-form-field>
@@ -34,7 +34,7 @@
     mat-raised-button
     color="primary"
     (click)="onSave()"
-    [disabled]="!selectedItemId() || quantity() <= 0"
+    [disabled]="!selectedItemId() || !quantity() || quantity() <= 0"
   >
     Salvar
   </button>

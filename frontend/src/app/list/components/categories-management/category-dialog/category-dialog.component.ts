@@ -48,9 +48,12 @@ export class CategoryDialogComponent {
   }
 
   onSave(): void {
+    const trimmedName = this.categoryName().trim();
+    if (!trimmedName) return;
+
     this.dialogRef.close({
       ...this.data.category,
-      name: this.categoryName(),
+      name: trimmedName,
     } satisfies Category);
   }
 }
