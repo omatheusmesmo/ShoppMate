@@ -62,26 +62,15 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
         categoryRepository.deleteAll();
         String jwtToken = testUserFactory.createTokenForTestUser();
 
-        Response response = given()
-                .port(port)
-                .header("Authorization", "Bearer " + jwtToken)
-                .when()
-                .get("/category")
-                .then()
-                .statusCode(200)
-                .extract().response();
+        Response response = given().port(port).header("Authorization", "Bearer " + jwtToken).when().get("/category")
+                .then().statusCode(200).extract().response();
 
         String csrfToken = response.cookie("XSRF-TOKEN");
 
-        specification = new RequestSpecBuilder()
-                .setPort(port)
-                .setBasePath("/category")
-                .addHeader("Authorization", "Bearer " + jwtToken)
-                .addHeader("X-XSRF-TOKEN", csrfToken)
-                .addCookie("XSRF-TOKEN", csrfToken)
-                .setContentType(ContentType.JSON)
-                .addFilter(new RequestLoggingFilter(LogDetail.ALL))
-                .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+        specification = new RequestSpecBuilder().setPort(port).setBasePath("/category")
+                .addHeader("Authorization", "Bearer " + jwtToken).addHeader("X-XSRF-TOKEN", csrfToken)
+                .addCookie("XSRF-TOKEN", csrfToken).setContentType(ContentType.JSON)
+                .addFilter(new RequestLoggingFilter(LogDetail.ALL)).addFilter(new ResponseLoggingFilter(LogDetail.ALL))
                 .build();
     }
 
@@ -89,17 +78,8 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
     void testPostAddCategory() throws Exception {
         CategoryRequestDTO request = new CategoryRequestDTO("Book");
 
-        var content = given(specification)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(request)
-                .when()
-                .post()
-                .then()
-                .statusCode(201)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .extract()
-                .body()
-                .asString();
+        var content = given(specification).contentType(MediaType.APPLICATION_JSON_VALUE).body(request).when().post()
+                .then().statusCode(201).contentType(MediaType.APPLICATION_JSON_VALUE).extract().body().asString();
 
         CategoryResponseDTO createdCategory = objectMapper.readValue(content, CategoryResponseDTO.class);
         categoryResponseDTOCreated = createdCategory;
@@ -114,18 +94,9 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
         CategoryRequestDTO categoryResponseDTOToUpdated = new CategoryRequestDTO("Book Putted");
         Category categoryEntity = createCategoryToTest();
 
-        var content = given(specification)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .pathParam("id", categoryEntity.getId())
-                .body(categoryResponseDTOToUpdated)
-                .when()
-                .put("{id}")
-                .then()
-                .statusCode(200)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .extract()
-                .body()
-                .asString();
+        var content = given(specification).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .pathParam("id", categoryEntity.getId()).body(categoryResponseDTOToUpdated).when().put("{id}").then()
+                .statusCode(200).contentType(MediaType.APPLICATION_JSON_VALUE).extract().body().asString();
 
         CategoryResponseDTO updatedCategory = objectMapper.readValue(content, CategoryResponseDTO.class);
         categoryResponseDTOUpdated = updatedCategory;
@@ -139,18 +110,12 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
     void testGetAllCategories() throws Exception {
         Category categoryEntity = createCategoryToTest();
 
-        var content = given(specification)
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get()
-                .then()
-                .statusCode(200)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .extract()
-                .body()
-                .asString();
+        var content = given(specification).accept(MediaType.APPLICATION_JSON_VALUE).when().get().then().statusCode(200)
+                .contentType(MediaType.APPLICATION_JSON_VALUE).extract().body().asString();
 
-        List<CategoryResponseDTO> categories = objectMapper.readValue(content, new TypeReference<List<CategoryResponseDTO>>(){});
+        List<CategoryResponseDTO> categories = objectMapper.readValue(content,
+                new TypeReference<List<CategoryResponseDTO>>() {
+                });
         CategoryResponseDTO categoryOne = categories.get(0);
 
         assertNotNull(categoryOne.id());
@@ -163,47 +128,24 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
     void testDeleteRemoveCategory() {
         Category categoryEntity = createCategoryToTest();
 
-        given(specification)
-                .pathParam("id", categoryEntity.getId())
-                .when()
-                .delete("{id}")
-                .then()
-                .statusCode(204);
+        given(specification).pathParam("id", categoryEntity.getId()).when().delete("{id}").then().statusCode(204);
     }
 
     @Test
     void IntegrationTestPostAddCategory_BadRequest() throws Exception {
         CategoryRequestDTO invalidItem = new CategoryRequestDTO("");
 
-        given(specification)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(invalidItem)
-                .when()
-                .post()
-                .then()
-                .statusCode(400)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .extract()
-                .body()
-                .asString();
+        given(specification).contentType(MediaType.APPLICATION_JSON_VALUE).body(invalidItem).when().post().then()
+                .statusCode(400).contentType(MediaType.APPLICATION_JSON_VALUE).extract().body().asString();
     }
 
     @Test
     void IntegrationTestPutEditCategory_NotFound() throws Exception {
         CategoryRequestDTO invalidItem = new CategoryRequestDTO("Toy");
 
-        given(specification)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .pathParam("id", 999L)
-                .body(invalidItem)
-                .when()
-                .put("/{id}")
-                .then()
-                .statusCode(404)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .extract()
-                .body()
-                .asString();
+        given(specification).contentType(MediaType.APPLICATION_JSON_VALUE).pathParam("id", 999L).body(invalidItem)
+                .when().put("/{id}").then().statusCode(404).contentType(MediaType.APPLICATION_JSON_VALUE).extract()
+                .body().asString();
     }
 
     Category createCategoryToTest() {

@@ -97,9 +97,8 @@ class CategoryControllerTest {
         when(categoryService.saveCategory(any(Category.class))).thenReturn(category1);
         when(categoryMapper.toResponseDTO(any(Category.class))).thenReturn(category1ResponseDTO);
 
-
         mockMvc.perform(post("/category").contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO))).andExpect(status().isCreated())
+                .content(objectMapper.writeValueAsString(requestDTO))).andExpect(status().isCreated())
                 .andExpect(content().json(objectMapper.writeValueAsString(category1ResponseDTO)));
     }
 
@@ -131,16 +130,14 @@ class CategoryControllerTest {
         updatedCategory.setId(id);
         updatedCategory.setName("Updated Food");
 
-        CategoryResponseDTO responseDTO =
-                new CategoryResponseDTO(id, "Updated Food");
+        CategoryResponseDTO responseDTO = new CategoryResponseDTO(id, "Updated Food");
 
         when(categoryService.findCategoryById(id)).thenReturn(existingCategory);
         when(categoryService.saveCategory(any(Category.class))).thenReturn(updatedCategory);
         when(categoryMapper.toResponseDTO(updatedCategory)).thenReturn(responseDTO);
 
         mockMvc.perform(put("/category/{id}", id).contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
-                .andExpect(status().isOk())
+                .content(objectMapper.writeValueAsString(requestDTO))).andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(responseDTO)));
     }
 }

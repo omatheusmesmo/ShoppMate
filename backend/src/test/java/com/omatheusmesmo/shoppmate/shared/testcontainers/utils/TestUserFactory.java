@@ -31,11 +31,8 @@ public class TestUserFactory {
             return userRepository.save(newUser);
         });
 
-        var userDetails = org.springframework.security.core.userdetails.User.builder()
-                .username(user.getEmail())
-                .password(user.getPassword())
-                .roles(user.getRole())
-                .build();
+        var userDetails = org.springframework.security.core.userdetails.User.builder().username(user.getEmail())
+                .password(user.getPassword()).roles(user.getRole()).build();
 
         return jwtService.generateToken(userDetails);
     }

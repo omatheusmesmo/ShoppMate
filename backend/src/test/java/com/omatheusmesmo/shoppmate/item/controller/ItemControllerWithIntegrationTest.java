@@ -64,26 +64,15 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
 
         String jwtToken = testUserFactory.createTokenForTestUser();
 
-        Response response = given()
-                .port(port)
-                .header("Authorization", "Bearer " + jwtToken)
-                .when()
-                .get("/item")
-                .then()
-                .statusCode(200)
-                .extract().response();
+        Response response = given().port(port).header("Authorization", "Bearer " + jwtToken).when().get("/item").then()
+                .statusCode(200).extract().response();
 
         String csrfToken = response.cookie("XSRF-TOKEN");
 
-        specification = new RequestSpecBuilder()
-                .setPort(port)
-                .setBasePath("/item")
-                .addHeader("Authorization", "Bearer " + jwtToken)
-                .addHeader("X-XSRF-TOKEN", csrfToken)
-                .addCookie("XSRF-TOKEN", csrfToken)
-                .setContentType(ContentType.JSON)
-                .addFilter(new RequestLoggingFilter(LogDetail.ALL))
-                .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+        specification = new RequestSpecBuilder().setPort(port).setBasePath("/item")
+                .addHeader("Authorization", "Bearer " + jwtToken).addHeader("X-XSRF-TOKEN", csrfToken)
+                .addCookie("XSRF-TOKEN", csrfToken).setContentType(ContentType.JSON)
+                .addFilter(new RequestLoggingFilter(LogDetail.ALL)).addFilter(new ResponseLoggingFilter(LogDetail.ALL))
                 .build();
     }
 
@@ -100,17 +89,8 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
 
         ItemRequestDTO requestDTO = new ItemRequestDTO("Feijão", categoryEntity.getId(), unitEntity.getId());
 
-        var content = given(specification)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(requestDTO)
-                .when()
-                .post()
-                .then()
-                .statusCode(201)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .extract()
-                .body()
-                .asString();
+        var content = given(specification).contentType(MediaType.APPLICATION_JSON_VALUE).body(requestDTO).when().post()
+                .then().statusCode(201).contentType(MediaType.APPLICATION_JSON_VALUE).extract().body().asString();
 
         ItemResponseDTO createdItem = objectMapper.readValue(content, ItemResponseDTO.class);
         itemResponseDTOCreated = createdItem;
@@ -127,21 +107,12 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
     void testPutEditItem() throws Exception {
         Item itemEntity = createItemToTest();
 
-        ItemRequestDTO requestDTO = new ItemRequestDTO("Arroz", itemEntity.getCategory().getId(), itemEntity.getUnit().getId());
+        ItemRequestDTO requestDTO = new ItemRequestDTO("Arroz", itemEntity.getCategory().getId(),
+                itemEntity.getUnit().getId());
 
-
-        var content = given(specification)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .pathParam("id", itemEntity.getId())
-                .body(requestDTO)
-                .when()
-                .put("{id}")
-                .then()
-                .statusCode(200)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .extract()
-                .body()
-                .asString();
+        var content = given(specification).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .pathParam("id", itemEntity.getId()).body(requestDTO).when().put("{id}").then().statusCode(200)
+                .contentType(MediaType.APPLICATION_JSON_VALUE).extract().body().asString();
 
         ItemResponseDTO updatedItem = objectMapper.readValue(content, ItemResponseDTO.class);
         itemResponseDTOUpdated = updatedItem;
@@ -158,18 +129,11 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
     void testGetAllItems() throws Exception {
         createItemToTest();
 
-        var content = given(specification)
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .get()
-                .then()
-                .statusCode(200)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .extract()
-                .body()
-                .asString();
+        var content = given(specification).accept(MediaType.APPLICATION_JSON_VALUE).when().get().then().statusCode(200)
+                .contentType(MediaType.APPLICATION_JSON_VALUE).extract().body().asString();
 
-        List<ItemResponseDTO> itens = objectMapper.readValue(content, new TypeReference<List<ItemResponseDTO>>(){});
+        List<ItemResponseDTO> itens = objectMapper.readValue(content, new TypeReference<List<ItemResponseDTO>>() {
+        });
         ItemResponseDTO itemOne = itens.get(0);
 
         assertNotNull(itemOne.id());
@@ -182,12 +146,7 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
     void testDeleteRemoveCategory() throws Exception {
         Item itemEntity = createItemToTest();
 
-        given(specification)
-                .pathParam("id", itemEntity.getId())
-                .when()
-                .delete("{id}")
-                .then()
-                .statusCode(204);
+        given(specification).pathParam("id", itemEntity.getId()).when().delete("{id}").then().statusCode(204);
     }
 
     @Test
@@ -197,17 +156,8 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
 
         ItemRequestDTO invalidItem = new ItemRequestDTO("", categoryEntity.getId(), unitEntity.getId());
 
-        given(specification)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(invalidItem)
-                .when()
-                .post()
-                .then()
-                .statusCode(400)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .extract()
-                .body()
-                .asString();
+        given(specification).contentType(MediaType.APPLICATION_JSON_VALUE).body(invalidItem).when().post().then()
+                .statusCode(400).contentType(MediaType.APPLICATION_JSON_VALUE).extract().body().asString();
     }
 
     @Test
@@ -216,18 +166,9 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
         Unit unitEntity = createUnitToTest();
         ItemRequestDTO invalidItem = new ItemRequestDTO("Feijão", categoryEntity.getId(), unitEntity.getId());
 
-        given(specification)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .pathParam("id", 999L)
-                .body(invalidItem)
-                .when()
-                .put("/{id}")
-                .then()
-                .statusCode(404)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .extract()
-                .body()
-                .asString();
+        given(specification).contentType(MediaType.APPLICATION_JSON_VALUE).pathParam("id", 999L).body(invalidItem)
+                .when().put("/{id}").then().statusCode(404).contentType(MediaType.APPLICATION_JSON_VALUE).extract()
+                .body().asString();
     }
 
     Category createCategoryToTest() {
