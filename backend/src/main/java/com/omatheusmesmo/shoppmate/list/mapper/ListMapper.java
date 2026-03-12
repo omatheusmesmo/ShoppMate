@@ -53,14 +53,26 @@ public class ListMapper {
         if (entity.getItems() == null) {
             return BigDecimal.ZERO;
         }
-        return entity.getItems().stream().filter(item -> !item.getDeleted()).map(this::calculateItemTotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal total = BigDecimal.ZERO;
+        for (ListItem item : entity.getItems()) {
+            if (item.getDeleted() != null && item.getDeleted())
+                continue;
+            BigDecimal itemTotal = calculateItemTotal(item);
+            if (itemTotal == null) {
+                return null;
+            }
+            total = total.add(itemTotal);
+        }
+        return total;
     }
 
     private BigDecimal calculateItemTotal(ListItem item) {
-        BigDecimal price = item.getUnitPrice() != null ? item.getUnitPrice() : BigDecimal.ZERO;
+        if (item.getUnitPrice() == null) {
+            return null;
+        }
         Integer quantity = item.getQuantity() != null ? item.getQuantity() : 0;
-        return price.multiply(BigDecimal.valueOf(quantity));
+        return item.getUnitPrice().multiply(BigDecimal.valueOf(quantity));
     }
 
     public void updateEntityFromDto(ShoppingListUpdateRequestDTO dto, ShoppingList entity) {

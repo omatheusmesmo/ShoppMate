@@ -30,7 +30,7 @@ public class ListItemMapper {
     }
 
     public ListItemResponseDTO toResponseDTO(ListItem listItem) {
-        BigDecimal unitPrice = getSafeUnitPrice(listItem);
+        BigDecimal unitPrice = listItem.getUnitPrice();
         BigDecimal totalPrice = calculateTotalPrice(unitPrice, listItem.getQuantity());
 
         return new ListItemResponseDTO(listMapper.toResponseDTO(listItem.getShoppList()),
@@ -38,13 +38,9 @@ public class ListItemMapper {
                 listItem.getPurchased(), unitPrice, totalPrice);
     }
 
-    private BigDecimal getSafeUnitPrice(ListItem listItem) {
-        return listItem.getUnitPrice() != null ? listItem.getUnitPrice() : BigDecimal.ZERO;
-    }
-
     private BigDecimal calculateTotalPrice(BigDecimal unitPrice, Integer quantity) {
         if (unitPrice == null || quantity == null) {
-            return BigDecimal.ZERO;
+            return null;
         }
         return unitPrice.multiply(BigDecimal.valueOf(quantity));
     }
