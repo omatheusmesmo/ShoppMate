@@ -34,10 +34,10 @@ Based on our core API capabilities, ShoppMate offers a comprehensive suite of fe
 
 Before running the project, you need to configure the environment variables.
 
-1.  Navigate to the `backend/` directory.
-2.  Copy `.env.example` to a new file named `.env`:
+1.  From the project root directory:
+2.  Copy `backend/.env.example` to a new file named `.env` in the **root** directory:
     ```bash
-    cp .env.example .env
+    cp backend/.env.example .env
     ```
 3.  (Optional) Edit `.env` to customize your database credentials or JWT settings.
 
