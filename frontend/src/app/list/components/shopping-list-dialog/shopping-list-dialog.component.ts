@@ -70,9 +70,22 @@ export class ShoppingListDialogComponent {
 
   onSubmit(): void {
     if (this.listForm.valid) {
+      const userId = this.authService.getCurrentUserId();
+
+      if (!userId) {
+        this.snackBar.open(
+          'Usuário não identificado. Por favor, faça login novamente.',
+          'Fechar',
+          {
+            duration: 3000,
+          },
+        );
+        return;
+      }
+
       const listData: ShoppingListRequestDTO = {
         name: this.listForm.value.name,
-        idUser: this.authService.getCurrentUserId(), // Get from auth service
+        idUser: userId,
       };
 
       if (this.isEdit() && this.data.list) {

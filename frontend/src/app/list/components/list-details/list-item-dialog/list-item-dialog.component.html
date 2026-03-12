@@ -11,7 +11,7 @@
       required
     >
       <mat-option *ngFor="let item of items()" [value]="item.id">
-        {{ item.name }} ({{ item.unit?.symbol || "-" }})
+        {{ item.name }} ({{ item.unit.symbol }})
       </mat-option>
     </mat-select>
   </mat-form-field>
