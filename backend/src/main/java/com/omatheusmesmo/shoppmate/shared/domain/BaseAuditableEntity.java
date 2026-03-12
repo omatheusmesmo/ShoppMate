@@ -1,13 +1,14 @@
 package com.omatheusmesmo.shoppmate.shared.domain;
 
+import com.omatheusmesmo.shoppmate.shared.utils.SnowflakeIdentifierGenerator;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 @MappedSuperclass
 @Getter
@@ -16,7 +17,7 @@ public abstract class BaseAuditableEntity implements AuditableEntity {
 
     @Id
     @GeneratedValue(generator = "snowflake")
-    @org.hibernate.annotations.GenericGenerator(name = "snowflake", type = com.omatheusmesmo.shoppmate.shared.utils.SnowflakeIdentifierGenerator.class)
+    @GenericGenerator(name = "snowflake", type = SnowflakeIdentifierGenerator.class)
     @Column(name = "id")
     private Long id;
 

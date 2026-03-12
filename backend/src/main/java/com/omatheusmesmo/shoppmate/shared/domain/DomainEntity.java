@@ -1,8 +1,10 @@
 package com.omatheusmesmo.shoppmate.shared.domain;
 
+import com.omatheusmesmo.shoppmate.shared.utils.SnowflakeIdentifierGenerator;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
 
@@ -13,7 +15,7 @@ public abstract class DomainEntity implements AuditableEntity {
 
     @Id
     @GeneratedValue(generator = "snowflake")
-    @org.hibernate.annotations.GenericGenerator(name = "snowflake", type = com.omatheusmesmo.shoppmate.shared.utils.SnowflakeIdentifierGenerator.class)
+    @GenericGenerator(name = "snowflake", type = SnowflakeIdentifierGenerator.class)
     @Column(name = "id")
     private Long id;
 
