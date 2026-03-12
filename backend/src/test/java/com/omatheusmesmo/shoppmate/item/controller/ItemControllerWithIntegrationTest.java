@@ -9,7 +9,6 @@ import com.omatheusmesmo.shoppmate.item.entity.Item;
 import com.omatheusmesmo.shoppmate.item.repository.ItemRepository;
 import com.omatheusmesmo.shoppmate.shared.testcontainers.AbstractIntegrationTest;
 import com.omatheusmesmo.shoppmate.shared.testcontainers.utils.TestUserFactory;
-import com.omatheusmesmo.shoppmate.config.TestConfigs;
 import com.omatheusmesmo.shoppmate.item.dto.ItemRequestDTO;
 import com.omatheusmesmo.shoppmate.item.dto.ItemResponseDTO;
 import com.omatheusmesmo.shoppmate.unit.entity.Unit;
@@ -24,6 +23,7 @@ import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 
 import java.util.List;
@@ -34,6 +34,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
+
+    @LocalServerPort
+    private int port;
 
     @Autowired
     private TestUserFactory testUserFactory;
@@ -62,7 +65,7 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
         String jwtToken = testUserFactory.createTokenForTestUser();
 
         Response response = given()
-                .port(TestConfigs.SERVER_PORT)
+                .port(port)
                 .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get("/item")
@@ -73,7 +76,7 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
         String csrfToken = response.cookie("XSRF-TOKEN");
 
         specification = new RequestSpecBuilder()
-                .setPort(TestConfigs.SERVER_PORT)
+                .setPort(port)
                 .setBasePath("/item")
                 .addHeader("Authorization", "Bearer " + jwtToken)
                 .addHeader("X-XSRF-TOKEN", csrfToken)

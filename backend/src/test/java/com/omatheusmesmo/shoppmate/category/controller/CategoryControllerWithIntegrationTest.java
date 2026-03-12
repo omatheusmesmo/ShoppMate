@@ -10,7 +10,6 @@ import com.omatheusmesmo.shoppmate.shared.testcontainers.AbstractIntegrationTest
 import com.omatheusmesmo.shoppmate.shared.testcontainers.utils.TestUserFactory;
 import com.omatheusmesmo.shoppmate.category.dto.CategoryRequestDTO;
 import com.omatheusmesmo.shoppmate.category.dto.CategoryResponseDTO;
-import com.omatheusmesmo.shoppmate.config.TestConfigs;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -21,6 +20,7 @@ import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 
 import java.util.List;
@@ -31,6 +31,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
+
+    @LocalServerPort
+    private int port;
 
     @Autowired
     private TestUserFactory testUserFactory;
@@ -60,7 +63,7 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
         String jwtToken = testUserFactory.createTokenForTestUser();
 
         Response response = given()
-                .port(TestConfigs.SERVER_PORT)
+                .port(port)
                 .header("Authorization", "Bearer " + jwtToken)
                 .when()
                 .get("/category")
@@ -71,7 +74,7 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
         String csrfToken = response.cookie("XSRF-TOKEN");
 
         specification = new RequestSpecBuilder()
-                .setPort(TestConfigs.SERVER_PORT)
+                .setPort(port)
                 .setBasePath("/category")
                 .addHeader("Authorization", "Bearer " + jwtToken)
                 .addHeader("X-XSRF-TOKEN", csrfToken)
