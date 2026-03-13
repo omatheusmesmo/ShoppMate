@@ -54,6 +54,7 @@ export class ShoppingListDialogComponent {
 
   listForm: FormGroup;
   readonly isEdit = signal(false);
+  snackBar: any;
 
   constructor() {
     this.isEdit.set(this.data.isEdit);
@@ -73,15 +74,19 @@ export class ShoppingListDialogComponent {
       const userId = this.authService.getCurrentUserId();
 
       if (!userId) {
-        this.feedback.error(
-          'Usuario nao identificado. Por favor, faca login novamente.',
+        this.snackBar.open(
+          'Usuário não identificado. Por favor, faça login novamente.',
+          'Fechar',
+          {
+            duration: 3000,
+          },
         );
         return;
       }
 
       const listData: ShoppingListRequestDTO = {
         name: this.listForm.value.name,
-        idUser: userId,
+        idUser: this.authService.getCurrentUserId(),
       };
 
       if (this.isEdit() && this.data.list) {

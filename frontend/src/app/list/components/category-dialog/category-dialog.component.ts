@@ -90,7 +90,7 @@ export class CategoryDialogComponent implements OnInit {
         this.updateNameValidator();
       },
       error: () => {
-        this.feedback.error('Erro ao carregar categorias para validacao');
+        this.feedback.error('Erro ao carregar categorias para validação');
       },
     });
   }

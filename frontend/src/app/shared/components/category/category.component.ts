@@ -127,7 +127,7 @@ export class CategoryComponent implements OnInit {
 
         this.categoryService.deleteCategory(id).subscribe({
           next: () => {
-            this.feedback.success('Categoria excluida com sucesso');
+            this.feedback.success('Categoria excluída com sucesso');
             this.loadCategories();
           },
           error: () => {

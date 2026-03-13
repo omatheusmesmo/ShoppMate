@@ -130,7 +130,7 @@ export class UnitComponent implements OnInit {
 
         this.unitService.deleteUnit(id).subscribe({
           next: () => {
-            this.feedback.success('Unidade excluida com sucesso');
+            this.feedback.success('Unidade excluída com sucesso');
             this.loadUnits();
           },
           error: () => {

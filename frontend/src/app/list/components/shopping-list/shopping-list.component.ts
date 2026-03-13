@@ -101,7 +101,7 @@ export class ShoppingListComponent implements OnInit {
         this.shoppingListService.deleteShoppingList(id).subscribe({
           next: () => {
             this.loadLists();
-            this.feedback.success('Lista excluida com sucesso');
+            this.feedback.success('Lista excluída com sucesso');
           },
           error: () => {
             this.feedback.error('Erro ao excluir lista');
