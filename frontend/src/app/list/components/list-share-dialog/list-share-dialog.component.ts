@@ -8,7 +8,6 @@ import {
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
-  FormControl,
   FormGroup,
   ReactiveFormsModule,
   Validators,
@@ -77,7 +76,6 @@ export class ListShareDialogComponent implements OnInit {
   displayedColumns: string[] = ['user', 'permission', 'actions'];
   permissionTypes = Object.values(Permission);
   readonly isLoading = signal(false);
-  isLoading = false;
 
   ngOnInit(): void {
     this.loadPermissions();
