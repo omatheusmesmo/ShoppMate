@@ -148,7 +148,7 @@ export class ItemComponent implements OnInit {
 
         this.itemService.deleteItem(id).subscribe({
           next: () => {
-            this.feedback.success('Item excluido com sucesso');
+            this.feedback.success('Item excluído com sucesso');
             this.loadInitialData();
           },
           error: () => {
