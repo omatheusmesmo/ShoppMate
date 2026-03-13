@@ -24,7 +24,7 @@ Based on our core API capabilities, ShoppMate offers a comprehensive suite of fe
 
 ## 🏗️ Project Structure
 
-- **`/backend`**: Spring Boot 3 REST API (Java 17, PostgreSQL, Flyway).
+- **`/backend`**: Spring Boot 3 REST API (Java 25, PostgreSQL, Flyway).
 - **`/frontend`**: Angular 19+ Web Application (Material Design 3, Signals).
 - **`/backend/bruno`**: API Testing collections for the [Bruno](https://www.usebruno.com/) client.
 
@@ -65,7 +65,7 @@ docker compose up postgres -d
 
 #### Backend
 1. Navigate to `backend/`.
-2. Ensure you have Java 17 installed.
+2. Ensure you have Java 25 installed.
 3. Run with:
    ```bash
    ./mvnw spring-boot:run

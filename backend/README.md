@@ -76,8 +76,8 @@ ShoppMate is a RESTful API designed to help users manage their shopping lists ef
 
 ### Prerequisites
 
-* **Java Development Kit (JDK)**: Version 17 (required)
-  * This project uses Java 17 and is configured to automatically switch to it via SDKMAN
+* **Java Development Kit (JDK)**: Version 25 (required)
+  * This project uses Java 25 and is configured to automatically switch to it via SDKMAN
   * If you use SDKMAN, the correct Java version will be activated automatically when you enter the project directory
 * **Maven**: For building and managing the project
 * **PostgreSQL**: A running PostgreSQL database instance
@@ -86,21 +86,21 @@ ShoppMate is a RESTful API designed to help users manage their shopping lists ef
 
 ### Java Version Management
 
-This project is configured to use **Java 17** automatically via SDKMAN.
+This project is configured to use **Java 25** automatically via SDKMAN.
 
 **If you use SDKMAN:**
 - The `.sdkmanrc` file ensures the correct Java version is used
 - Enable auto-environment: `sdk config sdkman_auto_env true` (already configured)
-- Java 17 will be activated automatically when you enter the project directory
+- Java 25 will be activated automatically when you enter the project directory
 - Manual activation: `sdk env`
 
 **If you don't use SDKMAN:**
-- Make sure you have JDK 17 installed and configured
-- Set `JAVA_HOME` to point to your JDK 17 installation
+- Make sure you have JDK 25 installed and configured
+- Set `JAVA_HOME` to point to your JDK 25 installation
 
 **Verify your Java version:**
 ```bash
-java -version  # Should show Java 17
+java -version  # Should show Java 25
 ```
 
 ### Installation
@@ -112,7 +112,7 @@ java -version  # Should show Java 17
     cd ShoppMateAPI
     ```
 
-    **Note:** If you use SDKMAN with auto-environment enabled, Java 17 will be automatically activated.
+    **Note:** If you use SDKMAN with auto-environment enabled, Java 25 will be automatically activated.
 
 2.  Configure the Database:
     * **Create a database in your PostgreSQL instance.**

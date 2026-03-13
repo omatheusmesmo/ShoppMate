@@ -1,5 +1,5 @@
 # Stage 1: Build environment
-FROM maven:3.9.6-eclipse-temurin-17-alpine AS build
+FROM maven:3.9.6-eclipse-temurin-25-alpine AS build
 WORKDIR /app
 
 # Copy pom.xml and download dependencies to leverage Docker cache
@@ -11,7 +11,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Stage 2: Runtime environment
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 WORKDIR /app
 
 # Create a non-root user for better security
