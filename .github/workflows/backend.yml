@@ -59,7 +59,13 @@ jobs:
         with:
           java-version: '25'
           distribution: 'temurin'
+          check-latest: true
           cache: maven
+
+      - name: Print Java and Maven versions
+        run: |
+          java -version
+          mvn -v
       
       - name: Build
         run: mvn -B -ntp clean verify

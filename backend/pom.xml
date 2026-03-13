@@ -28,6 +28,13 @@
 	</scm>
 	<properties>
 		<java.version>25</java.version>
+		<testcontainers.version>2.0.3</testcontainers.version>
+		<flyway.version>11.0.0</flyway.version>
+		<lombok.version>1.18.36</lombok.version>
+		<springdoc.version>2.6.0</springdoc.version>
+		<jjwt.version>0.11.5</jjwt.version>
+		<jacoco.version>0.8.11</jacoco.version>
+		<formatter-maven-plugin.version>2.29.0</formatter-maven-plugin.version>
 	</properties>
 
 	<dependencyManagement>
@@ -35,7 +42,7 @@
 			<dependency>
 				<groupId>org.testcontainers</groupId>
 				<artifactId>testcontainers-bom</artifactId>
-				<version>2.0.3</version>
+				<version>${testcontainers.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -62,13 +69,14 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<version>${lombok.version}</version>
 			<optional>true</optional>
 		</dependency>
 
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-database-postgresql</artifactId>
-			<version>11.0.0</version>
+			<version>${flyway.version}</version>
 		</dependency>
 
 		<dependency>
@@ -80,7 +88,7 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.1.0</version>
+			<version>${springdoc.version}</version>
 		</dependency>
 
 		<dependency>
@@ -115,13 +123,11 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
-			<version>6.3.5</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-config</artifactId>
-			<version>6.3.5</version>
 		</dependency>
 
 		<dependency>
@@ -132,30 +138,17 @@
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
-			<version>0.11.5</version>
+			<version>${jjwt.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-impl</artifactId>
-			<version>0.11.5</version>
+			<version>${jjwt.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-jackson</artifactId>
-			<version>0.11.5</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.10.2</version> <!-- Or latest version -->
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-junit-jupiter</artifactId>
-			<version>5.3.1</version> <!-- Or latest version -->
-			<scope>test</scope>
+			<version>${jjwt.version}</version>
 		</dependency>
 
 		<dependency>
@@ -170,6 +163,13 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<release>${java.version}</release>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>${lombok.version}</version>
+						</path>
+					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -187,7 +187,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.11</version>
+				<version>${jacoco.version}</version>
 				<executions>
 					<execution>
 						<id>prepare-agent</id>
@@ -207,7 +207,7 @@
 			<plugin>
 				<groupId>org.flywaydb</groupId>
 				<artifactId>flyway-maven-plugin</artifactId>
-				<version>11.0.0</version>
+				<version>${flyway.version}</version>
 				<configuration>
 					<url>${DB_URL}</url>
 					<user>${DB_USERNAME}</user>
@@ -218,7 +218,7 @@
 			<plugin>
 				<groupId>net.revelc.code.formatter</groupId>
 				<artifactId>formatter-maven-plugin</artifactId>
-				<version>2.29.0</version>
+				<version>${formatter-maven-plugin.version}</version>
 				<executions>
 					<execution>
         				<id>validate-format</id>
