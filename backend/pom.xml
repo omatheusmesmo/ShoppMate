@@ -33,6 +33,7 @@
 		<lombok.version>1.18.44</lombok.version>
 		<mockito.version>5.22.0</mockito.version>
 		<byte-buddy.version>1.18.5</byte-buddy.version>
+		<rest-assured.version>5.5.7</rest-assured.version>
 		<springdoc.version>3.0.2</springdoc.version>
 		<jjwt.version>0.11.5</jjwt.version>
 		<jacoco.version>0.8.11</jacoco.version>
@@ -140,6 +141,7 @@
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
+			<version>${rest-assured.version}</version>
 			<scope>test</scope>
 		</dependency>
 
