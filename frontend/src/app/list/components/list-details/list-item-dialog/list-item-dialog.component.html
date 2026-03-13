@@ -1,9 +1,10 @@
 <h2 mat-dialog-title>
   {{ data.listItem ? "Editar" : "Adicionar" }} Item na Lista
 </h2>
-<mat-dialog-content>
+<mat-dialog-content [formGroup]="form">
   <mat-form-field appearance="outline" class="w-100">
     <mat-label>Item</mat-label>
+<<<<<<< HEAD
     <mat-select
       [ngModel]="selectedItemId()"
       (ngModelChange)="selectedItemId.set($event)"
@@ -11,6 +12,10 @@
       required
     >
       <mat-option *ngFor="let item of items()" [value]="item.id">
+=======
+    <mat-select formControlName="itemId" required>
+      <mat-option *ngFor="let item of items" [value]="item.id">
+>>>>>>> fe9633e (fix: remove category dialog and ajustmends list-item-dialog refactor)
         {{ item.name }} ({{ item.unit.symbol }})
       </mat-option>
     </mat-select>
@@ -18,6 +23,7 @@
 
   <mat-form-field appearance="outline" class="w-100">
     <mat-label>Quantidade</mat-label>
+<<<<<<< HEAD
     <input
       matInput
       type="number"
@@ -26,6 +32,9 @@
       min="1"
       required
     />
+=======
+    <input matInput type="number" formControlName="quantity" min="1" required />
+>>>>>>> fe9633e (fix: remove category dialog and ajustmends list-item-dialog refactor)
   </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
@@ -34,7 +43,11 @@
     mat-raised-button
     color="primary"
     (click)="onSave()"
+<<<<<<< HEAD
     [disabled]="!selectedItemId() || !quantity() || quantity() <= 0"
+=======
+    [disabled]="form.invalid"
+>>>>>>> fe9633e (fix: remove category dialog and ajustmends list-item-dialog refactor)
   >
     Salvar
   </button>
