@@ -1,9 +1,8 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  Inject,
   OnInit,
-  signal,
-  inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -43,18 +42,6 @@ import { ItemService } from '../../../../shared/services/item.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListItemDialogComponent implements OnInit {
-<<<<<<< HEAD
-  public dialogRef = inject(MatDialogRef<ListItemDialogComponent>);
-  public data = inject(MAT_DIALOG_DATA) as {
-    listItem?: ListItemResponseDTO;
-    listId: number;
-  };
-  private itemService = inject(ItemService);
-
-  readonly items = signal<ItemResponseDTO[]>([]);
-  readonly selectedItemId = signal<number | null>(null);
-  readonly quantity = signal(1);
-=======
   items: ItemResponseDTO[] = [];
   readonly form: FormGroup<{
     itemId: FormControl<number | null>;
@@ -79,7 +66,6 @@ export class ListItemDialogComponent implements OnInit {
       }),
     });
   }
->>>>>>> fe9633e (fix: remove category dialog and ajustmends list-item-dialog refactor)
 
   ngOnInit(): void {
     this.loadItems();
@@ -87,7 +73,7 @@ export class ListItemDialogComponent implements OnInit {
 
   loadItems(): void {
     this.itemService.getAllItems().subscribe((items) => {
-      this.items.set(items);
+      this.items = items;
     });
   }
 
@@ -96,27 +82,18 @@ export class ListItemDialogComponent implements OnInit {
   }
 
   onSave(): void {
-<<<<<<< HEAD
-    if (!this.selectedItemId() || !this.quantity() || this.quantity() <= 0) {
-=======
     if (this.form.invalid) {
       return;
     }
 
     const { itemId, quantity } = this.form.getRawValue();
     if (itemId === null) {
->>>>>>> fe9633e (fix: remove category dialog and ajustmends list-item-dialog refactor)
       return;
     }
 
     this.dialogRef.close({
-<<<<<<< HEAD
-      itemId: this.selectedItemId(),
-      quantity: this.quantity(),
-=======
       itemId,
       quantity,
->>>>>>> fe9633e (fix: remove category dialog and ajustmends list-item-dialog refactor)
     });
   }
 }
