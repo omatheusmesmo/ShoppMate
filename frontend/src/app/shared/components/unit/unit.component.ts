@@ -79,7 +79,10 @@ export class UnitComponent implements OnInit {
     const editingId = this.editingUnitId();
 
     const { name, symbol } = this.unitForm.getRawValue();
-    const unitData: Unit = { name, symbol };
+    const normalizedName = name.trim();
+    const normalizedSymbol = symbol.trim();
+    if (!normalizedName || !normalizedSymbol) return;
+    const unitData: Unit = { name: normalizedName, symbol: normalizedSymbol };
 
     if (editingId !== null) {
       unitData.id = editingId;
