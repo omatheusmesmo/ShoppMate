@@ -9,15 +9,18 @@ This monorepo contains both the **Spring Boot Backend** and the **Angular Fronte
 Based on our core API capabilities, ShoppMate offers a comprehensive suite of features:
 
 ### 🔐 Security & Identity
+
 - **User Registration & Login**: Secure JWT-based authentication.
 - **Profile Management**: View and manage user details.
 
 ### 📋 Shopping Lists
+
 - **Multi-list Management**: Create, view, update, and delete multiple shopping lists.
 - **Item Organization**: Add items to specific lists with quantity tracking and "purchased" status.
 - **Collaborative Lists**: Share lists with other users by granting specific permissions (`READ`, `WRITE`, etc.).
 
 ### 📦 Catalog Management
+
 - **Custom Categories**: Organize your items into categories (e.g., Fruits, Cleaning, Dairy).
 - **Measurement Units**: Define units like `kg`, `unit`, `liters`, or any custom measurement.
 - **Item Database**: Create a reusable catalog of items to quickly add to your lists.
@@ -50,6 +53,7 @@ docker compose up --build
 ```
 
 Access the application at:
+
 - **Frontend**: [http://localhost](http://localhost)
 - **Backend API**: [http://localhost:8080](http://localhost:8080)
 
@@ -58,12 +62,15 @@ Access the application at:
 If you prefer to run the components individually for development:
 
 #### Database
+
 You still need a PostgreSQL instance. You can run just the database via Docker:
+
 ```bash
 docker compose up postgres -d
 ```
 
 #### Backend
+
 1. Navigate to `backend/`.
 2. Ensure you have Java 17 installed.
 3. Run with:
@@ -72,6 +79,7 @@ docker compose up postgres -d
    ```
 
 #### Frontend
+
 1. Navigate to `frontend/`.
 2. Install dependencies:
    ```bash

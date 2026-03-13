@@ -13,14 +13,10 @@ This is the collection of API requests for ShoppMate.
 
 ## Variables
 
-
-
 - `baseUrl`: The API's base URL (default: `http://localhost:8080`).
 
 - `token`: The JWT token obtained after login.
 
 - `listId`, `itemId`, `categoryId`, etc.: IDs used as parameters in various requests (configured in the `Vars` tabs of each request).
-
-
 
 > **Note:** The request paths in this collection follow the actual implementation in the Spring Boot Controllers (e.g., `/lists` instead of `/shopplists`), which might differ from some outdated documentation.

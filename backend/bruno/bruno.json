@@ -2,8 +2,5 @@
   "name": "ShoppMate",
   "type": "collection",
   "version": "1",
-  "ignore": [
-    "node_modules",
-    ".git"
-  ]
+  "ignore": ["node_modules", ".git"]
 }

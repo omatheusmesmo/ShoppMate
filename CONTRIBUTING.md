@@ -3,20 +3,24 @@
 First off, thank you for considering contributing to ShoppMate! It's people like you that make the open-source community such an amazing place to learn, inspire, and create.
 
 ## Code of Conduct
+
 By participating in this project, you agree to abide by our Code of Conduct (standard Contributor Covenant).
 
 ## How Can I Contribute?
 
 ### Reporting Bugs
+
 - Use the GitHub issue tracker.
 - Describe the bug with enough detail for others to reproduce it.
 - Include your operating system, Java version, and any relevant logs.
 
 ### Suggesting Enhancements
+
 - Check if the enhancement has already been suggested.
 - Open a new issue with a clear title and description of the benefits.
 
 ### Pull Requests
+
 1. **Fork the repository** and create your branch from `develop`.
 2. **Target your PR to the `develop` branch**. PRs targeting `main` will be automatically redirected.
 3. **Install dependencies** using Maven: `./mvnw install` (inside the `backend` folder).
@@ -33,7 +37,9 @@ By participating in this project, you agree to abide by our Code of Conduct (sta
 9. **Submit the PR**: Link it to the relevant issue (e.g., `Closes #15`).
 
 ### Auto-Assignment Bot
+
 We use a bot to manage issue assignments. To work on an issue:
+
 - Comment **"Assign me"** or **"Eu quero trabalhar nisso"** on the issue.
 - The bot will assign you automatically if the issue is free.
 - If the issue is already assigned, the bot will ask the current assignee for a status update.
@@ -42,12 +48,15 @@ We use a bot to manage issue assignments. To work on an issue:
 ## Development Workflow
 
 ### Branch Naming Convention
+
 - `feature/description-of-feature`
 - `fix/description-of-bug`
 - `docs/description-of-change`
 
 ### Commit Message Guidelines
+
 We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
+
 - **feat**: A new feature
 - **fix**: A bug fix
 - **docs**: Documentation only changes
@@ -62,10 +71,12 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/) speci
 `fix(list): resolve N+1 query in shopping list retrieval`
 
 ## Technical Stack
+
 - **Backend**: Java 17+, Spring Boot 3+
 - **Database**: PostgreSQL (Migrations via Flyway)
 - **Security**: Spring Security + JWT
 - **API Testing**: Bruno (collections found in `/bruno`)
 
 ## Questions?
+
 Feel free to open a discussion or an issue if you have any questions about the setup or the roadmap.

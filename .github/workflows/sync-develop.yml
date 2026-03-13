@@ -30,13 +30,13 @@ jobs:
           echo "Waiting 10 seconds for GitHub to stabilize..."
           sleep 10
           git fetch origin main
-          
+
           # Tenta o rebase, se falhar ele aborta e para o workflow
           if ! git rebase origin/main; then
             echo "❌ Conflict detected during rebase! Aborting..."
             git rebase --abort
             exit 1
           fi
-          
+
           echo "✅ Rebase successful. Pushing changes..."
           git push origin develop --force-with-lease

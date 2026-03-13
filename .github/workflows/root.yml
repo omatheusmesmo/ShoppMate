@@ -2,24 +2,24 @@ name: Root CI
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: ["main", "develop"]
     paths:
-      - '.github/workflows/**'
-      - 'docker-compose.yml'
-      - 'README.md'
-      - '.editorconfig'
-      - '.prettierrc'
-      - '.eslintrc*'
+      - ".github/workflows/**"
+      - "docker-compose.yml"
+      - "README.md"
+      - ".editorconfig"
+      - ".prettierrc"
+      - ".eslintrc*"
 
   pull_request:
-    branches: [ "main", "develop" ]
+    branches: ["main", "develop"]
     paths:
-      - '.github/workflows/**'
-      - 'docker-compose.yml'
-      - 'README.md'
-      - '.editorconfig'
-      - '.prettierrc'
-      - '.eslintrc*'
+      - ".github/workflows/**"
+      - "docker-compose.yml"
+      - "README.md"
+      - ".editorconfig"
+      - ".prettierrc"
+      - ".eslintrc*"
 
 jobs:
   validate:
