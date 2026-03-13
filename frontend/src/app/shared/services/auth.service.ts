@@ -58,8 +58,7 @@ export class AuthService {
         }),
       })
       .pipe(
-        tap(() => {}),
-        catchError((error: HttpErrorResponse) => {
+        catchError(() => {
           return throwError(
             () =>
               new Error(
