@@ -1,8 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Inject,
   OnInit,
+  inject,
+  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -42,30 +43,32 @@ import { ItemService } from '../../../../shared/services/item.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListItemDialogComponent implements OnInit {
-  items: ItemResponseDTO[] = [];
+  private dialogRef = inject(MatDialogRef<ListItemDialogComponent>);
+  private itemService = inject(ItemService);
+  private fb = inject(FormBuilder);
+
+  readonly data = inject(MAT_DIALOG_DATA) as {
+    listItem?: ListItemResponseDTO;
+    listId: number;
+  };
+
+  readonly items = signal<ItemResponseDTO[]>([]);
+
   readonly form: FormGroup<{
     itemId: FormControl<number | null>;
     quantity: FormControl<number>;
-  }>;
-
-  constructor(
-    public dialogRef: MatDialogRef<ListItemDialogComponent>,
-    @Inject(MAT_DIALOG_DATA)
-    public data: { listItem?: ListItemResponseDTO; listId: number },
-    private itemService: ItemService,
-    private fb: FormBuilder,
-  ) {
-    const isEdit = !!data.listItem;
-    this.form = this.fb.group({
-      itemId: new FormControl<number | null>(
-        { value: data.listItem?.item.id ?? null, disabled: isEdit },
-        { validators: [Validators.required] },
-      ),
-      quantity: this.fb.nonNullable.control(data.listItem?.quantity ?? 1, {
-        validators: [Validators.required, Validators.min(1)],
-      }),
-    });
-  }
+  }> = this.fb.group({
+    itemId: new FormControl<number | null>(
+      {
+        value: this.data.listItem?.item.id ?? null,
+        disabled: !!this.data.listItem,
+      },
+      { validators: [Validators.required] },
+    ),
+    quantity: this.fb.nonNullable.control(this.data.listItem?.quantity ?? 1, {
+      validators: [Validators.required, Validators.min(1)],
+    }),
+  });
 
   ngOnInit(): void {
     this.loadItems();
@@ -73,7 +76,7 @@ export class ListItemDialogComponent implements OnInit {
 
   loadItems(): void {
     this.itemService.getAllItems().subscribe((items) => {
-      this.items = items;
+      this.items.set(items);
     });
   }
 

@@ -11,6 +11,7 @@ import {
   FormGroup,
   Validators,
   ReactiveFormsModule,
+  FormControl,
 } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -46,9 +47,12 @@ export class CategoryComponent implements OnInit {
 
   readonly categories = signal<Category[]>([]);
   readonly isLoading = signal(false);
-  categoryForm: FormGroup = this.fb.group({
-    name: ['', [Validators.required, Validators.minLength(2)]],
-  });
+  categoryForm: FormGroup<{ name: FormControl<string> }> =
+    this.fb.nonNullable.group({
+      name: this.fb.nonNullable.control('', {
+        validators: [Validators.required, Validators.minLength(2)],
+      }),
+    });
   readonly editingCategoryId = signal<number | null>(null);
 
   private confirmDialog = inject(ConfirmDialogService);
