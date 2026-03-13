@@ -24,7 +24,7 @@ import {
 } from '@angular/forms';
 import { CategoryService } from '../../../shared/services/category.service';
 import { Category } from '../../../shared/interfaces/category.interface';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { FeedbackService } from '../../../shared/services/feedback.service';
 
 export function duplicateNameValidator(
   existingNames: string[],
@@ -61,7 +61,7 @@ export class CategoryDialogComponent implements OnInit {
   private readonly dialogRef = inject(MatDialogRef<CategoryDialogComponent>);
   private readonly fb = inject(FormBuilder);
   private readonly categoryService = inject(CategoryService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly feedback = inject(FeedbackService);
   private readonly data = inject(MAT_DIALOG_DATA) as {
     category?: Category;
     isEdit: boolean;
@@ -90,11 +90,7 @@ export class CategoryDialogComponent implements OnInit {
         this.updateNameValidator();
       },
       error: () => {
-        this.snackBar.open(
-          'Erro ao carregar categorias para validação',
-          'Fechar',
-          { duration: 3000 },
-        );
+        this.feedback.error('Erro ao carregar categorias para validacao');
       },
     });
   }
@@ -129,29 +125,21 @@ export class CategoryDialogComponent implements OnInit {
       if (this.isEdit() && this.data.category) {
         this.categoryService.updateCategory(categoryData).subscribe({
           next: () => {
-            this.snackBar.open('Categoria atualizada com sucesso', 'Fechar', {
-              duration: 3000,
-            });
+            this.feedback.success('Categoria atualizada com sucesso');
             this.dialogRef.close(true);
           },
           error: () => {
-            this.snackBar.open('Erro ao atualizar categoria', 'Fechar', {
-              duration: 3000,
-            });
+            this.feedback.error('Erro ao atualizar categoria');
           },
         });
       } else {
         this.categoryService.addCategory(categoryData).subscribe({
           next: () => {
-            this.snackBar.open('Categoria criada com sucesso', 'Fechar', {
-              duration: 3000,
-            });
+            this.feedback.success('Categoria criada com sucesso');
             this.dialogRef.close(true);
           },
           error: () => {
-            this.snackBar.open('Erro ao criar categoria', 'Fechar', {
-              duration: 3000,
-            });
+            this.feedback.error('Erro ao criar categoria');
           },
         });
       }

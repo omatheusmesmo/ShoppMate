@@ -21,9 +21,9 @@ import {
   ShoppingListRequestDTO,
 } from '../../../shared/interfaces/shopping-list.interface';
 import { AuthService } from '../../../shared/services/auth.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialogActions } from '@angular/material/dialog';
 import { MatDialogContent } from '@angular/material/dialog';
+import { FeedbackService } from '../../../shared/services/feedback.service';
 
 @Component({
   selector: 'app-shopping-list-dialog',
@@ -45,7 +45,7 @@ export class ShoppingListDialogComponent {
   private dialogRef = inject(MatDialogRef<ShoppingListDialogComponent>);
   private fb = inject(FormBuilder);
   private shoppingListService = inject(ShoppingListService);
-  private snackBar = inject(MatSnackBar);
+  private feedback = inject(FeedbackService);
   private authService = inject(AuthService);
   private data = inject(MAT_DIALOG_DATA) as {
     list?: ShoppingListResponseDTO;
@@ -73,12 +73,8 @@ export class ShoppingListDialogComponent {
       const userId = this.authService.getCurrentUserId();
 
       if (!userId) {
-        this.snackBar.open(
-          'Usuário não identificado. Por favor, faça login novamente.',
-          'Fechar',
-          {
-            duration: 3000,
-          },
+        this.feedback.error(
+          'Usuario nao identificado. Por favor, faca login novamente.',
         );
         return;
       }
@@ -93,29 +89,21 @@ export class ShoppingListDialogComponent {
           .updateShoppingList(this.data.list.idList, listData)
           .subscribe({
             next: () => {
-              this.snackBar.open('Lista atualizada com sucesso', 'Fechar', {
-                duration: 3000,
-              });
+              this.feedback.success('Lista atualizada com sucesso');
               this.dialogRef.close(true);
             },
             error: () => {
-              this.snackBar.open('Erro ao atualizar lista', 'Fechar', {
-                duration: 3000,
-              });
+              this.feedback.error('Erro ao atualizar lista');
             },
           });
       } else {
         this.shoppingListService.createShoppingList(listData).subscribe({
           next: () => {
-            this.snackBar.open('Lista criada com sucesso', 'Fechar', {
-              duration: 3000,
-            });
+            this.feedback.success('Lista criada com sucesso');
             this.dialogRef.close(true);
           },
           error: () => {
-            this.snackBar.open('Erro ao criar lista', 'Fechar', {
-              duration: 3000,
-            });
+            this.feedback.error('Erro ao criar lista');
           },
         });
       }

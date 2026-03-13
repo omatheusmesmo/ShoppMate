@@ -9,7 +9,6 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 
@@ -17,6 +16,8 @@ import { UnitService } from '../../../shared/services/unit.service';
 import { Unit } from '../../../shared/interfaces/unit.interface';
 import { finalize, catchError, of, tap } from 'rxjs';
 import { UnitDialogComponent } from './unit-dialog/unit-dialog.component';
+import { ConfirmDialogService } from '../../../shared/services/confirm-dialog.service';
+import { FeedbackService } from '../../../shared/services/feedback.service';
 
 @Component({
   selector: 'app-units-management',
@@ -35,7 +36,8 @@ import { UnitDialogComponent } from './unit-dialog/unit-dialog.component';
 export class UnitsManagementComponent implements OnInit {
   private unitService = inject(UnitService);
   private dialog = inject(MatDialog);
-  private snackBar = inject(MatSnackBar);
+  private confirmDialog = inject(ConfirmDialogService);
+  private feedback = inject(FeedbackService);
 
   readonly loading = signal(true);
   readonly error = signal(false);
@@ -58,12 +60,9 @@ export class UnitsManagementComponent implements OnInit {
         }),
         catchError(() => {
           this.error.set(true);
-          this.snackBar.open(
+          this.units.set([]);
+          this.feedback.error(
             'Erro ao carregar unidades. Tente novamente mais tarde.',
-            'Fechar',
-            {
-              duration: 5000,
-            },
           );
           return of([]);
         }),
@@ -85,14 +84,10 @@ export class UnitsManagementComponent implements OnInit {
         this.unitService.updateUnit(result).subscribe({
           next: () => {
             this.loadUnits();
-            this.snackBar.open('Unidade atualizada com sucesso', 'Fechar', {
-              duration: 3000,
-            });
+            this.feedback.success('Unidade atualizada com sucesso');
           },
           error: () => {
-            this.snackBar.open('Erro ao atualizar unidade', 'Fechar', {
-              duration: 3000,
-            });
+            this.feedback.error('Erro ao atualizar unidade');
           },
         });
       }
@@ -100,21 +95,25 @@ export class UnitsManagementComponent implements OnInit {
   }
 
   deleteUnit(unit: Unit): void {
-    if (confirm(`Tem certeza que deseja excluir a unidade "${unit.name}"?`)) {
-      this.unitService.deleteUnit(unit.id!).subscribe({
-        next: () => {
-          this.loadUnits();
-          this.snackBar.open('Unidade excluída com sucesso', 'Fechar', {
-            duration: 3000,
-          });
-        },
-        error: () => {
-          this.snackBar.open('Erro ao excluir unidade', 'Fechar', {
-            duration: 3000,
-          });
-        },
+    this.confirmDialog
+      .open({
+        title: 'Excluir unidade',
+        message: `Tem certeza que deseja excluir a unidade "${unit.name}"?`,
+        confirmText: 'Excluir',
+      })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+
+        this.unitService.deleteUnit(unit.id!).subscribe({
+          next: () => {
+            this.loadUnits();
+            this.feedback.success('Unidade excluida com sucesso');
+          },
+          error: () => {
+            this.feedback.error('Erro ao excluir unidade');
+          },
+        });
       });
-    }
   }
 
   openNewUnitDialog(): void {
@@ -128,14 +127,10 @@ export class UnitsManagementComponent implements OnInit {
         this.unitService.addUnit(result).subscribe({
           next: () => {
             this.loadUnits();
-            this.snackBar.open('Unidade adicionada com sucesso', 'Fechar', {
-              duration: 3000,
-            });
+            this.feedback.success('Unidade adicionada com sucesso');
           },
           error: () => {
-            this.snackBar.open('Erro ao adicionar unidade', 'Fechar', {
-              duration: 3000,
-            });
+            this.feedback.error('Erro ao adicionar unidade');
           },
         });
       }

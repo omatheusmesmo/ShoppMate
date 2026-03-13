@@ -24,7 +24,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ListPermissionService } from '../../../shared/services/list-permission.service';
@@ -34,6 +33,8 @@ import {
   Permission,
 } from '../../../shared/interfaces/list-permission.interface';
 import { User } from '../../../shared/interfaces/user.interface';
+import { ConfirmDialogService } from '../../../shared/services/confirm-dialog.service';
+import { FeedbackService } from '../../../shared/services/feedback.service';
 
 @Component({
   selector: 'app-list-share-dialog',
@@ -59,7 +60,8 @@ export class ListShareDialogComponent implements OnInit {
   private fb = inject(FormBuilder);
   private listPermissionService = inject(ListPermissionService);
   private userService = inject(UserService);
-  private snackBar = inject(MatSnackBar);
+  private confirmDialog = inject(ConfirmDialogService);
+  private feedback = inject(FeedbackService);
 
   shareForm: FormGroup;
   readonly permissions = signal<ListPermissionSummaryDTO[]>([]);
@@ -93,9 +95,7 @@ export class ListShareDialogComponent implements OnInit {
           this.isLoading.set(false);
         },
         error: () => {
-          this.snackBar.open('Erro ao carregar permissões', 'Fechar', {
-            duration: 3000,
-          });
+          this.feedback.error('Erro ao carregar permissoes');
           this.isLoading.set(false);
         },
       });
@@ -107,7 +107,7 @@ export class ListShareDialogComponent implements OnInit {
         this.users.set(users);
       },
       error: () => {
-        console.error('Error loading users');
+        this.feedback.error('Erro ao carregar usuarios');
       },
     });
   }
@@ -118,9 +118,7 @@ export class ListShareDialogComponent implements OnInit {
       const user = this.users().find((u) => u.email === email);
 
       if (!user || !user.id) {
-        this.snackBar.open('Usuário não encontrado com este e-mail', 'Fechar', {
-          duration: 3000,
-        });
+        this.feedback.error('Usuario nao encontrado com este e-mail');
         return;
       }
 
@@ -132,39 +130,39 @@ export class ListShareDialogComponent implements OnInit {
 
       this.listPermissionService.addListPermission(request).subscribe({
         next: () => {
-          this.snackBar.open('Lista compartilhada com sucesso', 'Fechar', {
-            duration: 3000,
-          });
+          this.feedback.success('Lista compartilhada com sucesso');
           this.shareForm.reset({ permission: Permission.READ });
           this.loadPermissions();
         },
         error: () => {
-          this.snackBar.open('Erro ao compartilhar lista', 'Fechar', {
-            duration: 3000,
-          });
+          this.feedback.error('Erro ao compartilhar lista');
         },
       });
     }
   }
 
   removePermission(permissionId: number): void {
-    if (confirm('Tem certeza que deseja remover esta permissão?')) {
-      this.listPermissionService
-        .deleteListPermission(this.data.listId, permissionId)
-        .subscribe({
-          next: () => {
-            this.snackBar.open('Permissão removida', 'Fechar', {
-              duration: 3000,
-            });
-            this.loadPermissions();
-          },
-          error: () => {
-            this.snackBar.open('Erro ao remover permissão', 'Fechar', {
-              duration: 3000,
-            });
-          },
-        });
-    }
+    this.confirmDialog
+      .open({
+        title: 'Remover permissao',
+        message: 'Tem certeza que deseja remover esta permissao?',
+        confirmText: 'Remover',
+      })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+
+        this.listPermissionService
+          .deleteListPermission(this.data.listId, permissionId)
+          .subscribe({
+            next: () => {
+              this.feedback.success('Permissao removida com sucesso');
+              this.loadPermissions();
+            },
+            error: () => {
+              this.feedback.error('Erro ao remover permissao');
+            },
+          });
+      });
   }
 
   onClose(): void {

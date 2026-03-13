@@ -24,7 +24,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { Unit } from '../../../../shared/interfaces/unit.interface';
 import { UnitService } from '../../../../shared/services/unit.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { FeedbackService } from '../../../../shared/services/feedback.service';
 
 export function duplicateNameValidator(
   existingNames: string[],
@@ -60,7 +60,7 @@ export function duplicateNameValidator(
 export class UnitDialogComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly unitService = inject(UnitService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly feedback = inject(FeedbackService);
   readonly dialogRef = inject(MatDialogRef<UnitDialogComponent>);
   readonly data = inject(MAT_DIALOG_DATA) as { unit?: Unit };
 
@@ -85,13 +85,7 @@ export class UnitDialogComponent implements OnInit {
         this.updateNameValidator();
       },
       error: () => {
-        this.snackBar.open(
-          'Erro ao carregar unidades para validação',
-          'Fechar',
-          {
-            duration: 3000,
-          },
-        );
+        this.feedback.error('Erro ao carregar unidades para validacao');
       },
     });
   }

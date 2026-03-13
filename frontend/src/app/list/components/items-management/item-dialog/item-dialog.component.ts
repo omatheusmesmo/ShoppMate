@@ -32,7 +32,7 @@ import { UnitService } from '../../../../shared/services/unit.service';
 import { ItemService } from '../../../../shared/services/item.service';
 import { Category } from '../../../../shared/interfaces/category.interface';
 import { Unit } from '../../../../shared/interfaces/unit.interface';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { FeedbackService } from '../../../../shared/services/feedback.service';
 
 export function duplicateNameValidator(
   existingNames: string[],
@@ -71,7 +71,7 @@ export class ItemDialogComponent implements OnInit {
   private readonly itemService = inject(ItemService);
   private readonly categoryService = inject(CategoryService);
   private readonly unitService = inject(UnitService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly feedback = inject(FeedbackService);
   readonly dialogRef = inject(MatDialogRef<ItemDialogComponent>);
   readonly data = inject(MAT_DIALOG_DATA) as { item?: ItemRequestDTO };
 
@@ -101,9 +101,7 @@ export class ItemDialogComponent implements OnInit {
         this.updateNameValidator();
       },
       error: () => {
-        this.snackBar.open('Erro ao carregar itens para validação', 'Fechar', {
-          duration: 3000,
-        });
+        this.feedback.error('Erro ao carregar itens para validacao');
       },
     });
   }

@@ -9,11 +9,12 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CategoryService } from '../../../shared/services/category.service';
 import { Category } from '../../../shared/interfaces/category.interface';
 import { CategoryDialogComponent } from '../category-dialog/category-dialog.component';
+import { ConfirmDialogService } from '../../../shared/services/confirm-dialog.service';
+import { FeedbackService } from '../../../shared/services/feedback.service';
 
 @Component({
   selector: 'app-categories-management',
@@ -36,7 +37,8 @@ export class CategoriesManagementComponent implements OnInit {
   constructor(
     private categoryService: CategoryService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar,
+    private confirmDialog: ConfirmDialogService,
+    private feedback: FeedbackService,
   ) {}
 
   ngOnInit(): void {
@@ -51,9 +53,7 @@ export class CategoriesManagementComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: () => {
-        this.snackBar.open('Erro ao carregar categorias', 'Fechar', {
-          duration: 3000,
-        });
+        this.feedback.error('Erro ao carregar categorias');
         this.isLoading.set(false);
       },
     });
@@ -86,20 +86,24 @@ export class CategoriesManagementComponent implements OnInit {
   }
 
   deleteCategory(id: number): void {
-    if (confirm('Tem certeza que deseja excluir esta categoria?')) {
-      this.categoryService.deleteCategory(id).subscribe({
-        next: () => {
-          this.snackBar.open('Categoria excluída com sucesso', 'Fechar', {
-            duration: 3000,
-          });
-          this.loadCategories();
-        },
-        error: () => {
-          this.snackBar.open('Erro ao excluir categoria', 'Fechar', {
-            duration: 3000,
-          });
-        },
+    this.confirmDialog
+      .open({
+        title: 'Excluir categoria',
+        message: 'Tem certeza que deseja excluir esta categoria?',
+        confirmText: 'Excluir',
+      })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+
+        this.categoryService.deleteCategory(id).subscribe({
+          next: () => {
+            this.feedback.success('Categoria excluida com sucesso');
+            this.loadCategories();
+          },
+          error: () => {
+            this.feedback.error('Erro ao excluir categoria');
+          },
+        });
       });
-    }
   }
 }

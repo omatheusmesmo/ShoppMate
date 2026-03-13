@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
+  inject,
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -17,7 +18,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
 import {
   ItemResponseDTO,
@@ -29,6 +29,8 @@ import { ItemService } from '../../services/item.service';
 import { CategoryService } from '../../services/category.service';
 import { UnitService } from '../../services/unit.service';
 import { forkJoin } from 'rxjs';
+import { ConfirmDialogService } from '../../services/confirm-dialog.service';
+import { FeedbackService } from '../../services/feedback.service';
 
 @Component({
   standalone: true,
@@ -56,12 +58,14 @@ export class ItemComponent implements OnInit {
   itemForm: FormGroup;
   readonly editingItemId = signal<number | null>(null);
 
+  private confirmDialog = inject(ConfirmDialogService);
+  private feedback = inject(FeedbackService);
+
   constructor(
     private itemService: ItemService,
     private categoryService: CategoryService,
     private unitService: UnitService,
     private fb: FormBuilder,
-    private snackBar: MatSnackBar,
   ) {
     this.itemForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
@@ -88,7 +92,7 @@ export class ItemComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: () => {
-        this.snackBar.open('Error loading data', 'Close', { duration: 3000 });
+        this.feedback.error('Erro ao carregar dados');
         this.isLoading.set(false);
       },
     });
@@ -109,18 +113,16 @@ export class ItemComponent implements OnInit {
 
     operation.subscribe({
       next: () => {
-        this.snackBar.open(
+        this.feedback.success(
           this.editingItemId()
-            ? 'Item updated successfully'
-            : 'Item created successfully',
-          'Close',
-          { duration: 3000 },
+            ? 'Item atualizado com sucesso'
+            : 'Item criado com sucesso',
         );
         this.resetForm();
         this.loadInitialData();
       },
       error: () => {
-        this.snackBar.open('Error saving item', 'Close', { duration: 3000 });
+        this.feedback.error('Erro ao salvar item');
       },
     });
   }
@@ -135,21 +137,25 @@ export class ItemComponent implements OnInit {
   }
 
   deleteItem(id: number): void {
-    if (confirm('Are you sure you want to delete this item?')) {
-      this.itemService.deleteItem(id).subscribe({
-        next: () => {
-          this.snackBar.open('Item deleted successfully', 'Close', {
-            duration: 3000,
-          });
-          this.loadInitialData();
-        },
-        error: () => {
-          this.snackBar.open('Error deleting item', 'Close', {
-            duration: 3000,
-          });
-        },
+    this.confirmDialog
+      .open({
+        title: 'Excluir item',
+        message: 'Tem certeza que deseja excluir este item?',
+        confirmText: 'Excluir',
+      })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+
+        this.itemService.deleteItem(id).subscribe({
+          next: () => {
+            this.feedback.success('Item excluido com sucesso');
+            this.loadInitialData();
+          },
+          error: () => {
+            this.feedback.error('Erro ao excluir item');
+          },
+        });
       });
-    }
   }
 
   resetForm(): void {

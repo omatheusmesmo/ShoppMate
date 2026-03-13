@@ -3,6 +3,7 @@ import {
   Component,
   OnInit,
   signal,
+  inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -17,9 +18,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Category } from '../../interfaces/category.interface';
 import { CategoryService } from '../../services/category.service';
+import { ConfirmDialogService } from '../../services/confirm-dialog.service';
+import { FeedbackService } from '../../services/feedback.service';
 
 @Component({
   standalone: true,
@@ -44,10 +46,12 @@ export class CategoryComponent implements OnInit {
   categoryForm: FormGroup;
   readonly editingCategoryId = signal<number | null>(null);
 
+  private confirmDialog = inject(ConfirmDialogService);
+  private feedback = inject(FeedbackService);
+
   constructor(
     private categoryService: CategoryService,
     private fb: FormBuilder,
-    private snackBar: MatSnackBar,
   ) {
     this.categoryForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
@@ -66,9 +70,7 @@ export class CategoryComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: () => {
-        this.snackBar.open('Error loading categories', 'Close', {
-          duration: 3000,
-        });
+        this.feedback.error('Erro ao carregar categorias');
         this.isLoading.set(false);
       },
     });
@@ -92,20 +94,16 @@ export class CategoryComponent implements OnInit {
 
     operation.subscribe({
       next: () => {
-        this.snackBar.open(
+        this.feedback.success(
           this.editingCategoryId() !== null
-            ? 'Category updated successfully'
-            : 'Category created successfully',
-          'Close',
-          { duration: 3000 },
+            ? 'Categoria atualizada com sucesso'
+            : 'Categoria criada com sucesso',
         );
         this.resetForm();
         this.loadCategories();
       },
       error: () => {
-        this.snackBar.open('Error saving category', 'Close', {
-          duration: 3000,
-        });
+        this.feedback.error('Erro ao salvar categoria');
       },
     });
   }
@@ -118,21 +116,25 @@ export class CategoryComponent implements OnInit {
   }
 
   deleteCategory(id: number): void {
-    if (confirm('Are you sure you want to delete this category?')) {
-      this.categoryService.deleteCategory(id).subscribe({
-        next: () => {
-          this.snackBar.open('Category deleted successfully', 'Close', {
-            duration: 3000,
-          });
-          this.loadCategories();
-        },
-        error: () => {
-          this.snackBar.open('Error deleting category', 'Close', {
-            duration: 3000,
-          });
-        },
+    this.confirmDialog
+      .open({
+        title: 'Excluir categoria',
+        message: 'Tem certeza que deseja excluir esta categoria?',
+        confirmText: 'Excluir',
+      })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+
+        this.categoryService.deleteCategory(id).subscribe({
+          next: () => {
+            this.feedback.success('Categoria excluida com sucesso');
+            this.loadCategories();
+          },
+          error: () => {
+            this.feedback.error('Erro ao excluir categoria');
+          },
+        });
       });
-    }
   }
 
   resetForm(): void {
