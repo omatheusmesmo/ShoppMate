@@ -3,8 +3,11 @@ name: External PR Branch Enforcer
 on:
   pull_request_target:
     types: [opened, edited, synchronize, reopened]
+<<<<<<< HEAD
   pull_request_target:
     types: [opened, edited, synchronize, reopened]
+=======
+>>>>>>> 57e833a (fix(ci): update branch enforcer permissions and enable Gemini reviews for main)
 
 permissions:
   pull-requests: write
@@ -69,5 +72,8 @@ jobs:
             } catch (error) {
               console.error("❌ Error processing branch enforcement:", error);
               core.setFailed(error.message);
+<<<<<<< HEAD
               core.setFailed(error instanceof Error ? error.message : String(error));
+=======
+>>>>>>> 57e833a (fix(ci): update branch enforcer permissions and enable Gemini reviews for main)
             }
