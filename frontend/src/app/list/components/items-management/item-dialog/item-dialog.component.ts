@@ -8,6 +8,8 @@ import {
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
+  FormControl,
+  FormGroup,
   ReactiveFormsModule,
   Validators,
   AbstractControl,
@@ -75,10 +77,14 @@ export class ItemDialogComponent implements OnInit {
   readonly dialogRef = inject(MatDialogRef<ItemDialogComponent>);
   readonly data = inject(MAT_DIALOG_DATA) as { item?: ItemRequestDTO };
 
-  readonly itemForm = this.fb.group({
-    name: ['', [Validators.required]],
-    idCategory: [null as number | null, [Validators.required]],
-    idUnit: [null as number | null, [Validators.required]],
+  readonly itemForm: FormGroup<{
+    name: FormControl<string>;
+    idCategory: FormControl<number | null>;
+    idUnit: FormControl<number | null>;
+  }> = this.fb.group({
+    name: this.fb.nonNullable.control('', [Validators.required]),
+    idCategory: this.fb.control<number | null>(null, [Validators.required]),
+    idUnit: this.fb.control<number | null>(null, [Validators.required]),
   });
 
   readonly categories = signal<Category[]>([]);
@@ -134,7 +140,14 @@ export class ItemDialogComponent implements OnInit {
 
   onSave(): void {
     if (this.itemForm.valid) {
-      this.dialogRef.close(this.itemForm.value);
+      const { name, idCategory, idUnit } = this.itemForm.getRawValue();
+      if (idCategory === null || idUnit === null) return;
+
+      this.dialogRef.close({
+        name,
+        idCategory,
+        idUnit,
+      });
     }
   }
 }

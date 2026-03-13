@@ -8,6 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
+  FormControl,
   FormGroup,
   ReactiveFormsModule,
   Validators,
@@ -76,6 +77,8 @@ export class ListShareDialogComponent implements OnInit {
   displayedColumns: string[] = ['user', 'permission', 'actions'];
   permissionTypes = Object.values(Permission);
   readonly isLoading = signal(false);
+  isLoading = false;
+  
 
   ngOnInit(): void {
     this.loadPermissions();
@@ -111,7 +114,7 @@ export class ListShareDialogComponent implements OnInit {
 
   onShare(): void {
     if (this.shareForm.valid) {
-      const email = this.shareForm.value.email;
+      const { email, permission } = this.shareForm.getRawValue();
       const user = this.users().find((u) => u.email === email);
 
       if (!user || !user.id) {
@@ -122,7 +125,7 @@ export class ListShareDialogComponent implements OnInit {
       const request = {
         idList: this.data.listId,
         idUser: user.id,
-        permission: this.shareForm.value.permission,
+        permission,
       };
 
       this.listPermissionService.addListPermission(request).subscribe({

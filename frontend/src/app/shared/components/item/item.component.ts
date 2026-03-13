@@ -8,6 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
+  FormControl,
   FormGroup,
   Validators,
   ReactiveFormsModule,
@@ -69,6 +70,7 @@ export class ItemComponent implements OnInit {
 
   private confirmDialog = inject(ConfirmDialogService);
   private feedback = inject(FeedbackService);
+  
 
   ngOnInit(): void {
     this.loadInitialData();
@@ -97,11 +99,10 @@ export class ItemComponent implements OnInit {
   onSubmit(): void {
     if (this.itemForm.invalid) return;
 
-    const itemData: ItemRequestDTO = {
-      name: this.itemForm.value.name,
-      idCategory: this.itemForm.value.idCategory,
-      idUnit: this.itemForm.value.idUnit,
-    };
+    const { name, idCategory, idUnit } = this.itemForm.getRawValue();
+    if (idCategory === null || idUnit === null) return;
+
+    const itemData: ItemRequestDTO = { name, idCategory, idUnit };
 
     const operation = this.editingItemId()
       ? this.itemService.updateItem(this.editingItemId()!, itemData)

@@ -16,6 +16,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import {
   FormBuilder,
+  FormControl,
+  FormGroup,
   ReactiveFormsModule,
   Validators,
   AbstractControl,
@@ -67,7 +69,9 @@ export class CategoryDialogComponent implements OnInit {
     isEdit: boolean;
   };
 
-  readonly categoryForm = this.fb.group({
+  readonly categoryForm: FormGroup<{
+    name: FormControl<string>;
+  }> = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
   });
 
@@ -108,8 +112,9 @@ export class CategoryDialogComponent implements OnInit {
 
   onSubmit(): void {
     if (this.categoryForm.valid) {
+      const { name } = this.categoryForm.getRawValue();
       const categoryData: Category = {
-        name: this.categoryForm.value.name ?? '',
+        name,
         id:
           this.isEdit() && this.data.category
             ? this.data.category.id

@@ -8,6 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
+  FormControl,
   FormGroup,
   Validators,
   ReactiveFormsModule,
@@ -76,15 +77,10 @@ export class UnitComponent implements OnInit {
   onSubmit(): void {
     if (this.unitForm.invalid) return;
 
-    const editingId = this.editingUnitId();
-    const name = (this.unitForm.value.name ?? '').trim();
-    const symbol = (this.unitForm.value.symbol ?? '').trim();
-    if (!name || !symbol) return;
+    const editingId = this.editingUnitId(); 
 
-    const unitData: Unit = {
-      name,
-      symbol,
-    };
+    const { name, symbol } = this.unitForm.getRawValue();
+    const unitData: Unit = { name, symbol };
 
     if (editingId !== null) {
       unitData.id = editingId;

@@ -6,6 +6,7 @@ import {
 } from '@angular/core';
 import {
   FormBuilder,
+  FormControl,
   FormGroup,
   ReactiveFormsModule,
   Validators,
@@ -45,7 +46,11 @@ export class SignupComponent {
   private snackBar = inject(MatSnackBar);
   private router = inject(Router);
 
-  signupForm: FormGroup = this.fb.group({
+  signupForm: FormGroup<{
+    fullName: FormControl<string>;
+    email: FormControl<string>;
+    password: FormControl<string>;
+  }> = this.fb.nonNullable.group({
     fullName: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
@@ -61,7 +66,7 @@ export class SignupComponent {
     }
 
     this.isLoading.set(true);
-    const userData: User = this.signupForm.value;
+    const userData: User = this.signupForm.getRawValue();
 
     this.authService
       .register(userData)

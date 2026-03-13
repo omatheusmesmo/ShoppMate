@@ -8,6 +8,8 @@ import {
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
+  FormControl,
+  FormGroup,
   ReactiveFormsModule,
   Validators,
   AbstractControl,
@@ -64,7 +66,10 @@ export class UnitDialogComponent implements OnInit {
   readonly dialogRef = inject(MatDialogRef<UnitDialogComponent>);
   readonly data = inject(MAT_DIALOG_DATA) as { unit?: Unit };
 
-  readonly unitForm = this.fb.group({
+  readonly unitForm: FormGroup<{
+    name: FormControl<string>;
+    symbol: FormControl<string>;
+  }> = this.fb.nonNullable.group({
     name: ['', [Validators.required]],
     symbol: ['', [Validators.required]],
   });
@@ -106,9 +111,10 @@ export class UnitDialogComponent implements OnInit {
 
   onSave(): void {
     if (this.unitForm.valid) {
+      const formValue = this.unitForm.getRawValue();
       this.dialogRef.close({
         ...this.data.unit,
-        ...this.unitForm.value,
+        ...formValue,
       });
     }
   }

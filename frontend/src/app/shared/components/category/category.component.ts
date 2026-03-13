@@ -8,6 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
+  FormControl,
   FormGroup,
   Validators,
   ReactiveFormsModule,
@@ -52,16 +53,7 @@ export class CategoryComponent implements OnInit {
   readonly editingCategoryId = signal<number | null>(null);
 
   private confirmDialog = inject(ConfirmDialogService);
-  private feedback = inject(FeedbackService);
-
-  constructor(
-    private categoryService: CategoryService,
-    private fb: FormBuilder,
-  ) {
-    this.categoryForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
-    });
-  }
+  private feedback = inject(FeedbackService);  
 
   ngOnInit(): void {
     this.loadCategories();
@@ -84,9 +76,8 @@ export class CategoryComponent implements OnInit {
   onSubmit(): void {
     if (this.categoryForm.invalid) return;
 
-    const categoryData: Category = {
-      name: this.categoryForm.value.name,
-    };
+    const { name } = this.categoryForm.getRawValue();
+    const categoryData: Category = { name };
 
     if (this.editingCategoryId() !== null) {
       categoryData.id = this.editingCategoryId()!;

@@ -11,6 +11,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import {
   FormBuilder,
+  FormControl,
   FormGroup,
   ReactiveFormsModule,
   Validators,
@@ -79,6 +80,7 @@ export class ShoppingListDialogComponent {
         return;
       }
 
+      const { name } = this.listForm.getRawValue();
       const listData: ShoppingListRequestDTO = {
         name,
         idUser: userId,

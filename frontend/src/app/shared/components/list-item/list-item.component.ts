@@ -8,6 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
+  FormControl,
   FormGroup,
   Validators,
   ReactiveFormsModule,
@@ -96,6 +97,9 @@ export class ListItemComponent implements OnInit {
 
   onSubmit(): void {
     if (this.listItemForm.invalid) return;
+
+    const { itemId, quantity } = this.listItemForm.getRawValue();
+    if (itemId === null) return;
 
     const listItemData: ListItemRequestDTO = {
       listId: this.listId,
