@@ -53,7 +53,7 @@ export class ShoppingListDialogComponent {
   };
 
   listForm: FormGroup;
-  readonly isEdit = signal(false);  
+  readonly isEdit = signal(false);
 
   constructor() {
     this.isEdit.set(this.data.isEdit);
