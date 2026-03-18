@@ -150,6 +150,26 @@ spring.flyway.enabled=true
 - `secret.key.jwt`: A secret key used for JWT token generation.
 - `spring.flyway.enabled`: Enable or disable flyway.
 
+### Alternative Way for JWT
+
+This project uses RSA keys to sign and verify JWT tokens. For security reasons, these keys are not included in the repository. You must generate them manually before running the application.
+
+Navigate to the backend directory:
+cd backend
+
+Create the certificates directory:
+mkdir certs
+
+Generate the Private Key (PKCS#8 format):
+```bash
+openssl genpkey -algorithm RSA -out certs/private_key.pem -pkeyopt rsa_keygen_bits:2048
+```
+
+Generate the Public Key:
+```bash
+openssl rsa -pubout -in certs/private_key.pem -out certs/public_key.pem
+```
+
 ### Running the Application
 
 1.  Navigate to the project root directory.
