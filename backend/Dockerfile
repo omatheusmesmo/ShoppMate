@@ -16,6 +16,17 @@ WORKDIR /app
 
 # Create a non-root user for better security
 RUN addgroup -S spring && adduser -S spring -G spring
+
+# Create the directory first
+RUN mkdir -p /app/certs
+
+# Copy the keys during the build (if they exist)
+COPY certs/ /app/certs/
+
+# Ensure the 'spring' user owns them
+RUN chown -R spring:spring /app/certs
+
+# Switch to spring user
 USER spring:spring
 
 # Copy the built artifact from the build stage
