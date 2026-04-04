@@ -56,7 +56,7 @@ public class ListPermissionService {
     }
 
     public Optional<ListPermission> findListItem(ListPermission listPermission) {
-        Optional<ListPermission> foundList = listPermissionRepository.findById(listPermission.getId());
+        Optional<ListPermission> foundList = listPermissionRepository.findByIdAndDeletedFalse(listPermission.getId());
         if (foundList.isPresent()) {
             return foundList;
         } else {
@@ -65,7 +65,7 @@ public class ListPermissionService {
     }
 
     public ListPermission findListUserPermissionById(Long id) {
-        return listPermissionRepository.findById(id)
+        return listPermissionRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new NoSuchElementException("ListPermission not found"));
     }
 

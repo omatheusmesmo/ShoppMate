@@ -44,7 +44,7 @@ public class ItemService {
     }
 
     public Optional<Item> findItem(Item item) {
-        Optional<Item> foundItem = itemRepository.findById(item.getId());
+        Optional<Item> foundItem = itemRepository.findByIdAndDeletedFalse(item.getId());
         if (foundItem.isPresent()) {
             return foundItem;
         } else {
@@ -53,7 +53,7 @@ public class ItemService {
     }
 
     public Item findById(Long id) {
-        return itemRepository.findById(id)
+        return itemRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new NoSuchElementException("Item not found with id: " + id));
     }
 

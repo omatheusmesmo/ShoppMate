@@ -78,7 +78,7 @@ class ItemServiceTest {
     void findItem_ExistingItem_ReturnsItem() {
         // Arrange
         Item item = createSampleItem();
-        when(itemRepository.findById(item.getId())).thenReturn(Optional.of(item));
+        when(itemRepository.findByIdAndDeletedFalse(item.getId())).thenReturn(Optional.of(item));
 
         // Act
         Optional<Item> result = itemService.findItem(item);
@@ -86,18 +86,18 @@ class ItemServiceTest {
         // Assert
         assertTrue(result.isPresent());
         assertEquals(item, result.get());
-        verify(itemRepository, times(1)).findById(item.getId());
+        verify(itemRepository, times(1)).findByIdAndDeletedFalse(item.getId());
     }
 
     @Test
     void findItem_NonExistingItem_ThrowsNoSuchElementException() {
         // Arrange
         Item item = createSampleItem();
-        when(itemRepository.findById(item.getId())).thenReturn(Optional.empty());
+        when(itemRepository.findByIdAndDeletedFalse(item.getId())).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(NoSuchElementException.class, () -> itemService.findItem(item));
-        verify(itemRepository, times(1)).findById(item.getId());
+        verify(itemRepository, times(1)).findByIdAndDeletedFalse(item.getId());
     }
 
     @Test
@@ -106,25 +106,25 @@ class ItemServiceTest {
         Long id = 1L;
         Item item = createSampleItem();
         item.setId(id);
-        when(itemRepository.findById(id)).thenReturn(Optional.of(item));
+        when(itemRepository.findByIdAndDeletedFalse(id)).thenReturn(Optional.of(item));
 
         // Act
         Item result = itemService.findById(id);
 
         // Assert
         assertEquals(item, result);
-        verify(itemRepository, times(1)).findById(id);
+        verify(itemRepository, times(1)).findByIdAndDeletedFalse(id);
     }
 
     @Test
     void findItemById_NonExistingId_ThrowsNoSuchElementException() {
         // Arrange
         Long id = 1L;
-        when(itemRepository.findById(id)).thenReturn(Optional.empty());
+        when(itemRepository.findByIdAndDeletedFalse(id)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(NoSuchElementException.class, () -> itemService.findById(id));
-        verify(itemRepository, times(1)).findById(id);
+        verify(itemRepository, times(1)).findByIdAndDeletedFalse(id);
     }
 
     @Test
@@ -133,13 +133,13 @@ class ItemServiceTest {
         Long id = 1L;
         Item item = createSampleItem();
         item.setId(id);
-        when(itemRepository.findById(id)).thenReturn(Optional.of(item));
+        when(itemRepository.findByIdAndDeletedFalse(id)).thenReturn(Optional.of(item));
 
         // Act
         itemService.removeItem(id);
 
         // Assert
-        verify(itemRepository, times(1)).findById(id);
+        verify(itemRepository, times(1)).findByIdAndDeletedFalse(id);
         verify(itemRepository, times(1)).deleteById(id);
     }
 
@@ -147,11 +147,11 @@ class ItemServiceTest {
     void removeItem_NonExistingId_ThrowsNoSuchElementException() {
         // Arrange
         Long id = 1L;
-        when(itemRepository.findById(id)).thenReturn(Optional.empty());
+        when(itemRepository.findByIdAndDeletedFalse(id)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(NoSuchElementException.class, () -> itemService.removeItem(id));
-        verify(itemRepository, times(1)).findById(id);
+        verify(itemRepository, times(1)).findByIdAndDeletedFalse(id);
         verify(itemRepository, never()).deleteById(any());
     }
 
@@ -159,7 +159,7 @@ class ItemServiceTest {
     void editItem_ExistingItem_ReturnsEditedItem() {
         // Arrange
         Item item = createSampleItem();
-        when(itemRepository.findById(item.getId())).thenReturn(Optional.of(item));
+        when(itemRepository.findByIdAndDeletedFalse(item.getId())).thenReturn(Optional.of(item));
         when(itemRepository.save(item)).thenReturn(item);
 
         // Act
@@ -168,7 +168,7 @@ class ItemServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(item, result);
-        verify(itemRepository, times(1)).findById(item.getId());
+        verify(itemRepository, times(1)).findByIdAndDeletedFalse(item.getId());
         verify(categoryService, times(1)).isCategoryValid(item.getCategory());
         verify(unitService, times(1)).isUnitValid(item.getUnit());
         verify(auditService, times(1)).setAuditData(item, false);
@@ -179,11 +179,11 @@ class ItemServiceTest {
     void editItem_NonExistingItem_ThrowsNoSuchElementException() {
         // Arrange
         Item item = createSampleItem();
-        when(itemRepository.findById(item.getId())).thenReturn(Optional.empty());
+        when(itemRepository.findByIdAndDeletedFalse(item.getId())).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(NoSuchElementException.class, () -> itemService.editItem(item));
-        verify(itemRepository, times(1)).findById(item.getId());
+        verify(itemRepository, times(1)).findByIdAndDeletedFalse(item.getId());
         verify(itemRepository, never()).save(any());
     }
 

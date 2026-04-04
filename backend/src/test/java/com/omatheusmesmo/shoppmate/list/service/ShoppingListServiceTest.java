@@ -62,7 +62,7 @@ class ShoppingListServiceTest {
 
     @Test
     void testFindListByIdSuccess() {
-        when(shoppingListRepository.findById(1L)).thenReturn(Optional.of(testList));
+        when(shoppingListRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.of(testList));
 
         ShoppingList result = shoppingListService.findListById(1L);
 
@@ -70,21 +70,21 @@ class ShoppingListServiceTest {
         assertEquals(1L, result.getId());
         assertEquals("Supermercado", result.getName());
 
-        verify(shoppingListRepository, times(1)).findById(1L);
+        verify(shoppingListRepository, times(1)).findByIdAndDeletedFalse(1L);
     }
 
     @Test
     void testFindListByIdThrowsException() {
-        when(shoppingListRepository.findById(999L)).thenReturn(Optional.empty());
+        when(shoppingListRepository.findByIdAndDeletedFalse(999L)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> shoppingListService.findListById(999L));
 
-        verify(shoppingListRepository, times(1)).findById(999L);
+        verify(shoppingListRepository, times(1)).findByIdAndDeletedFalse(999L);
     }
 
     @Test
     void testRemoveListSuccess() {
-        when(shoppingListRepository.findById(1L)).thenReturn(Optional.of(testList));
+        when(shoppingListRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.of(testList));
 
         assertDoesNotThrow(() -> shoppingListService.removeList(1L));
 
@@ -93,7 +93,7 @@ class ShoppingListServiceTest {
 
     @Test
     void testRemoveListThrowsExceptionWhenNotFound() {
-        when(shoppingListRepository.findById(999L)).thenReturn(Optional.empty());
+        when(shoppingListRepository.findByIdAndDeletedFalse(999L)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> shoppingListService.removeList(999L));
 
@@ -110,7 +110,7 @@ class ShoppingListServiceTest {
     @Test
     void testEditListSuccess() {
         testList.setName("Supermercado Atualizado");
-        when(shoppingListRepository.findById(1L)).thenReturn(Optional.of(testList));
+        when(shoppingListRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.of(testList));
 
         ShoppingList result = shoppingListService.editList(testList);
 

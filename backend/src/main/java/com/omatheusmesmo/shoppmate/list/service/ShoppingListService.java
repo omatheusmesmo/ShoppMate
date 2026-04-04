@@ -45,7 +45,7 @@ public class ShoppingListService {
     }
 
     public Optional<ShoppingList> findList(ShoppingList ShoppingList) {
-        Optional<ShoppingList> foundList = shoppingListRepository.findById(ShoppingList.getId());
+        Optional<ShoppingList> foundList = shoppingListRepository.findByIdAndDeletedFalse(ShoppingList.getId());
         if (foundList.isPresent()) {
             return foundList;
         } else {
@@ -54,7 +54,7 @@ public class ShoppingListService {
     }
 
     public ShoppingList findListById(Long id) {
-        return shoppingListRepository.findById(id)
+        return shoppingListRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new NoSuchElementException("ShoppingList not found"));
     }
 
