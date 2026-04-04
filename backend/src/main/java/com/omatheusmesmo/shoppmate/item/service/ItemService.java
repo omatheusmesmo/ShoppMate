@@ -73,6 +73,6 @@ public class ItemService {
     }
 
     public List<Item> findAll() {
-        return itemRepository.findAll();
+        return itemRepository.findAllByDeletedFalse();
     }
 }

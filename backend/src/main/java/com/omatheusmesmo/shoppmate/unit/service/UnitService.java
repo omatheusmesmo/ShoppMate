@@ -30,7 +30,7 @@ public class UnitService {
 
     public void editUnit(Unit unit) {
         isUnitValid(unit);
-        if (unitExists(unit)) {
+        if (!unitExists(unit)) {
             throw new NoSuchElementException("Unit not found");
         }
         auditService.setAuditData(unit, false);

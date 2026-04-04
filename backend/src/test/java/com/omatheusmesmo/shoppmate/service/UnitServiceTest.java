@@ -43,7 +43,7 @@ class UnitServiceTest {
     }
 
     @Test
-    void saveUnit() {
+    void saveUnit_ValidUnit_ReturnsSavedUnit() {
         when(unitRepository.save(any(Unit.class))).thenReturn(unit);
 
         Unit result = unitService.saveUnit(unit);
@@ -54,7 +54,7 @@ class UnitServiceTest {
     }
 
     @Test
-    void findAll() {
+    void findAll_ExistingUnits_ReturnsUnitList() {
         when(unitRepository.findAll()).thenReturn(List.of(unit));
 
         List<Unit> result = unitService.findAll();
@@ -64,7 +64,7 @@ class UnitServiceTest {
     }
 
     @Test
-    void findUnitById() {
+    void findUnitById_ExistingId_ReturnsUnit() {
         when(unitRepository.findById(1L)).thenReturn(Optional.of(unit));
 
         Optional<Unit> result = unitService.findUnitById(1L);
@@ -74,7 +74,7 @@ class UnitServiceTest {
     }
 
     @Test
-    void isUnitValid_InvalidSymbol() {
+    void isUnitValid_BlankSymbol_ThrowsIllegalArgumentException() {
         unit.setSymbol(" ");
 
         assertThrows(IllegalArgumentException.class, () -> unitService.isUnitValid(unit));

@@ -74,7 +74,7 @@ class ShoppingListControllerTest {
 
     @Test
     @WithMockUser
-    void getAllShoppingLists() throws Exception {
+    void getAllShoppingLists_ExistingLists_ReturnsOkWithShoppingLists() throws Exception {
         when(shoppingListService.findAll()).thenReturn(List.of(shoppingList));
         when(listMapper.toResponseDTO(any(ShoppingList.class))).thenReturn(responseDTO);
 
@@ -84,7 +84,7 @@ class ShoppingListControllerTest {
 
     @Test
     @WithMockUser
-    void addShoppingList() throws Exception {
+    void addShoppingList_ValidRequest_ReturnsCreatedWithShoppingList() throws Exception {
         ShoppingListRequestDTO requestDTO = new ShoppingListRequestDTO("Weekly", 1L);
         when(listMapper.toEntity(any(ShoppingListRequestDTO.class))).thenReturn(shoppingList);
         when(shoppingListService.saveList(any(ShoppingList.class))).thenReturn(shoppingList);

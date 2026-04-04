@@ -68,7 +68,7 @@ class ListItemControllerTest {
 
     @Test
     @WithMockUser
-    void getAllListItemsByListId() throws Exception {
+    void getAllListItemsByListId_ExistingListId_ReturnsOkWithListItems() throws Exception {
         when(listItemService.findAll(1L)).thenReturn(List.of(listItem));
         when(listItemMapper.toSummaryDTO(any(ListItem.class))).thenReturn(summaryDTO);
 
@@ -78,7 +78,7 @@ class ListItemControllerTest {
 
     @Test
     @WithMockUser
-    void addListItem() throws Exception {
+    void addListItem_ValidRequest_ReturnsCreatedWithListItem() throws Exception {
         ListItemRequestDTO requestDTO = new ListItemRequestDTO(1L, 1L, 2, BigDecimal.valueOf(1.0));
         when(listItemService.addShoppItemList(any(ListItemRequestDTO.class))).thenReturn(listItem);
         when(listItemMapper.toResponseDTO(any(ListItem.class))).thenReturn(responseDTO);

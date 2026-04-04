@@ -67,7 +67,7 @@ class ListPermissionControllerTest {
 
     @Test
     @WithMockUser
-    void getAllListPermissions() throws Exception {
+    void getAllListPermissions_ExistingListId_ReturnsOkWithPermissions() throws Exception {
         when(listPermissionService.findAllPermissionsByListId(1L)).thenReturn(List.of(listPermission));
         when(listPermissionMapper.toSummaryDTO(any(ListPermission.class))).thenReturn(summaryDTO);
 
@@ -77,7 +77,7 @@ class ListPermissionControllerTest {
 
     @Test
     @WithMockUser
-    void addListPermission() throws Exception {
+    void addListPermission_ValidRequest_ReturnsCreatedWithPermission() throws Exception {
         ListPermissionRequestDTO requestDTO = new ListPermissionRequestDTO(1L, 1L, Permission.READ);
         when(listPermissionService.addListPermission(any(ListPermissionRequestDTO.class))).thenReturn(listPermission);
         when(listPermissionMapper.toResponseDTO(any(ListPermission.class))).thenReturn(responseDTO);

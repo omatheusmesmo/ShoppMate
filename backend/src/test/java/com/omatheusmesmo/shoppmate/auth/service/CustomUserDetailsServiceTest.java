@@ -38,7 +38,7 @@ class CustomUserDetailsServiceTest {
     }
 
     @Test
-    void loadUserByUsername() {
+    void loadUserByUsername_ExistingEmail_ReturnsUserDetails() {
         when(userRepository.findByEmail("john@example.com")).thenReturn(Optional.of(user));
 
         UserDetails userDetails = customUserDetailsService.loadUserByUsername("john@example.com");
@@ -48,7 +48,7 @@ class CustomUserDetailsServiceTest {
     }
 
     @Test
-    void loadUserByUsername_NotFound() {
+    void loadUserByUsername_MissingEmail_ThrowsUsernameNotFoundException() {
         when(userRepository.findByEmail("missing@example.com")).thenReturn(Optional.empty());
 
         assertThrows(UsernameNotFoundException.class,

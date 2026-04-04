@@ -43,7 +43,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    void saveCategory() {
+    void saveCategory_ValidCategory_ReturnsSavedCategory() {
         when(categoryRepository.save(any(Category.class))).thenReturn(category);
 
         Category result = categoryService.saveCategory(category);
@@ -55,7 +55,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    void findCategoryById() {
+    void findCategoryById_ExistingId_ReturnsCategory() {
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
 
         Category found = categoryService.findCategoryById(1L);
@@ -64,14 +64,14 @@ class CategoryServiceTest {
     }
 
     @Test
-    void findCategoryById_NotFound() {
+    void findCategoryById_MissingId_ThrowsNoSuchElementException() {
         when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> categoryService.findCategoryById(1L));
     }
 
     @Test
-    void findAll() {
+    void findAll_ExistingCategories_ReturnsCategoryList() {
         when(categoryRepository.findAll()).thenReturn(List.of(category));
 
         List<Category> result = categoryService.findAll();

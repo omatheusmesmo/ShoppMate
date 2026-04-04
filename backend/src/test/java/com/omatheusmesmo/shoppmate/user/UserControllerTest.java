@@ -53,7 +53,7 @@ class UserControllerTest {
 
     @Test
     @WithMockUser
-    void getUsers() throws Exception {
+    void getUsers_ExistingUsers_ReturnsOkWithUsers() throws Exception {
         when(userService.findUsers()).thenReturn(List.of(user));
 
         mockMvc.perform(get("/users/users")).andExpect(status().isOk())
@@ -62,7 +62,7 @@ class UserControllerTest {
 
     @Test
     @WithMockUser
-    void getUserById() throws Exception {
+    void getUserById_ExistingId_ReturnsOkWithUser() throws Exception {
         when(userService.findUser(1L)).thenReturn(user);
 
         mockMvc.perform(get("/users/userDetailsService/1")).andExpect(status().isOk())

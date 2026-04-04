@@ -11,7 +11,7 @@ class AuditServiceTest {
     private final AuditService auditService = new AuditService();
 
     @Test
-    void setAuditDataWhenNew() {
+    void setAuditData_NewEntity_SetsCreatedAtAndDeletedFalse() {
         Category category = new Category();
 
         auditService.setAuditData(category, true);
@@ -21,7 +21,7 @@ class AuditServiceTest {
     }
 
     @Test
-    void setAuditDataWhenExisting() {
+    void setAuditData_ExistingEntity_SetsUpdatedAt() {
         Category category = new Category();
 
         auditService.setAuditData(category, false);
@@ -30,7 +30,7 @@ class AuditServiceTest {
     }
 
     @Test
-    void softDelete() {
+    void softDelete_ActiveEntity_SetsDeletedTrueAndUpdatedAt() {
         Category category = new Category();
         category.setDeleted(false);
 

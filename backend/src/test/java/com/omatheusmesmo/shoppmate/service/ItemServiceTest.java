@@ -193,7 +193,7 @@ class ItemServiceTest {
         Item item1 = createSampleItem();
         Item item2 = createSampleItem();
         List<Item> items = Arrays.asList(item1, item2);
-        when(itemRepository.findAll()).thenReturn(items);
+        when(itemRepository.findAllByDeletedFalse()).thenReturn(items);
 
         // Act
         List<Item> result = itemService.findAll();
@@ -202,7 +202,7 @@ class ItemServiceTest {
         assertEquals(2, result.size());
         assertTrue(result.contains(item1));
         assertTrue(result.contains(item2));
-        verify(itemRepository, times(1)).findAll();
+        verify(itemRepository, times(1)).findAllByDeletedFalse();
     }
 
     private Item createSampleItem() {
