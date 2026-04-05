@@ -1,0 +1,54 @@
+name: Commit Message Lint
+
+on:
+  pull_request:
+    branches: ['main', 'develop']
+    types: [opened, synchronize, reopened]
+  push:
+    branches: ['main', 'develop']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: commitlint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  commitlint:
+    name: Validate Commit Messages
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate commits in pull request
+        if: github.event_name == 'pull_request'
+        run: |
+          npx --yes --package @commitlint/cli --package @commitlint/config-conventional \
+            commitlint --config commitlint.config.cjs \
+            --from "${{ github.event.pull_request.base.sha }}" \
+            --to "${{ github.event.pull_request.head.sha }}" --verbose
+
+      - name: Validate commits in push
+        if: github.event_name == 'push'
+        run: |
+          BEFORE_SHA="${{ github.event.before }}"
+          AFTER_SHA="${{ github.sha }}"
+
+          if [ "$BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            BEFORE_SHA=$(git rev-list --max-parents=0 "$AFTER_SHA" | tail -n 1)
+          fi
+
+          npx --yes --package @commitlint/cli --package @commitlint/config-conventional \
+            commitlint --config commitlint.config.cjs \
+            --from "$BEFORE_SHA" --to "$AFTER_SHA" --verbose
