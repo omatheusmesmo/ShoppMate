@@ -86,22 +86,22 @@ class ListPermissionServiceTest {
     @Test
     void findListItem_ExistingPermission_ReturnsPermission() {
         ListPermission permission = createSamplePermission();
-        when(ListPermissionRepository.findById(permission.getId())).thenReturn(Optional.of(permission));
+        when(ListPermissionRepository.findByIdAndDeletedFalse(permission.getId())).thenReturn(Optional.of(permission));
 
         Optional<ListPermission> result = listPermissionService.findListItem(permission);
 
         assertTrue(result.isPresent());
         assertEquals(permission, result.get());
-        verify(ListPermissionRepository, times(1)).findById(permission.getId());
+        verify(ListPermissionRepository, times(1)).findByIdAndDeletedFalse(permission.getId());
     }
 
     @Test
     void findListItem_NonExistingPermission_ThrowsNoSuchElementException() {
         ListPermission permission = createSamplePermission();
-        when(ListPermissionRepository.findById(permission.getId())).thenReturn(Optional.empty());
+        when(ListPermissionRepository.findByIdAndDeletedFalse(permission.getId())).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> listPermissionService.findListItem(permission));
-        verify(ListPermissionRepository, times(1)).findById(permission.getId());
+        verify(ListPermissionRepository, times(1)).findByIdAndDeletedFalse(permission.getId());
     }
 
     @Test
@@ -109,22 +109,22 @@ class ListPermissionServiceTest {
         Long id = 1L;
         ListPermission permission = createSamplePermission();
         permission.setId(id);
-        when(ListPermissionRepository.findById(id)).thenReturn(Optional.of(permission));
+        when(ListPermissionRepository.findByIdAndDeletedFalse(id)).thenReturn(Optional.of(permission));
 
         ListPermission result = listPermissionService.findListUserPermissionById(id);
 
         assertNotNull(result);
         assertEquals(permission, result);
-        verify(ListPermissionRepository, times(1)).findById(id);
+        verify(ListPermissionRepository, times(1)).findByIdAndDeletedFalse(id);
     }
 
     @Test
     void findListUserPermissionById_NonExistingId_ThrowsNoSuchElementException() {
         Long id = 1L;
-        when(ListPermissionRepository.findById(id)).thenReturn(Optional.empty());
+        when(ListPermissionRepository.findByIdAndDeletedFalse(id)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> listPermissionService.findListUserPermissionById(id));
-        verify(ListPermissionRepository, times(1)).findById(id);
+        verify(ListPermissionRepository, times(1)).findByIdAndDeletedFalse(id);
     }
 
     @Test
@@ -132,21 +132,21 @@ class ListPermissionServiceTest {
         Long id = 1L;
         ListPermission permission = createSamplePermission();
         permission.setId(id);
-        when(ListPermissionRepository.findById(id)).thenReturn(Optional.of(permission));
+        when(ListPermissionRepository.findByIdAndDeletedFalse(id)).thenReturn(Optional.of(permission));
 
         listPermissionService.removeList(id);
 
-        verify(ListPermissionRepository, times(1)).findById(id);
+        verify(ListPermissionRepository, times(1)).findByIdAndDeletedFalse(id);
         verify(ListPermissionRepository, times(1)).save(permission);
     }
 
     @Test
     void removeList_NonExistingId_ThrowsNoSuchElementException() {
         Long id = 1L;
-        when(ListPermissionRepository.findById(id)).thenReturn(Optional.empty());
+        when(ListPermissionRepository.findByIdAndDeletedFalse(id)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> listPermissionService.removeList(id));
-        verify(ListPermissionRepository, times(1)).findById(id);
+        verify(ListPermissionRepository, times(1)).findByIdAndDeletedFalse(id);
         verify(ListPermissionRepository, never()).deleteById(any());
     }
 
@@ -157,7 +157,7 @@ class ListPermissionServiceTest {
         permission.setId(id);
         ListPermissionUpdateRequestDTO updateDTO = new ListPermissionUpdateRequestDTO(Permission.WRITE);
 
-        when(ListPermissionRepository.findById(id)).thenReturn(Optional.of(permission));
+        when(ListPermissionRepository.findByIdAndDeletedFalse(id)).thenReturn(Optional.of(permission));
         when(ListPermissionRepository.save(permission)).thenReturn(permission);
 
         ListPermission result = listPermissionService.editList(id, updateDTO);
@@ -165,7 +165,7 @@ class ListPermissionServiceTest {
         assertNotNull(result);
         assertEquals(permission, result);
         assertEquals(Permission.WRITE, result.getPermission());
-        verify(ListPermissionRepository, times(1)).findById(id);
+        verify(ListPermissionRepository, times(1)).findByIdAndDeletedFalse(id);
         verify(userService, times(1)).isUserValid(permission.getUser());
         verify(shoppingListService, times(1)).isListValid(permission.getShoppingList());
         verify(auditService, times(1)).setAuditData(permission, false);
@@ -175,10 +175,10 @@ class ListPermissionServiceTest {
     @Test
     void editList_NonExistingPermission_ThrowsNoSuchElementException() {
         Long id = 1L;
-        when(ListPermissionRepository.findById(id)).thenReturn(Optional.empty());
+        when(ListPermissionRepository.findByIdAndDeletedFalse(id)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> listPermissionService.editList(id, null));
-        verify(ListPermissionRepository, times(1)).findById(id);
+        verify(ListPermissionRepository, times(1)).findByIdAndDeletedFalse(id);
         verify(ListPermissionRepository, never()).save(any());
     }
 
