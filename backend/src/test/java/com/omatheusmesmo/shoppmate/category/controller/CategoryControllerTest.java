@@ -19,8 +19,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -50,38 +51,30 @@ class CategoryControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private Category category1;
-    private Category category2;
-
-    CategoryResponseDTO category1ResponseDTO;
-    CategoryResponseDTO category2ResponseDTO;
-
     @BeforeEach
     void setUp() {
-        category1 = new Category();
-        category1.setId(1L);
-        category1.setName("Food");
-
-        category2 = new Category();
-        category2.setId(2L);
-        category2.setName("Toy");
-
-        category1ResponseDTO = new CategoryResponseDTO(1L, "Food");
-        category2ResponseDTO = new CategoryResponseDTO(2L, "Toy");
     }
 
     @Test
     @WithMockUser
     void testGetAllCategories() throws Exception {
-        List<Category> allCategories = Arrays.asList(category1, category2);
-        List<CategoryResponseDTO> allCategoriesDTOs = Arrays.asList(category1ResponseDTO, category2ResponseDTO);
+        int numberOfCategories = 3;
+        List<Category> allCategories = IntStream.range(0, numberOfCategories)
+                .mapToObj(i -> {
+                    Category category = new Category();
+                    category.setId((long) i + 1);
+                    category.setName("Category " + (i + 1));
+                    return category;
+                }).collect(Collectors.toList());
+
+        List<CategoryResponseDTO> allCategoriesDTOs = allCategories.stream()
+                .map(category -> new CategoryResponseDTO(category.getId(), category.getName()))
+                .collect(Collectors.toList());
 
         when(categoryService.findAll()).thenReturn(allCategories);
         when(categoryMapper.toResponseDTO(any(Category.class))).thenAnswer(invocation -> {
             Category category = invocation.getArgument(0);
-            if (category.getId().equals(1L))
-                return category1ResponseDTO;
-            return category2ResponseDTO;
+            return new CategoryResponseDTO(category.getId(), category.getName());
         });
 
         mockMvc.perform(get("/category")).andExpect(status().isOk())
@@ -93,13 +86,19 @@ class CategoryControllerTest {
     void testPostAddCategory() throws Exception {
         CategoryRequestDTO requestDTO = new CategoryRequestDTO("Food");
 
-        when(categoryMapper.toEntity(any(CategoryRequestDTO.class))).thenReturn(category1);
-        when(categoryService.saveCategory(any(Category.class))).thenReturn(category1);
-        when(categoryMapper.toResponseDTO(any(Category.class))).thenReturn(category1ResponseDTO);
+        Category category = new Category();
+        category.setId(1L);
+        category.setName("Food");
+
+        CategoryResponseDTO responseDTO = new CategoryResponseDTO(1L, "Food");
+
+        when(categoryMapper.toEntity(any(CategoryRequestDTO.class))).thenReturn(category);
+        when(categoryService.saveCategory(any(Category.class))).thenReturn(category);
+        when(categoryMapper.toResponseDTO(any(Category.class))).thenReturn(responseDTO);
 
         mockMvc.perform(post("/category").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO))).andExpect(status().isCreated())
-                .andExpect(content().json(objectMapper.writeValueAsString(category1ResponseDTO)));
+                .andExpect(content().json(objectMapper.writeValueAsString(responseDTO)));
     }
 
     @Test
