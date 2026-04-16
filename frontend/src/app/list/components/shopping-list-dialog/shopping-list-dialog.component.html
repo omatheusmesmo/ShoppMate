@@ -4,11 +4,7 @@
   <form [formGroup]="listForm">
     <mat-form-field appearance="outline" class="w-100">
       <mat-label>List Name</mat-label>
-      <input
-        matInput
-        formControlName="name"
-        placeholder="Enter list name"
-      />
+      <input matInput formControlName="name" placeholder="Enter list name" />
       @if (listForm.get("name")?.hasError("required")) {
         <mat-error>Name is required</mat-error>
       }

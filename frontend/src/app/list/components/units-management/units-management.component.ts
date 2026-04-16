@@ -61,9 +61,7 @@ export class UnitsManagementComponent implements OnInit {
         catchError(() => {
           this.error.set(true);
           this.units.set([]);
-          this.feedback.error(
-            'Error loading units. Please try again later.',
-          );
+          this.feedback.error('Error loading units. Please try again later.');
           return of([]);
         }),
         finalize(() => {

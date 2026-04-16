@@ -65,9 +65,7 @@ export class ShoppingListDialogComponent {
       const userId = this.authService.getCurrentUserId();
 
       if (userId == null) {
-        this.feedback.error(
-          'User not identified. Please login again.',
-        );
+        this.feedback.error('User not identified. Please login again.');
         return;
       }
 

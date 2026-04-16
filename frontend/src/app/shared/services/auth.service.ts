@@ -43,7 +43,10 @@ export class AuthService {
             return throwError(() => new Error('Invalid credentials'));
           }
           return throwError(
-            () => new Error('Error occurred while logging in. Please try again later.'),
+            () =>
+              new Error(
+                'Error occurred while logging in. Please try again later.',
+              ),
           );
         }),
       );
