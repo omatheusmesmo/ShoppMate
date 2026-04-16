@@ -8,14 +8,14 @@ export class FeedbackService {
   private readonly snackBar = inject(MatSnackBar);
 
   success(message: string): void {
-    this.snackBar.open(message, 'Fechar', {
+    this.snackBar.open(message, 'Close', {
       duration: 3000,
       panelClass: ['success-snackbar'],
     });
   }
 
   error(message: string): void {
-    this.snackBar.open(message, 'Fechar', {
+    this.snackBar.open(message, 'Close', {
       duration: 3000,
       panelClass: ['error-snackbar'],
     });

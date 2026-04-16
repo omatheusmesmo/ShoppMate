@@ -55,7 +55,7 @@ export class ShoppingListComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: () => {
-        this.feedback.error('Erro ao carregar listas');
+        this.feedback.error('Error loading lists');
         this.isLoading.set(false);
       },
     });
