@@ -73,7 +73,7 @@ export class SignupComponent {
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: () => {
-          this.snackBar.open('Cadastro realizado com sucesso!', 'Fechar', {
+          this.snackBar.open('Account created successfully!', 'Close', {
             duration: 3000,
           });
           this.router.navigate(['/login']);
