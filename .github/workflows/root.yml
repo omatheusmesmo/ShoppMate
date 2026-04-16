@@ -2,7 +2,7 @@ name: Root CI
 
 on:
   push:
-    branches: ["main", "develop"]
+    branches: ["main"]
     paths:
       - ".github/workflows/**"
       - "docker-compose.yml"
@@ -12,7 +12,7 @@ on:
       - ".eslintrc*"
 
   pull_request:
-    branches: ["main", "develop"]
+    branches: ["main"]
     paths:
       - ".github/workflows/**"
       - "docker-compose.yml"
