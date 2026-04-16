@@ -88,7 +88,7 @@ export class ItemComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: () => {
-        this.feedback.error('Erro ao carregar dados');
+        this.feedback.error('Error loading data');
         this.isLoading.set(false);
       },
     });
@@ -110,14 +110,14 @@ export class ItemComponent implements OnInit {
       next: () => {
         this.feedback.success(
           this.editingItemId()
-            ? 'Item atualizado com sucesso'
-            : 'Item criado com sucesso',
+            ? 'Item updated successfully'
+            : 'Item created successfully',
         );
         this.resetForm();
         this.loadInitialData();
       },
       error: () => {
-        this.feedback.error('Erro ao salvar item');
+        this.feedback.error('Error saving item');
       },
     });
   }
@@ -134,20 +134,20 @@ export class ItemComponent implements OnInit {
   deleteItem(id: number): void {
     this.confirmDialog
       .open({
-        title: 'Excluir item',
-        message: 'Tem certeza que deseja excluir este item?',
-        confirmText: 'Excluir',
+        title: 'Delete Item',
+        message: 'Are you sure you want to delete this item?',
+        confirmText: 'Delete',
       })
       .subscribe((confirmed) => {
         if (!confirmed) return;
 
         this.itemService.deleteItem(id).subscribe({
           next: () => {
-            this.feedback.success('Item excluído com sucesso');
+            this.feedback.success('Item deleted successfully');
             this.loadInitialData();
           },
           error: () => {
-            this.feedback.error('Erro ao excluir item');
+            this.feedback.error('Error deleting item');
           },
         });
       });

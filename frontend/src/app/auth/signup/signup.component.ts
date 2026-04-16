@@ -81,8 +81,8 @@ export class SignupComponent {
         error: (error) => {
           console.error('Signup error:', error);
           this.snackBar.open(
-            'Falha ao realizar cadastro. Tente novamente.',
-            'Fechar',
+            'Failed to create account. Please try again.',
+            'Close',
             { duration: 5000 },
           );
         },

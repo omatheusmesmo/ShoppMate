@@ -13,26 +13,26 @@
               matInput
               type="email"
               formControlName="email"
-              placeholder="Seu email"
+              placeholder="Your email"
             />
 
             @if (
               loginForm.get("email")?.hasError("required") &&
               loginForm.get("email")?.touched
             ) {
-              <mat-error> Email é obrigatório </mat-error>
+              <mat-error> Email is required </mat-error>
             }
 
             @if (
               loginForm.get("email")?.hasError("email") &&
               !loginForm.get("email")?.hasError("required")
             ) {
-              <mat-error> Email inválido </mat-error>
+              <mat-error> Email is invalid </mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Senha</mat-label>
+            <mat-label>Password</mat-label>
             <input
               matInput
               [type]="hidePassword() ? 'password' : 'text'"
@@ -53,7 +53,7 @@
               loginForm.get("password")?.hasError("required") &&
               loginForm.get("password")?.touched
             ) {
-              <mat-error> Senha é obrigatória </mat-error>
+              <mat-error> Password is required </mat-error>
             }
           </mat-form-field>
 
@@ -67,7 +67,7 @@
               @if (isLoading()) {
                 <mat-spinner diameter="24"></mat-spinner>
               } @else {
-                Entrar
+                Sign In
               }
             </button>
           </div>
@@ -75,8 +75,8 @@
       </mat-card-content>
 
       <mat-card-actions class="login-actions">
-        <span>Não possui uma conta?</span>
-        <a mat-button color="primary" routerLink="/signup">Cadastre-se</a>
+        <span>Don't have an account?</span>
+        <a mat-button color="primary" routerLink="/signup">Sign Up</a>
       </mat-card-actions>
     </mat-card>
   </div>

@@ -40,10 +40,10 @@ export class AuthService {
         catchError((error: HttpErrorResponse) => {
           console.error('Login error:', error);
           if (error.status === 403) {
-            return throwError(() => new Error('Credenciais inválidas'));
+            return throwError(() => new Error('Invalid credentials'));
           }
           return throwError(
-            () => new Error('Erro ao fazer login. Tente novamente mais tarde.'),
+            () => new Error('Error occurred while logging in. Please try again later.'),
           );
         }),
       );
@@ -62,7 +62,7 @@ export class AuthService {
           return throwError(
             () =>
               new Error(
-                'Erro ao registrar usuário. Tente novamente mais tarde.',
+                'Error occurred while registering user. Please try again later.',
               ),
           );
         }),

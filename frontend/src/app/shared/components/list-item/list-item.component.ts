@@ -88,7 +88,7 @@ export class ListItemComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: () => {
-        this.feedback.error('Erro ao carregar dados');
+        this.feedback.error('Error loading data');
         this.isLoading.set(false);
       },
     });
@@ -119,14 +119,14 @@ export class ListItemComponent implements OnInit {
       next: () => {
         this.feedback.success(
           this.editingListItemId()
-            ? 'Item atualizado com sucesso'
-            : 'Item adicionado com sucesso',
+            ? 'Item updated successfully'
+            : 'Item created successfully',
         );
         this.resetForm();
         this.loadInitialData();
       },
       error: () => {
-        this.feedback.error('Erro ao salvar item da lista');
+        this.feedback.error('Error saving list item');
       },
     });
   }
@@ -144,20 +144,20 @@ export class ListItemComponent implements OnInit {
   deleteListItem(id: number): void {
     this.confirmDialog
       .open({
-        title: 'Remover item',
-        message: 'Tem certeza que deseja remover este item da lista?',
-        confirmText: 'Remover',
+        title: 'Delete Item',
+        message: 'Are you sure you want to delete this item from the list?',
+        confirmText: 'Delete',
       })
       .subscribe((confirmed) => {
         if (!confirmed) return;
 
         this.listItemService.deleteListItem(this.listId, id).subscribe({
           next: () => {
-            this.feedback.success('Item removido com sucesso');
+            this.feedback.success('Item deleted successfully');
             this.loadInitialData();
           },
           error: () => {
-            this.feedback.error('Erro ao remover item');
+            this.feedback.error('Error deleting item');
           },
         });
       });
@@ -178,7 +178,7 @@ export class ListItemComponent implements OnInit {
           this.loadInitialData();
         },
         error: () => {
-          this.feedback.error('Erro ao atualizar status do item');
+          this.feedback.error('Error updating item status');
         },
       });
   }

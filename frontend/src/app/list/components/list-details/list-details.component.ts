@@ -113,10 +113,10 @@ export class ListDetailsComponent implements OnInit {
         this.listItemService.addListItem(this.listId, result).subscribe({
           next: () => {
             this.loadData();
-            this.feedback.success('Item adicionado com sucesso');
+            this.feedback.success('Item added successfully');
           },
           error: () => {
-            this.feedback.error('Erro ao adicionar item');
+            this.feedback.error('Error adding item');
           },
         });
       }
@@ -136,10 +136,10 @@ export class ListDetailsComponent implements OnInit {
           .subscribe({
             next: () => {
               this.loadData();
-              this.feedback.success('Item atualizado com sucesso');
+              this.feedback.success('Item updated successfully');
             },
             error: () => {
-              this.feedback.error('Erro ao atualizar item');
+              this.feedback.error('Error updating item');
             },
           });
       }
@@ -149,9 +149,9 @@ export class ListDetailsComponent implements OnInit {
   removeItem(item: ListItemResponseDTO): void {
     this.confirmDialog
       .open({
-        title: 'Remover item',
-        message: `Tem certeza que deseja remover ${item.item.name} da lista?`,
-        confirmText: 'Remover',
+        title: 'Remove Item',
+        message: `Are you sure you want to remove ${item.item.name} from the list?`,
+        confirmText: 'Remove',
       })
       .subscribe((confirmed) => {
         if (!confirmed) return;
@@ -161,10 +161,10 @@ export class ListDetailsComponent implements OnInit {
           .subscribe({
             next: () => {
               this.loadData();
-              this.feedback.success('Item removido com sucesso');
+              this.feedback.success('Item removed successfully');
             },
             error: () => {
-              this.feedback.error('Erro ao remover item');
+              this.feedback.error('Error removing item');
             },
           });
       });

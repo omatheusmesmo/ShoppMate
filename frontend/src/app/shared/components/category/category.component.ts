@@ -70,7 +70,7 @@ export class CategoryComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: () => {
-        this.feedback.error('Erro ao carregar categorias');
+        this.feedback.error('Error loading categories');
         this.isLoading.set(false);
       },
     });
@@ -95,14 +95,14 @@ export class CategoryComponent implements OnInit {
       next: () => {
         this.feedback.success(
           this.editingCategoryId() !== null
-            ? 'Categoria atualizada com sucesso'
-            : 'Categoria criada com sucesso',
+            ? 'Category updated successfully'
+            : 'Category created successfully',
         );
         this.resetForm();
         this.loadCategories();
       },
       error: () => {
-        this.feedback.error('Erro ao salvar categoria');
+        this.feedback.error('Error saving category');
       },
     });
   }
@@ -117,20 +117,20 @@ export class CategoryComponent implements OnInit {
   deleteCategory(id: number): void {
     this.confirmDialog
       .open({
-        title: 'Excluir categoria',
-        message: 'Tem certeza que deseja excluir esta categoria?',
-        confirmText: 'Excluir',
+        title: 'Delete Category',
+        message: 'Are you sure you want to delete this category?',
+        confirmText: 'Delete',
       })
       .subscribe((confirmed) => {
         if (!confirmed) return;
 
         this.categoryService.deleteCategory(id).subscribe({
           next: () => {
-            this.feedback.success('Categoria excluída com sucesso');
+            this.feedback.success('Category deleted successfully');
             this.loadCategories();
           },
           error: () => {
-            this.feedback.error('Erro ao excluir categoria');
+            this.feedback.error('Error deleting category');
           },
         });
       });

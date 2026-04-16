@@ -1,7 +1,7 @@
 <div class="lists-container">
   <mat-card>
     <mat-card-header>
-      <mat-card-title>Minhas Listas de Compras</mat-card-title>
+      <mat-card-title>My Shopping Lists</mat-card-title>
     </mat-card-header>
 
     <mat-card-content>
@@ -57,13 +57,13 @@
             </mat-card>
           } @empty {
             <div class="no-lists">
-              <p>Você ainda não tem nenhuma lista de compras</p>
+              <p>You don't have any shopping lists yet</p>
               <button
                 mat-raised-button
                 color="primary"
                 (click)="openNewListDialog()"
               >
-                Criar Primeira Lista
+                Create First List
               </button>
             </div>
           }
@@ -74,7 +74,7 @@
     <mat-card-actions>
       <button mat-raised-button color="primary" (click)="openNewListDialog()">
         <mat-icon>add</mat-icon>
-        Nova Lista
+        Create New List
       </button>
     </mat-card-actions>
   </mat-card>

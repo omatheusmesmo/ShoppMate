@@ -8,19 +8,19 @@
         <div class="nav-links" [class.hidden-mobile]="!isLargeScreen()">
           <a mat-button routerLink="/lists" routerLinkActive="active-link">
             <mat-icon>list</mat-icon>
-            <span>Minhas Listas</span>
+            <span>My Lists</span>
           </a>
           <a mat-button routerLink="/items" routerLinkActive="active-link">
             <mat-icon>shopping_basket</mat-icon>
-            <span>Itens</span>
+            <span>Items</span>
           </a>
           <a mat-button routerLink="/categories" routerLinkActive="active-link">
             <mat-icon>category</mat-icon>
-            <span>Categorias</span>
+            <span>Categories</span>
           </a>
           <a mat-button routerLink="/units" routerLinkActive="active-link">
             <mat-icon>straighten</mat-icon>
-            <span>Unidades</span>
+            <span>Units</span>
           </a>
         </div>
 
@@ -38,7 +38,7 @@
           >Login</a
         >
         <a mat-button routerLink="/signup" routerLinkActive="active-link"
-          >Cadastro</a
+          >Sign Up</a
         >
       }
     </mat-toolbar>
@@ -46,30 +46,30 @@
     <mat-menu #navMenu="matMenu">
       <a mat-menu-item routerLink="/lists">
         <mat-icon>list</mat-icon>
-        <span>Minhas Listas</span>
+        <span>My Lists</span>
       </a>
       <a mat-menu-item routerLink="/items">
         <mat-icon>shopping_basket</mat-icon>
-        <span>Itens</span>
+        <span>Items</span>
       </a>
       <a mat-menu-item routerLink="/categories">
         <mat-icon>category</mat-icon>
-        <span>Categorias</span>
+        <span>Categories</span>
       </a>
       <a mat-menu-item routerLink="/units">
         <mat-icon>straighten</mat-icon>
-        <span>Unidades</span>
+        <span>Units</span>
       </a>
     </mat-menu>
 
     <mat-menu #profileMenu="matMenu">
       <a mat-menu-item routerLink="/profile">
         <mat-icon>person</mat-icon>
-        <span>Perfil</span>
+        <span>Profile</span>
       </a>
       <button mat-menu-item (click)="logout()">
         <mat-icon>logout</mat-icon>
-        <span>Sair</span>
+        <span>Logout</span>
       </button>
     </mat-menu>
 

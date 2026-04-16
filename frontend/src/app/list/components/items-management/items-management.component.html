@@ -1,6 +1,6 @@
 <div class="container">
   <div class="page-header">
-    <h1>Gerenciar Itens</h1>
+    <h1>Manage Items</h1>
   </div>
 
   @if (loading()) {
@@ -10,7 +10,7 @@
   } @else {
     <div class="add-item-container mb-3">
       <button mat-raised-button color="primary" (click)="openAddItemDialog()">
-        <mat-icon>add</mat-icon> Novo Item
+        <mat-icon>add</mat-icon> New Item
       </button>
     </div>
 
@@ -21,13 +21,13 @@
             <table mat-table [dataSource]="items" class="item-table">
               <!-- Name Column -->
               <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef>Nome</th>
+                <th mat-header-cell *matHeaderCellDef>Name</th>
                 <td mat-cell *matCellDef="let element">{{ element.name }}</td>
               </ng-container>
 
               <!-- Category Column -->
               <ng-container matColumnDef="category">
-                <th mat-header-cell *matHeaderCellDef>Categoria</th>
+                <th mat-header-cell *matHeaderCellDef>Category</th>
                 <td mat-cell *matCellDef="let element">
                   {{ element.category.name }}
                 </td>
@@ -35,7 +35,7 @@
 
               <!-- Unit Column -->
               <ng-container matColumnDef="unit">
-                <th mat-header-cell *matHeaderCellDef>Unidade</th>
+                <th mat-header-cell *matHeaderCellDef>Unit</th>
                 <td mat-cell *matCellDef="let element">
                   {{ element.unit.symbol }}
                 </td>
@@ -43,7 +43,7 @@
 
               <!-- Actions Column -->
               <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef>Ações</th>
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
                 <td mat-cell *matCellDef="let element">
                   <button
                     mat-icon-button
@@ -70,13 +70,13 @@
       } @else {
         <mat-card appearance="outlined" class="empty-state">
           <mat-card-content>
-            <p>Nenhum item cadastrado.</p>
+            <p>No items registered.</p>
             <button
               mat-raised-button
               color="primary"
               (click)="openAddItemDialog()"
             >
-              Cadastrar Primeiro Item
+              Register First Item
             </button>
           </mat-card-content>
         </mat-card>

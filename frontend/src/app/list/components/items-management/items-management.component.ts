@@ -97,10 +97,10 @@ export class ItemsManagementComponent implements OnInit {
         this.itemService.addItem(result).subscribe({
           next: () => {
             this.loadItems();
-            this.feedback.success('Item adicionado com sucesso');
+            this.feedback.success('Item added successfully');
           },
           error: () => {
-            this.feedback.error('Erro ao adicionar item');
+            this.feedback.error('Error adding item');
           },
         });
       }
@@ -124,10 +124,10 @@ export class ItemsManagementComponent implements OnInit {
         this.itemService.updateItem(item.id, result).subscribe({
           next: () => {
             this.loadItems();
-            this.feedback.success('Item atualizado com sucesso');
+            this.feedback.success('Item updated successfully');
           },
           error: () => {
-            this.feedback.error('Erro ao atualizar item');
+            this.feedback.error('Error updating item');
           },
         });
       }
@@ -137,9 +137,9 @@ export class ItemsManagementComponent implements OnInit {
   deleteItem(item: ItemResponseDTO): void {
     this.confirmDialog
       .open({
-        title: 'Excluir item',
-        message: `Tem certeza que deseja excluir o item "${item.name}"?`,
-        confirmText: 'Excluir',
+        title: 'Delete Item',
+        message: `Are you sure you want to delete the item "${item.name}"?`,
+        confirmText: 'Delete',
       })
       .subscribe((confirmed) => {
         if (!confirmed) return;
@@ -147,10 +147,10 @@ export class ItemsManagementComponent implements OnInit {
         this.itemService.deleteItem(item.id).subscribe({
           next: () => {
             this.loadItems();
-            this.feedback.success('Item excluido com sucesso');
+            this.feedback.success('Item deleted successfully');
           },
           error: () => {
-            this.feedback.error('Erro ao excluir item');
+            this.feedback.error('Error deleting item');
           },
         });
       });
