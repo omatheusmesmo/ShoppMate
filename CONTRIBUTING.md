@@ -21,8 +21,8 @@ By participating in this project, you agree to abide by our Code of Conduct (sta
 
 ### Pull Requests
 
-1. **Fork the repository** and create your branch from `develop`.
-2. **Target your PR to the `develop` branch**. PRs targeting `main` will be automatically redirected.
+1. **Fork the repository** and create your branch from `main`.
+2. **Target your PR to the `main` branch**.
 3. **Install dependencies** using Maven: `./mvnw install` (inside the `backend` folder).
 4. **Follow the coding style**:
    - Match the existing indentation (4 spaces for Java, 2 for Angular/YAML).
@@ -35,6 +35,7 @@ By participating in this project, you agree to abide by our Code of Conduct (sta
    - **Backend**: Ensure the project builds and tests pass using `./mvnw test`.
 8. **Self-review**: Read through your changes before submitting.
 9. **Submit the PR**: Link it to the relevant issue (e.g., `Closes #15`).
+10. **Use squash merge**: keep the PR history clean by combining the changes into a single commit when merging.
 
 ### Auto-Assignment Bot
 
@@ -66,9 +67,15 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/) speci
 - **test**: Adding missing tests or correcting existing tests
 - **chore**: Changes to the build process or auxiliary tools and libraries
 
-**Example:**
-`feat(auth): add JWT expiration validation`
-`fix(list): resolve N+1 query in shopping list retrieval`
+**Examples:**
+
+- `feat(auth): add JWT expiration validation`
+- `fix(list): resolve N+1 query in shopping list retrieval`
+- `docs(contributing): add commit message examples`
+- `ci: add conventional commits workflow`
+- `chore: squash branch history before merge`
+
+For PRs merged with squash commit, make sure the PR title follows Conventional Commits as well, since that becomes the final commit message.
 
 ## Technical Stack
 
