@@ -3,3 +3,4 @@
 gha-creds-*.json
 postgres-data/
 **/postgres-data/
+.env
