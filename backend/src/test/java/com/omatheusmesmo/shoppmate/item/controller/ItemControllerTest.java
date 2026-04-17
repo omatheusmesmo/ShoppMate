@@ -2,13 +2,12 @@ package com.omatheusmesmo.shoppmate.item.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.omatheusmesmo.shoppmate.category.dto.CategoryResponseDTO;
-import com.omatheusmesmo.shoppmate.category.entity.Category;
 import com.omatheusmesmo.shoppmate.item.dto.ItemRequestDTO;
 import com.omatheusmesmo.shoppmate.item.dto.ItemResponseDTO;
 import com.omatheusmesmo.shoppmate.item.entity.Item;
 import com.omatheusmesmo.shoppmate.item.mapper.ItemMapper;
+import com.omatheusmesmo.shoppmate.shared.testutils.ItemTestFactory;
 import com.omatheusmesmo.shoppmate.unit.dto.UnitResponseDTO;
-import com.omatheusmesmo.shoppmate.unit.entity.Unit;
 import com.omatheusmesmo.shoppmate.item.service.ItemService;
 import com.omatheusmesmo.shoppmate.auth.service.JwtService;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,55 +56,45 @@ class ItemControllerTest {
 
     private Item item1;
     private Item item2;
-    private Category category;
-    private Unit unit;
     private ItemResponseDTO itemResponseDTO1;
     private ItemResponseDTO itemResponseDTO2;
 
     @BeforeEach
     void setUp() {
-        unit = new Unit();
-        unit.setId(1L);
-        unit.setName("kg");
-        unit.setSymbol("kg");
+        item1 = ItemTestFactory.createValidItem();
+        item2 = ItemTestFactory.createValidItem();
+        // Ensure unique IDs
+        if (item1.getId().equals(item2.getId())) {
+            item2.setId(item1.getId() + 1);
+        }
 
-        category = new Category();
-        category.setId(1L);
-        category.setName("Food");
+        CategoryResponseDTO categoryDTO1 = new CategoryResponseDTO(item1.getCategory().getId(),
+                item1.getCategory().getName());
+        UnitResponseDTO unitDTO1 = new UnitResponseDTO(item1.getUnit().getId(), item1.getUnit().getName());
+        itemResponseDTO1 = new ItemResponseDTO(item1.getId(), item1.getName(), categoryDTO1, unitDTO1);
 
-        item1 = new Item();
-        item1.setId(1L);
-        item1.setName("Feijão");
-        item1.setUnit(unit);
-        item1.setCategory(category);
-
-        item2 = new Item();
-        item2.setId(2L);
-        item2.setName("Arroz");
-        item2.setUnit(unit);
-        item2.setCategory(category);
-
-        CategoryResponseDTO categoryResponseDTO = new CategoryResponseDTO(1L, "Food");
-        UnitResponseDTO unitResponseDTO = new UnitResponseDTO(1L, "kg");
-
-        itemResponseDTO1 = new ItemResponseDTO(1L, "Feijão", categoryResponseDTO, unitResponseDTO);
-        itemResponseDTO2 = new ItemResponseDTO(2L, "Arroz", categoryResponseDTO, unitResponseDTO);
+        CategoryResponseDTO categoryDTO2 = new CategoryResponseDTO(item2.getCategory().getId(),
+                item2.getCategory().getName());
+        UnitResponseDTO unitDTO2 = new UnitResponseDTO(item2.getUnit().getId(), item2.getUnit().getName());
+        itemResponseDTO2 = new ItemResponseDTO(item2.getId(), item2.getName(), categoryDTO2, unitDTO2);
     }
 
     @Test
     @WithMockUser
     void testGetAllItems() throws Exception {
+        // Arrange
         List<Item> allItems = Arrays.asList(item1, item2);
         List<ItemResponseDTO> allItemDTOs = Arrays.asList(itemResponseDTO1, itemResponseDTO2);
 
         when(itemService.findAll()).thenReturn(allItems);
         when(itemMapper.toResponseDTO(any(Item.class))).thenAnswer(invocation -> {
             Item item = invocation.getArgument(0);
-            if (item.getId().equals(1L))
+            if (item.getId().equals(item1.getId()))
                 return itemResponseDTO1;
             return itemResponseDTO2;
         });
 
+        // Act & Assert
         mockMvc.perform(get("/item")).andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(allItemDTOs)));
     }
@@ -113,12 +102,15 @@ class ItemControllerTest {
     @Test
     @WithMockUser
     void testPostAddItem() throws Exception {
-        ItemRequestDTO requestDTO = new ItemRequestDTO("Feijão", 1L, 1L);
+        // Arrange
+        ItemRequestDTO requestDTO = new ItemRequestDTO(item1.getName(), item1.getCategory().getId(),
+                item1.getUnit().getId());
 
         when(itemMapper.toEntity(any(ItemRequestDTO.class))).thenReturn(item1);
         when(itemService.addItem(any(Item.class))).thenReturn(item1);
         when(itemMapper.toResponseDTO(any(Item.class))).thenReturn(itemResponseDTO1);
 
+        // Act & Assert
         mockMvc.perform(post("/item").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO))).andExpect(status().isCreated())
                 .andExpect(content().json(objectMapper.writeValueAsString(itemResponseDTO1)));
@@ -127,25 +119,28 @@ class ItemControllerTest {
     @Test
     @WithMockUser
     void testDeleteRemoveItem() throws Exception {
-        Long id = 1L;
-
+        // Arrange
+        Long id = item1.getId();
         Mockito.doNothing().when(itemService).removeItem(id);
 
+        // Act & Assert
         mockMvc.perform(delete("/item/" + id)).andExpect(status().isNoContent());
-
         verify(itemService, times(1)).removeItem(id);
     }
 
     @Test
     @WithMockUser
     void testPutEditItem() throws Exception {
-        ItemRequestDTO requestDTO = new ItemRequestDTO("Feijão", 1L, 1L);
+        // Arrange
+        ItemRequestDTO requestDTO = new ItemRequestDTO(item1.getName(), item1.getCategory().getId(),
+                item1.getUnit().getId());
 
         when(itemMapper.toEntity(any(ItemRequestDTO.class))).thenReturn(item1);
         when(itemService.editItem(any(Item.class))).thenReturn(item1);
         when(itemMapper.toResponseDTO(any(Item.class))).thenReturn(itemResponseDTO1);
 
-        mockMvc.perform(put("/item/1").contentType(MediaType.APPLICATION_JSON)
+        // Act & Assert
+        mockMvc.perform(put("/item/" + item1.getId()).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO))).andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(itemResponseDTO1)));
     }
@@ -153,11 +148,12 @@ class ItemControllerTest {
     @Test
     @WithMockUser
     void testPostAddItem_BadRequest() throws Exception {
+        // Arrange
         when(itemMapper.toEntity(any(ItemRequestDTO.class))).thenThrow(new IllegalArgumentException("Invalid item"));
-        ;
 
-        ItemRequestDTO invalidItem = new ItemRequestDTO("", 1L, 1L);
+        ItemRequestDTO invalidItem = new ItemRequestDTO("", item1.getCategory().getId(), item1.getUnit().getId());
 
+        // Act & Assert
         mockMvc.perform(post("/item").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidItem))).andExpect(status().isBadRequest());
     }
@@ -165,12 +161,15 @@ class ItemControllerTest {
     @Test
     @WithMockUser
     void testPutEditItem_NotFound() throws Exception {
-        ItemRequestDTO requestDTO = new ItemRequestDTO("Feijão", 1L, 1L);
+        // Arrange
+        ItemRequestDTO requestDTO = new ItemRequestDTO(item1.getName(), item1.getCategory().getId(),
+                item1.getUnit().getId());
 
         when(itemMapper.toEntity(any(ItemRequestDTO.class))).thenReturn(item1);
         doThrow(new NoSuchElementException()).when(itemService).editItem(any(Item.class));
 
-        mockMvc.perform(put("/item/1").contentType(MediaType.APPLICATION_JSON)
+        // Act & Assert
+        mockMvc.perform(put("/item/" + item1.getId()).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO))).andExpect(status().isNotFound());
     }
 }

@@ -9,6 +9,7 @@ import com.omatheusmesmo.shoppmate.list.entity.ShoppingList;
 import com.omatheusmesmo.shoppmate.list.mapper.ListMapper;
 import com.omatheusmesmo.shoppmate.list.service.ShoppingListService;
 import com.omatheusmesmo.shoppmate.shared.test.annotation.WithMockCustomUser;
+import com.omatheusmesmo.shoppmate.shared.testutils.ListTestFactory;
 import com.omatheusmesmo.shoppmate.user.dtos.UserResponseDTO;
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,20 +59,22 @@ class ShoppingListControllerTest {
 
     @BeforeEach
     void setUp() {
-        shoppingList = new ShoppingList();
-        shoppingList.setId(1L);
-        shoppingList.setName("Weekly");
+        shoppingList = ListTestFactory.createValidShoppingList();
 
-        responseDTO = new ShoppingListResponseDTO(1L, "Weekly",
-                new UserResponseDTO(1L, "Test User", "test@example.com"), BigDecimal.valueOf(1.0));
+        responseDTO = new ShoppingListResponseDTO(
+                shoppingList.getId(), shoppingList.getName(), new UserResponseDTO(shoppingList.getOwner().getId(),
+                        shoppingList.getOwner().getFullName(), shoppingList.getOwner().getEmail()),
+                BigDecimal.valueOf(1.0));
     }
 
     @Test
     @WithMockCustomUser
     void getAllShoppingLists_ExistingLists_ReturnsOkWithShoppingLists() throws Exception {
+        // Arrange
         when(shoppingListService.findAllByUser(any(User.class))).thenReturn(List.of(shoppingList));
         when(listMapper.toResponseDTO(any(ShoppingList.class))).thenReturn(responseDTO);
 
+        // Act & Assert
         mockMvc.perform(get("/lists")).andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of(responseDTO))));
     }
@@ -79,13 +82,25 @@ class ShoppingListControllerTest {
     @Test
     @WithMockCustomUser
     void addShoppingList_ValidRequest_ReturnsCreatedWithShoppingList() throws Exception {
-        ShoppingListRequestDTO requestDTO = new ShoppingListRequestDTO("Weekly");
-        when(listMapper.toEntity(any(ShoppingListRequestDTO.class), any(User.class))).thenReturn(shoppingList);
-        when(shoppingListService.saveList(any(ShoppingList.class))).thenReturn(shoppingList);
-        when(listMapper.toResponseDTO(any(ShoppingList.class))).thenReturn(responseDTO);
+        // Arrange
+        ShoppingListRequestDTO requestDTO = ListTestFactory.createValidShoppingListRequestDTO();
+        ShoppingList entityFromRequest = new ShoppingList();
+        entityFromRequest.setId(shoppingList.getId());
+        entityFromRequest.setName(requestDTO.name());
+        entityFromRequest.setOwner(shoppingList.getOwner());
 
+        ShoppingListResponseDTO expectedResponseDTO = new ShoppingListResponseDTO(entityFromRequest.getId(),
+                entityFromRequest.getName(), new UserResponseDTO(entityFromRequest.getOwner().getId(),
+                        entityFromRequest.getOwner().getFullName(), entityFromRequest.getOwner().getEmail()),
+                BigDecimal.valueOf(1.0));
+
+        when(listMapper.toEntity(eq(requestDTO), any(User.class))).thenReturn(entityFromRequest);
+        when(shoppingListService.saveList(any(ShoppingList.class))).thenReturn(entityFromRequest);
+        when(listMapper.toResponseDTO(entityFromRequest)).thenReturn(expectedResponseDTO);
+
+        // Act & Assert
         mockMvc.perform(post("/lists").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO))).andExpect(status().isCreated())
-                .andExpect(content().json(objectMapper.writeValueAsString(responseDTO)));
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponseDTO)));
     }
 }

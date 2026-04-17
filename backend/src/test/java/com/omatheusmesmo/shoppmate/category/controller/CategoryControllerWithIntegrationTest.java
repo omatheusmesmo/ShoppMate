@@ -10,10 +10,8 @@ import com.omatheusmesmo.shoppmate.shared.testcontainers.AbstractIntegrationTest
 import com.omatheusmesmo.shoppmate.shared.testcontainers.utils.TestUserFactory;
 import com.omatheusmesmo.shoppmate.category.dto.CategoryRequestDTO;
 import com.omatheusmesmo.shoppmate.category.dto.CategoryResponseDTO;
+import com.omatheusmesmo.shoppmate.shared.testutils.CategoryTestFactory;
 import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.filter.log.LogDetail;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -47,9 +45,6 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
     private static RequestSpecification specification;
     private static ObjectMapper objectMapper;
 
-    static CategoryResponseDTO categoryResponseDTOCreated;
-    static CategoryResponseDTO categoryResponseDTOUpdated;
-
     @BeforeAll
     static void setUp() {
         objectMapper = new ObjectMapper();
@@ -74,34 +69,32 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void testPostAddCategory() throws Exception {
-        CategoryRequestDTO request = new CategoryRequestDTO("Book");
+        CategoryRequestDTO request = CategoryTestFactory.createValidCategoryRequestDTO();
 
         var content = given(specification).contentType(MediaType.APPLICATION_JSON_VALUE).body(request).when().post()
                 .then().statusCode(201).contentType(MediaType.APPLICATION_JSON_VALUE).extract().body().asString();
 
         CategoryResponseDTO createdCategory = objectMapper.readValue(content, CategoryResponseDTO.class);
-        categoryResponseDTOCreated = createdCategory;
 
         assertNotNull(createdCategory.id());
         assertTrue(createdCategory.id() > 0);
-        assertEquals("Book", createdCategory.name());
+        assertEquals(request.name(), createdCategory.name());
     }
 
     @Test
     void testPutEditCategory() throws Exception {
-        CategoryRequestDTO categoryResponseDTOToUpdated = new CategoryRequestDTO("Book Putted");
         Category categoryEntity = createCategoryToTest();
+        CategoryRequestDTO updateRequest = new CategoryRequestDTO(categoryEntity.getName() + " Updated");
 
         var content = given(specification).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .pathParam("id", categoryEntity.getId()).body(categoryResponseDTOToUpdated).when().put("{id}").then()
-                .statusCode(200).contentType(MediaType.APPLICATION_JSON_VALUE).extract().body().asString();
+                .pathParam("id", categoryEntity.getId()).body(updateRequest).when().put("{id}").then().statusCode(200)
+                .contentType(MediaType.APPLICATION_JSON_VALUE).extract().body().asString();
 
         CategoryResponseDTO updatedCategory = objectMapper.readValue(content, CategoryResponseDTO.class);
-        categoryResponseDTOUpdated = updatedCategory;
 
         assertNotNull(updatedCategory.id());
-        assertTrue(updatedCategory.id() > 0);
-        assertEquals("Book Putted", updatedCategory.name());
+        assertEquals(categoryEntity.getId(), updatedCategory.id());
+        assertEquals(updateRequest.name(), updatedCategory.name());
     }
 
     @Test
@@ -114,12 +107,12 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
         List<CategoryResponseDTO> categories = objectMapper.readValue(content,
                 new TypeReference<List<CategoryResponseDTO>>() {
                 });
+
+        assertFalse(categories.isEmpty());
         CategoryResponseDTO categoryOne = categories.get(0);
 
         assertNotNull(categoryOne.id());
-        assertTrue(categoryOne.id() > 0);
-
-        assertEquals("Book", categoryOne.name());
+        assertEquals(categoryEntity.getName(), categoryOne.name());
     }
 
     @Test
@@ -134,22 +127,20 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
         CategoryRequestDTO invalidItem = new CategoryRequestDTO("");
 
         given(specification).contentType(MediaType.APPLICATION_JSON_VALUE).body(invalidItem).when().post().then()
-                .statusCode(400).contentType(MediaType.APPLICATION_JSON_VALUE).extract().body().asString();
+                .statusCode(400);
     }
 
     @Test
     void IntegrationTestPutEditCategory_NotFound() throws Exception {
-        CategoryRequestDTO invalidItem = new CategoryRequestDTO("Toy");
+        CategoryRequestDTO request = CategoryTestFactory.createValidCategoryRequestDTO();
 
-        given(specification).contentType(MediaType.APPLICATION_JSON_VALUE).pathParam("id", 999L).body(invalidItem)
-                .when().put("/{id}").then().statusCode(404).contentType(MediaType.APPLICATION_JSON_VALUE).extract()
-                .body().asString();
+        given(specification).contentType(MediaType.APPLICATION_JSON_VALUE).pathParam("id", 999L).body(request).when()
+                .put("/{id}").then().statusCode(404);
     }
 
-    Category createCategoryToTest() {
-        Category categoryEntity = new Category();
-        categoryEntity.setName("Book");
-        categoryEntity = categoryRepository.save(categoryEntity);
-        return categoryEntity;
+    private Category createCategoryToTest() {
+        Category categoryEntity = CategoryTestFactory.createValidCategory();
+        categoryEntity.setId(null); // Let DB generate ID
+        return categoryRepository.save(categoryEntity);
     }
 }

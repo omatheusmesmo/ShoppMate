@@ -1,9 +1,12 @@
 package com.omatheusmesmo.shoppmate.user.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.omatheusmesmo.shoppmate.auth.service.JwtService;
-import com.omatheusmesmo.shoppmate.user.entity.User;
-import com.omatheusmesmo.shoppmate.user.service.UserService;
+import java.util.List;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +17,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
-
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.omatheusmesmo.shoppmate.auth.service.JwtService;
+import com.omatheusmesmo.shoppmate.shared.testutils.UserTestFactory;
+import com.omatheusmesmo.shoppmate.user.entity.User;
+import com.omatheusmesmo.shoppmate.user.service.UserService;
 
 @WebMvcTest(controllers = UserController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -44,18 +46,16 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
-        user = new User();
-        user.setId(1L);
-        user.setFullName("John Doe");
-        user.setEmail("john@example.com");
-        user.setPassword("pass");
+        user = UserTestFactory.createValidUser();
     }
 
     @Test
     @WithMockUser
     void getUsers_ExistingUsers_ReturnsOkWithUsers() throws Exception {
+        // Arrange
         when(userService.findUsers()).thenReturn(List.of(user));
 
+        // Act & Assert
         mockMvc.perform(get("/users/users")).andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of(user))));
     }
@@ -63,9 +63,11 @@ class UserControllerTest {
     @Test
     @WithMockUser
     void getUserById_ExistingId_ReturnsOkWithUser() throws Exception {
-        when(userService.findUser(1L)).thenReturn(user);
+        // Arrange
+        when(userService.findUser(user.getId())).thenReturn(user);
 
-        mockMvc.perform(get("/users/userDetailsService/1")).andExpect(status().isOk())
+        // Act & Assert
+        mockMvc.perform(get("/users/userDetailsService/" + user.getId())).andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(user)));
     }
 }

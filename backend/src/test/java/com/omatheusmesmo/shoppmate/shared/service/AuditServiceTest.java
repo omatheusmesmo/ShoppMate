@@ -1,4 +1,4 @@
-package com.omatheusmesmo.shoppmate.service;
+package com.omatheusmesmo.shoppmate.shared.service;
 
 import com.omatheusmesmo.shoppmate.category.entity.Category;
 import com.omatheusmesmo.shoppmate.shared.service.AuditService;

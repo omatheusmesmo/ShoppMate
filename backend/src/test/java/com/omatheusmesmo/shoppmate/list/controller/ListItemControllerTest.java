@@ -7,9 +7,11 @@ import com.omatheusmesmo.shoppmate.list.dtos.ListItemRequestDTO;
 import com.omatheusmesmo.shoppmate.list.dtos.ListItemResponseDTO;
 import com.omatheusmesmo.shoppmate.list.dtos.ListItemSummaryDTO;
 import com.omatheusmesmo.shoppmate.list.entity.ListItem;
+import com.omatheusmesmo.shoppmate.list.entity.ShoppingList;
 import com.omatheusmesmo.shoppmate.list.mapper.ListItemMapper;
 import com.omatheusmesmo.shoppmate.list.service.ListItemService;
 import com.omatheusmesmo.shoppmate.shared.test.annotation.WithMockCustomUser;
+import com.omatheusmesmo.shoppmate.shared.testutils.ListTestFactory;
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +22,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -53,39 +54,46 @@ class ListItemControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private ShoppingList shoppingList;
     private ListItem listItem;
     private ListItemSummaryDTO summaryDTO;
     private ListItemResponseDTO responseDTO;
 
     @BeforeEach
     void setUp() {
-        listItem = new ListItem();
-        listItem.setId(1L);
-        listItem.setQuantity(2);
-        listItem.setPurchased(false);
-        summaryDTO = new ListItemSummaryDTO(1L, 1L, "Rice", 2, false);
-        responseDTO = new ListItemResponseDTO(null, null, 1L, 2, false, BigDecimal.valueOf(1.0),
-                BigDecimal.valueOf(1.0));
+        shoppingList = ListTestFactory.createValidShoppingList();
+        listItem = ListTestFactory.createValidListItem(shoppingList);
+
+        summaryDTO = new ListItemSummaryDTO(listItem.getId(), listItem.getItem().getId(), listItem.getItem().getName(),
+                listItem.getQuantity(), listItem.getPurchased());
+
+        responseDTO = new ListItemResponseDTO(null, null, listItem.getItem().getId(), listItem.getQuantity(),
+                listItem.getPurchased(), listItem.getUnitPrice(), listItem.getUnitPrice());
     }
 
     @Test
     @WithMockCustomUser
     void getAllListItemsByListId_ExistingListId_ReturnsOkWithListItems() throws Exception {
-        when(listItemService.findAll(eq(1L), any(User.class))).thenReturn(List.of(listItem));
+        // Arrange
+        when(listItemService.findAll(eq(shoppingList.getId()), any(User.class))).thenReturn(List.of(listItem));
         when(listItemMapper.toSummaryDTO(any(ListItem.class))).thenReturn(summaryDTO);
 
-        mockMvc.perform(get("/lists/1/items")).andExpect(status().isOk())
+        // Act & Assert
+        mockMvc.perform(get("/lists/" + shoppingList.getId() + "/items")).andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of(summaryDTO))));
     }
 
     @Test
     @WithMockCustomUser
     void addListItem_ValidRequest_ReturnsCreatedWithListItem() throws Exception {
-        ListItemRequestDTO requestDTO = new ListItemRequestDTO(1L, 1L, 2, BigDecimal.valueOf(1.0));
+        // Arrange
+        ListItemRequestDTO requestDTO = ListTestFactory.createValidListItemRequestDTO(shoppingList.getId(),
+                listItem.getItem().getId());
         when(listItemService.addShoppItemList(any(ListItemRequestDTO.class), any(User.class))).thenReturn(listItem);
         when(listItemMapper.toResponseDTO(any(ListItem.class))).thenReturn(responseDTO);
 
-        mockMvc.perform(post("/lists/1/items").contentType(MediaType.APPLICATION_JSON)
+        // Act & Assert
+        mockMvc.perform(post("/lists/" + shoppingList.getId() + "/items").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO))).andExpect(status().isCreated())
                 .andExpect(content().json(objectMapper.writeValueAsString(responseDTO)));
     }

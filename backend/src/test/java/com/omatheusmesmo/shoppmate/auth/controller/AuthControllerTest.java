@@ -2,8 +2,8 @@ package com.omatheusmesmo.shoppmate.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.omatheusmesmo.shoppmate.auth.service.JwtService;
+import com.omatheusmesmo.shoppmate.shared.testutils.UserTestFactory;
 import com.omatheusmesmo.shoppmate.user.dtos.RegisterUserDTO;
-import com.omatheusmesmo.shoppmate.user.entity.User;
 import com.omatheusmesmo.shoppmate.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,16 +41,17 @@ public class AuthControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void ShouldReturnOk_WhenPasswordFollowsRequirements() throws Exception {
-        var dto = new RegisterUserDTO("anakin@skywalker.com", "Anakin Skywalker", "CorrectPass@123");
+    void registerUser_ValidPassword_ReturnsOk() throws Exception {
+        RegisterUserDTO dto = UserTestFactory.createValidRegisterUserDTO();
 
         mockMvc.perform(post("/auth/sign").contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(dto))).andExpect(status().isOk());
     }
 
     @Test
-    void ShouldReturnBadRequest_WhenPasswordDoesNotContainUppercaseLetters() throws Exception {
-        var dto = new RegisterUserDTO("anakin@skywalker.com", "Anakin Skywalker", "password-123");
+    void registerUser_NoUppercase_ReturnsBadRequest() throws Exception {
+        RegisterUserDTO validDto = UserTestFactory.createValidRegisterUserDTO();
+        RegisterUserDTO dto = new RegisterUserDTO(validDto.email(), validDto.fullName(), "password-123");
 
         mockMvc.perform(post("/auth/sign").contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(dto))).andExpect(status().isBadRequest())
@@ -60,8 +61,9 @@ public class AuthControllerTest {
     }
 
     @Test
-    void ShouldReturnBadRequest_WhenPasswordDoesNotContainSpecialCharacters() throws Exception {
-        var dto = new RegisterUserDTO("anakin@skywalker.com", "Anakin Skywalker", "Password123");
+    void registerUser_NoSpecialChar_ReturnsBadRequest() throws Exception {
+        RegisterUserDTO validDto = UserTestFactory.createValidRegisterUserDTO();
+        RegisterUserDTO dto = new RegisterUserDTO(validDto.email(), validDto.fullName(), "Password123");
 
         mockMvc.perform(post("/auth/sign").contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(dto))).andExpect(status().isBadRequest())
@@ -71,8 +73,9 @@ public class AuthControllerTest {
     }
 
     @Test
-    void ShouldReturnBadRequest_WhenPasswordDoesNotContainNumbers() throws Exception {
-        var dto = new RegisterUserDTO("anakin@skywalker.com", "Anakin Skywalker", "Password@");
+    void registerUser_NoNumbers_ReturnsBadRequest() throws Exception {
+        RegisterUserDTO validDto = UserTestFactory.createValidRegisterUserDTO();
+        RegisterUserDTO dto = new RegisterUserDTO(validDto.email(), validDto.fullName(), "Password@");
 
         mockMvc.perform(post("/auth/sign").contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(dto))).andExpect(status().isBadRequest())

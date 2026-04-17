@@ -1,9 +1,9 @@
-package com.omatheusmesmo.shoppmate.service;
+package com.omatheusmesmo.shoppmate.user.service;
 
+import com.omatheusmesmo.shoppmate.shared.testutils.UserTestFactory;
 import com.omatheusmesmo.shoppmate.user.dtos.RegisterUserDTO;
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import com.omatheusmesmo.shoppmate.user.repository.UserRepository;
-import com.omatheusmesmo.shoppmate.user.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,17 +28,16 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserService userService;
 
-    User userMock;
+    private User userMock;
 
     @BeforeEach
     void setUp() {
-        userMock = new User("John@Doe.com", "John Doe", "1234", "USER");
-        userMock.setId(1L);
+        userMock = UserTestFactory.createValidUser();
     }
 
     @AfterEach
@@ -48,50 +47,66 @@ class UserServiceTest {
     }
 
     @Test
-    void addUser() {
-        when(userRepository.save(any(User.class))).thenReturn(userMock);
-        when(passwordEncoder.encode(anyString())).thenReturn("encoded123");
+    void addUser_ValidDTO_ReturnsSavedUser() {
+        // Arrange
+        String encodedPassword = "encoded-" + userMock.getPassword();
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(passwordEncoder.encode(anyString())).thenReturn(encodedPassword);
 
-        var user = new RegisterUserDTO(userMock.getEmail(), userMock.getFullName(), userMock.getPassword());
-        User result = userService.addUser(user);
+        RegisterUserDTO registerDTO = new RegisterUserDTO(userMock.getEmail(), userMock.getFullName(),
+                userMock.getPassword());
 
-        // assertEquals(userMock, user); Now, because of the dto, a new instance is created
-        assertEquals("John@Doe.com", result.getEmail());
-        assertEquals("John Doe", result.getFullName());
-        assertEquals("encoded123", result.getPassword());
+        // Act
+        User result = userService.addUser(registerDTO);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(userMock.getEmail(), result.getEmail());
+        assertEquals(userMock.getFullName(), result.getFullName());
+        assertEquals(encodedPassword, result.getPassword());
         assertEquals("USER", result.getRole());
-        verify(userRepository, times(1)).save(result);
+        verify(userRepository, times(1)).save(any(User.class));
     }
 
     @Test
-    void addUserWithEmailUsed() {
-        doThrow(new IllegalArgumentException("E-mail is already being used!")).when(userRepository)
-                .save(any(User.class));
+    void addUser_EmailAlreadyUsed_ThrowsIllegalArgumentException() {
+        // Arrange
+        when(userRepository.findByEmail(userMock.getEmail())).thenReturn(Optional.of(userMock));
+        RegisterUserDTO registerDTO = new RegisterUserDTO(userMock.getEmail(), userMock.getFullName(),
+                userMock.getPassword());
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> userService
-                .addUser(new RegisterUserDTO(userMock.getEmail(), userMock.getFullName(), userMock.getPassword())));
+        // Act & Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> userService.addUser(registerDTO));
         assertEquals("E-mail is already being used!", exception.getMessage());
+        verify(userRepository, times(1)).findByEmail(userMock.getEmail());
+        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
-    void validateIfUserExists() {
+    void validateIfUserExists_UserDoesNotExist_NoExceptionThrown() {
+        // Arrange
+        when(userRepository.findByEmail(userMock.getEmail())).thenReturn(Optional.empty());
+
+        // Act & Assert
         assertDoesNotThrow(() -> userService.validateIfUserExists(userMock.getEmail()));
         verify(userRepository, times(1)).findByEmail(userMock.getEmail());
     }
 
     @Test
-    void validateIfUserExistsUserUsed() {
+    void validateIfUserExists_UserExists_ThrowsIllegalArgumentException() {
+        // Arrange
         when(userRepository.findByEmail(userMock.getEmail())).thenReturn(Optional.of(userMock));
 
+        // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> userService.validateIfUserExists(userMock.getEmail()));
         assertEquals("E-mail is already being used!", exception.getMessage());
-
-        verify(userRepository).findByEmail(userMock.getEmail());
     }
 
     @Test
-    void validateIfDataIsNullOrEmpty() {
+    void validateIfDataIsNullOrEmpty_ValidData_NoExceptionThrown() {
+        // Act & Assert
         assertDoesNotThrow(() -> userService.validateIfDataIsNullOrEmpty(userMock));
     }
 
@@ -102,56 +117,58 @@ class UserServiceTest {
     }
 
     @Test
-    void validateIfDataIsNullOrEmptyEmailIsEmpty() {
+    void validateIfDataIsNullOrEmpty_EmailIsEmpty_ThrowsIllegalArgumentException() {
         userMock.setEmail(" ");
         assertValidationException(userMock, "E-mail is required!");
     }
 
     @Test
-    void validateIfDataIsNullOrEmptyEmailIsNull() {
+    void validateIfDataIsNullOrEmpty_EmailIsNull_ThrowsIllegalArgumentException() {
         userMock.setEmail(null);
         assertValidationException(userMock, "E-mail is required!");
     }
 
     @Test
-    void validateIfDataIsNullOrEmptyPasswordIsEmpty() {
+    void validateIfDataIsNullOrEmpty_PasswordIsEmpty_ThrowsIllegalArgumentException() {
         userMock.setPassword(" ");
         assertValidationException(userMock, "Password is required!");
     }
 
     @Test
-    void validateIfDataIsNullOrEmptyPasswordIsNull() {
+    void validateIfDataIsNullOrEmpty_PasswordIsNull_ThrowsIllegalArgumentException() {
         userMock.setPassword(null);
         assertValidationException(userMock, "Password is required!");
     }
 
     @Test
-    void editUser() {
+    void editUser_ExistingId_ReturnsUpdatedUser() {
+        // Arrange
         when(userRepository.findById(userMock.getId())).thenReturn(Optional.of(userMock));
         when(userRepository.save(any(User.class))).thenReturn(userMock);
 
-        User user = userService.editUser(userMock);
+        // Act
+        User result = userService.editUser(userMock);
 
-        assertNotNull(user);
-        assertEquals(userMock, user);
-
+        // Assert
+        assertNotNull(result);
+        assertEquals(userMock, result);
         verify(userRepository, times(1)).findById(userMock.getId());
         verify(userRepository, times(1)).save(userMock);
     }
 
     @Test
-    void editUserWithoutExistingId() {
+    void editUser_UserNotFound_ThrowsNoSuchElementException() {
+        // Arrange
         when(userRepository.findById(userMock.getId())).thenReturn(Optional.empty());
 
+        // Act & Assert
         NoSuchElementException exception = assertThrows(NoSuchElementException.class,
                 () -> userService.editUser(userMock));
         assertEquals("User not found!", exception.getMessage());
-
-        verify(userRepository, times(1)).findById(userMock.getId());
     }
 
     @Test
-    void editUserWithEmailNull() {
+    void editUser_EmailNull_ThrowsIllegalArgumentException() {
         when(userRepository.findById(userMock.getId())).thenReturn(Optional.of(userMock));
         userMock.setEmail(null);
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
@@ -160,7 +177,7 @@ class UserServiceTest {
     }
 
     @Test
-    void editUserWithPasswordNull() {
+    void editUser_PasswordNull_ThrowsIllegalArgumentException() {
         when(userRepository.findById(userMock.getId())).thenReturn(Optional.of(userMock));
         userMock.setPassword(null);
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
@@ -169,7 +186,7 @@ class UserServiceTest {
     }
 
     @Test
-    void editUserWithEmailBlank() {
+    void editUser_EmailBlank_ThrowsIllegalArgumentException() {
         when(userRepository.findById(userMock.getId())).thenReturn(Optional.of(userMock));
         userMock.setEmail(" ");
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
@@ -178,7 +195,7 @@ class UserServiceTest {
     }
 
     @Test
-    void editUserWithPasswordBlank() {
+    void editUser_PasswordBlank_ThrowsIllegalArgumentException() {
         when(userRepository.findById(userMock.getId())).thenReturn(Optional.of(userMock));
         userMock.setPassword(" ");
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
@@ -187,40 +204,53 @@ class UserServiceTest {
     }
 
     @Test
-    void testFindUserById() {
+    void findUserById_ExistingId_ReturnsUser() {
+        // Arrange
         when(userRepository.findById(userMock.getId())).thenReturn(Optional.of(userMock));
 
-        assertDoesNotThrow(() -> userService.findUserById(userMock.getId()));
+        // Act
+        User result = userService.findUserById(userMock.getId());
 
+        // Assert
+        assertEquals(userMock, result);
         verify(userRepository, times(1)).findById(userMock.getId());
     }
 
     @Test
-    void testFindUserByIdThrowsExceptionWhenUserNotFound() {
+    void findUserById_NonExistingId_ThrowsNoSuchElementException() {
+        // Arrange
         when(userRepository.findById(userMock.getId())).thenReturn(Optional.empty());
 
+        // Act & Assert
         NoSuchElementException exception = assertThrows(NoSuchElementException.class,
                 () -> userService.findUserById(userMock.getId()));
         assertEquals("User not found!", exception.getMessage());
-
-        verify(userRepository, times(1)).findById(userMock.getId());
     }
 
     @Test
-    void removeUser() {
+    void removeUser_ExistingId_DeletesUser() {
+        // Arrange
         when(userRepository.findById(userMock.getId())).thenReturn(Optional.of(userMock));
+
+        // Act
         assertDoesNotThrow(() -> userService.removeUser(userMock.getId()));
 
+        // Assert
         verify(userRepository, times(1)).findById(userMock.getId());
         verify(userRepository, times(1)).deleteById(userMock.getId());
     }
 
     @Test
-    void returnAllUsers() {
+    void returnAllUsers_ExistingUsers_ReturnsList() {
+        // Arrange
         when(userRepository.findAll()).thenReturn(List.of(userMock));
 
-        List<User> list = userService.returnAllUsers();
+        // Act
+        List<User> result = userService.returnAllUsers();
 
+        // Assert
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
         verify(userRepository, times(1)).findAll();
     }
 }

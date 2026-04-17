@@ -1,4 +1,4 @@
-package com.omatheusmesmo.shoppmate.service;
+package com.omatheusmesmo.shoppmate.item.service;
 
 import com.omatheusmesmo.shoppmate.category.entity.Category;
 import com.omatheusmesmo.shoppmate.category.service.CategoryService;
@@ -7,6 +7,7 @@ import com.omatheusmesmo.shoppmate.item.service.ItemService;
 import com.omatheusmesmo.shoppmate.unit.entity.Unit;
 import com.omatheusmesmo.shoppmate.item.repository.ItemRepository;
 import com.omatheusmesmo.shoppmate.shared.service.AuditService;
+import com.omatheusmesmo.shoppmate.shared.testutils.ItemTestFactory;
 import com.omatheusmesmo.shoppmate.unit.service.UnitService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -206,13 +206,6 @@ class ItemServiceTest {
     }
 
     private Item createSampleItem() {
-        Item item = new Item();
-        item.setId(1L);
-        item.setName("Sample Item");
-        item.setCategory(new Category());
-        item.setUnit(new Unit());
-        item.setCreatedAt(LocalDateTime.now());
-        item.setUpdatedAt(LocalDateTime.now());
-        return item;
+        return ItemTestFactory.createValidItem();
     }
 }

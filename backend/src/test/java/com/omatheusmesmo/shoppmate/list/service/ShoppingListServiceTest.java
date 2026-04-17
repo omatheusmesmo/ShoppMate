@@ -3,6 +3,8 @@ package com.omatheusmesmo.shoppmate.list.service;
 import com.omatheusmesmo.shoppmate.list.entity.ShoppingList;
 import com.omatheusmesmo.shoppmate.list.repository.ShoppingListRepository;
 import com.omatheusmesmo.shoppmate.shared.service.AuditService;
+import com.omatheusmesmo.shoppmate.shared.testutils.ListTestFactory;
+import com.omatheusmesmo.shoppmate.shared.testutils.UserTestFactory;
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import com.omatheusmesmo.shoppmate.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,84 +40,94 @@ class ShoppingListServiceTest {
 
     @BeforeEach
     void setUp() {
-        testUser = new User();
-        testUser.setId(1L);
-        testUser.setFullName("João");
-        testUser.setEmail("joao@email.com");
-
-        testList = new ShoppingList();
-        testList.setId(1L);
-        testList.setName("Supermercado");
-        testList.setOwner(testUser);
+        testList = ListTestFactory.createValidShoppingList();
+        testUser = testList.getOwner();
     }
 
     @Test
-    void testSaveListSuccess() {
+    void saveList_ValidList_ReturnsSavedList() {
+        // Act
         ShoppingList result = shoppingListService.saveList(testList);
 
+        // Assert
         assertNotNull(result);
-        assertEquals("Supermercado", result.getName());
-
+        assertEquals(testList.getName(), result.getName());
         verify(auditService, times(1)).setAuditData(testList, true);
         verify(shoppingListRepository, times(1)).save(testList);
     }
 
     @Test
-    void testFindListByIdSuccess() {
-        when(shoppingListRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.of(testList));
+    void findListById_ExistingId_ReturnsList() {
+        // Arrange
+        when(shoppingListRepository.findByIdAndDeletedFalse(testList.getId())).thenReturn(Optional.of(testList));
 
-        ShoppingList result = shoppingListService.findListById(1L);
+        // Act
+        ShoppingList result = shoppingListService.findListById(testList.getId());
 
+        // Assert
         assertNotNull(result);
-        assertEquals(1L, result.getId());
-        assertEquals("Supermercado", result.getName());
-
-        verify(shoppingListRepository, times(1)).findByIdAndDeletedFalse(1L);
+        assertEquals(testList.getId(), result.getId());
+        assertEquals(testList.getName(), result.getName());
+        verify(shoppingListRepository, times(1)).findByIdAndDeletedFalse(testList.getId());
     }
 
     @Test
-    void testFindListByIdThrowsException() {
-        when(shoppingListRepository.findByIdAndDeletedFalse(999L)).thenReturn(Optional.empty());
+    void findListById_NonExistingId_ThrowsNoSuchElementException() {
+        // Arrange
+        Long nonExistingId = testList.getId() + 1000;
+        when(shoppingListRepository.findByIdAndDeletedFalse(nonExistingId)).thenReturn(Optional.empty());
 
-        assertThrows(NoSuchElementException.class, () -> shoppingListService.findListById(999L));
-
-        verify(shoppingListRepository, times(1)).findByIdAndDeletedFalse(999L);
+        // Act & Assert
+        assertThrows(NoSuchElementException.class, () -> shoppingListService.findListById(nonExistingId));
+        verify(shoppingListRepository, times(1)).findByIdAndDeletedFalse(nonExistingId);
     }
 
     @Test
-    void testRemoveListSuccess() {
-        when(shoppingListRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.of(testList));
+    void removeList_ExistingId_DeletesList() {
+        // Arrange
+        when(shoppingListRepository.findByIdAndDeletedFalse(testList.getId())).thenReturn(Optional.of(testList));
 
-        assertDoesNotThrow(() -> shoppingListService.removeList(1L, testUser));
+        // Act & Assert
+        assertDoesNotThrow(() -> shoppingListService.removeList(testList.getId(), testUser));
 
-        verify(shoppingListRepository, times(1)).deleteById(1L);
+        // Assert
+        verify(shoppingListRepository, times(1)).deleteById(testList.getId());
     }
 
     @Test
-    void testRemoveListThrowsExceptionWhenNotFound() {
-        when(shoppingListRepository.findByIdAndDeletedFalse(999L)).thenReturn(Optional.empty());
+    void removeList_NonExistingId_ThrowsNoSuchElementException() {
+        // Arrange
+        Long nonExistingId = testList.getId() + 1000;
+        when(shoppingListRepository.findByIdAndDeletedFalse(nonExistingId)).thenReturn(Optional.empty());
 
-        assertThrows(NoSuchElementException.class, () -> shoppingListService.removeList(999L, testUser));
-
-        verify(shoppingListRepository, never()).deleteById(999L);
+        // Act & Assert
+        assertThrows(NoSuchElementException.class, () -> shoppingListService.removeList(nonExistingId, testUser));
+        verify(shoppingListRepository, never()).deleteById(anyLong());
     }
 
     @Test
-    void testSaveListThrowsExceptionWhenNameIsNull() {
+    void saveList_NameIsNull_ThrowsIllegalArgumentException() {
+        // Arrange
         testList.setName(null);
 
+        // Act & Assert
         assertThrows(IllegalArgumentException.class, () -> shoppingListService.saveList(testList));
+        verify(shoppingListRepository, never()).save(any());
     }
 
     @Test
-    void testEditListSuccess() {
-        testList.setName("Supermercado Atualizado");
-        when(shoppingListRepository.findByIdAndDeletedFalse(1L)).thenReturn(Optional.of(testList));
+    void editList_ExistingList_ReturnsUpdatedList() {
+        // Arrange
+        String updatedName = testList.getName() + " Updated";
+        testList.setName(updatedName);
+        when(shoppingListRepository.findByIdAndDeletedFalse(testList.getId())).thenReturn(Optional.of(testList));
 
+        // Act
         ShoppingList result = shoppingListService.editList(testList, testUser);
 
+        // Assert
         assertNotNull(result);
-        assertEquals("Supermercado Atualizado", result.getName());
+        assertEquals(updatedName, result.getName());
         verify(auditService, times(1)).setAuditData(testList, false);
         verify(shoppingListRepository, times(1)).save(testList);
     }

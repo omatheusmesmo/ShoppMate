@@ -139,6 +139,7 @@ Each domain follows: `controller/`, `service/`, `repository/`, `entity/`, `dto/`
 
 ### Testing Patterns
 - **Unit tests**: Use JUnit 5 + Mockito
+  - Use domain-specific factories (e.g., `ItemTestFactory`) with **Datafaker** to generate dynamic test data.
   - `@WebMvcTest(Controller.class)` for controller tests
   - `@AutoConfigureMockMvc(addFilters = false)` to disable security
   - `@MockBean` for dependencies

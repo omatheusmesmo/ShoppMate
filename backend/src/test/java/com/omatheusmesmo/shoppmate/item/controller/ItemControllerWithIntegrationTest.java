@@ -11,6 +11,9 @@ import com.omatheusmesmo.shoppmate.shared.testcontainers.AbstractIntegrationTest
 import com.omatheusmesmo.shoppmate.shared.testcontainers.utils.TestUserFactory;
 import com.omatheusmesmo.shoppmate.item.dto.ItemRequestDTO;
 import com.omatheusmesmo.shoppmate.item.dto.ItemResponseDTO;
+import com.omatheusmesmo.shoppmate.shared.testutils.CategoryTestFactory;
+import com.omatheusmesmo.shoppmate.shared.testutils.ItemTestFactory;
+import com.omatheusmesmo.shoppmate.shared.testutils.UnitTestFactory;
 import com.omatheusmesmo.shoppmate.unit.entity.Unit;
 import com.omatheusmesmo.shoppmate.unit.repository.UnitRepository;
 import io.restassured.builder.RequestSpecBuilder;
@@ -85,7 +88,8 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
         Category categoryEntity = createCategoryToTest();
         Unit unitEntity = createUnitToTest();
 
-        ItemRequestDTO requestDTO = new ItemRequestDTO("Feijão", categoryEntity.getId(), unitEntity.getId());
+        ItemRequestDTO requestDTO = ItemTestFactory.createValidItemRequestDTO(categoryEntity.getId(),
+                unitEntity.getId());
 
         var content = given(specification).contentType(MediaType.APPLICATION_JSON_VALUE).body(requestDTO).when().post()
                 .then().statusCode(201).contentType(MediaType.APPLICATION_JSON_VALUE).extract().body().asString();
@@ -96,7 +100,7 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
         assertNotNull(createdItem.id());
         assertTrue(createdItem.id() > 0);
 
-        assertEquals("Feijão", createdItem.name());
+        assertEquals(requestDTO.name(), createdItem.name());
         assertEquals(categoryEntity.getId(), createdItem.category().id());
         assertEquals(unitEntity.getId(), createdItem.unit().id());
     }
@@ -105,7 +109,7 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
     void testPutEditItem() throws Exception {
         Item itemEntity = createItemToTest();
 
-        ItemRequestDTO requestDTO = new ItemRequestDTO("Arroz", itemEntity.getCategory().getId(),
+        ItemRequestDTO requestDTO = ItemTestFactory.createValidItemRequestDTO(itemEntity.getCategory().getId(),
                 itemEntity.getUnit().getId());
 
         var content = given(specification).contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -118,14 +122,14 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
         assertNotNull(updatedItem.id());
         assertTrue(updatedItem.id() > 0);
 
-        assertEquals("Arroz", updatedItem.name());
+        assertEquals(requestDTO.name(), updatedItem.name());
         assertEquals(requestDTO.idCategory(), updatedItem.category().id());
         assertEquals(requestDTO.idUnit(), updatedItem.unit().id());
     }
 
     @Test
     void testGetAllItems() throws Exception {
-        createItemToTest();
+        Item itemEntity = createItemToTest();
 
         var content = given(specification).accept(MediaType.APPLICATION_JSON_VALUE).when().get().then().statusCode(200)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).extract().body().asString();
@@ -137,7 +141,7 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
         assertNotNull(itemOne.id());
         assertTrue(itemOne.id() > 0);
 
-        assertEquals("Arroz", itemOne.name());
+        assertEquals(itemEntity.getName(), itemOne.name());
     }
 
     @Test
@@ -162,7 +166,8 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
     void IntegrationTestPutEditItem_NotFound() throws Exception {
         Category categoryEntity = createCategoryToTest();
         Unit unitEntity = createUnitToTest();
-        ItemRequestDTO invalidItem = new ItemRequestDTO("Feijão", categoryEntity.getId(), unitEntity.getId());
+        ItemRequestDTO invalidItem = ItemTestFactory.createValidItemRequestDTO(categoryEntity.getId(),
+                unitEntity.getId());
 
         given(specification).contentType(MediaType.APPLICATION_JSON_VALUE).pathParam("id", 999L).body(invalidItem)
                 .when().put("/{id}").then().statusCode(404).contentType(MediaType.APPLICATION_JSON_VALUE).extract()
@@ -170,26 +175,24 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
     }
 
     Category createCategoryToTest() {
-        Category categoryEntity = new Category();
-        categoryEntity.setName("Food");
+        Category categoryEntity = CategoryTestFactory.createValidCategory();
+        categoryEntity.setId(null); // Let DB generate ID
         categoryEntity = categoryRepository.save(categoryEntity);
         return categoryEntity;
     }
 
     Unit createUnitToTest() {
-        Unit unitEntity = new Unit();
-        unitEntity.setSymbol("KG");
-        unitEntity.setName("Kilogram");
+        Unit unitEntity = UnitTestFactory.createValidUnit();
+        unitEntity.setId(null); // Let DB generate ID
         unitEntity = unitRepository.save(unitEntity);
         return unitEntity;
     }
 
     Item createItemToTest() {
-        Item itemEntity = new Item();
-        itemEntity.setName("Arroz");
+        Item itemEntity = ItemTestFactory.createValidItem();
+        itemEntity.setId(null); // Let DB generate ID
         itemEntity.setCategory(createCategoryToTest());
         itemEntity.setUnit(createUnitToTest());
-        itemRepository.save(itemEntity);
-        return itemEntity;
+        return itemRepository.save(itemEntity);
     }
 }

@@ -7,10 +7,11 @@ import com.omatheusmesmo.shoppmate.list.dtos.listpermission.ListPermissionReques
 import com.omatheusmesmo.shoppmate.list.dtos.listpermission.ListPermissionResponseDTO;
 import com.omatheusmesmo.shoppmate.list.dtos.listpermission.ListPermissionSummaryDTO;
 import com.omatheusmesmo.shoppmate.list.entity.ListPermission;
-import com.omatheusmesmo.shoppmate.list.entity.Permission;
+import com.omatheusmesmo.shoppmate.list.entity.ShoppingList;
 import com.omatheusmesmo.shoppmate.list.mapper.ListPermissionMapper;
 import com.omatheusmesmo.shoppmate.list.service.ListPermissionService;
 import com.omatheusmesmo.shoppmate.shared.test.annotation.WithMockCustomUser;
+import com.omatheusmesmo.shoppmate.shared.testutils.ListTestFactory;
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,40 +54,47 @@ class ListPermissionControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private ShoppingList shoppingList;
     private ListPermission listPermission;
     private ListPermissionSummaryDTO summaryDTO;
     private ListPermissionResponseDTO responseDTO;
 
     @BeforeEach
     void setUp() {
-        listPermission = new ListPermission();
-        listPermission.setId(1L);
-        listPermission.setPermission(Permission.READ);
+        shoppingList = ListTestFactory.createValidShoppingList();
+        listPermission = ListTestFactory.createValidListPermission(shoppingList);
 
-        summaryDTO = new ListPermissionSummaryDTO(1L, "John Doe", "john@example.com", Permission.READ);
-        responseDTO = new ListPermissionResponseDTO(1L, null, null, Permission.READ);
+        summaryDTO = new ListPermissionSummaryDTO(listPermission.getId(), listPermission.getUser().getFullName(),
+                listPermission.getUser().getEmail(), listPermission.getPermission());
+
+        responseDTO = new ListPermissionResponseDTO(listPermission.getId(), null, null, listPermission.getPermission());
     }
 
     @Test
     @WithMockCustomUser
     void getAllListPermissions_ExistingListId_ReturnsOkWithPermissions() throws Exception {
-        when(listPermissionService.findAllPermissionsByListId(eq(1L), any(User.class)))
+        // Arrange
+        when(listPermissionService.findAllPermissionsByListId(eq(shoppingList.getId()), any(User.class)))
                 .thenReturn(List.of(listPermission));
         when(listPermissionMapper.toSummaryDTO(any(ListPermission.class))).thenReturn(summaryDTO);
 
-        mockMvc.perform(get("/lists/1/permissions")).andExpect(status().isOk())
+        // Act & Assert
+        mockMvc.perform(get("/lists/" + shoppingList.getId() + "/permissions")).andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of(summaryDTO))));
     }
 
     @Test
     @WithMockCustomUser
     void addListPermission_ValidRequest_ReturnsCreatedWithPermission() throws Exception {
-        ListPermissionRequestDTO requestDTO = new ListPermissionRequestDTO(1L, 1L, Permission.READ);
+        // Arrange
+        ListPermissionRequestDTO requestDTO = ListTestFactory.createValidListPermissionRequestDTO(shoppingList.getId(),
+                listPermission.getUser().getId());
         when(listPermissionService.addListPermission(any(ListPermissionRequestDTO.class), any(User.class)))
                 .thenReturn(listPermission);
         when(listPermissionMapper.toResponseDTO(any(ListPermission.class))).thenReturn(responseDTO);
 
-        mockMvc.perform(post("/lists/1/permissions").contentType(MediaType.APPLICATION_JSON)
+        // Act & Assert
+        mockMvc.perform(post("/lists/" + shoppingList.getId() + "/permissions").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO))).andExpect(status().isCreated())
                 .andExpect(content().json(objectMapper.writeValueAsString(responseDTO)));
     }

@@ -1,5 +1,6 @@
 package com.omatheusmesmo.shoppmate.auth.service;
 
+import com.omatheusmesmo.shoppmate.shared.testutils.UserTestFactory;
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import com.omatheusmesmo.shoppmate.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,28 +31,29 @@ class CustomUserDetailsServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = new User();
-        user.setId(1L);
-        user.setEmail("john@example.com");
-        user.setPassword("secret");
-        user.setFullName("John");
+        user = UserTestFactory.createValidUser();
     }
 
     @Test
     void loadUserByUsername_ExistingEmail_ReturnsUserDetails() {
-        when(userRepository.findByEmail("john@example.com")).thenReturn(Optional.of(user));
+        // Arrange
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername("john@example.com");
+        // Act
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getEmail());
 
-        assertEquals("john@example.com", userDetails.getUsername());
-        assertEquals("secret", userDetails.getPassword());
+        // Assert
+        assertEquals(user.getEmail(), userDetails.getUsername());
+        assertEquals(user.getPassword(), userDetails.getPassword());
     }
 
     @Test
     void loadUserByUsername_MissingEmail_ThrowsUsernameNotFoundException() {
-        when(userRepository.findByEmail("missing@example.com")).thenReturn(Optional.empty());
+        // Arrange
+        String missingEmail = "missing-" + user.getEmail();
+        when(userRepository.findByEmail(missingEmail)).thenReturn(Optional.empty());
 
-        assertThrows(UsernameNotFoundException.class,
-                () -> customUserDetailsService.loadUserByUsername("missing@example.com"));
+        // Act & Assert
+        assertThrows(UsernameNotFoundException.class, () -> customUserDetailsService.loadUserByUsername(missingEmail));
     }
 }
