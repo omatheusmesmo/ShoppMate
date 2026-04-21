@@ -1,6 +1,6 @@
 <div class="container">
   <div class="page-header">
-    <h1>Gerenciar Unidades</h1>
+    <h1>Manage Units</h1>
   </div>
 
   @if (loading()) {
@@ -12,9 +12,9 @@
       <mat-card appearance="outlined" class="error-card">
         <mat-card-content>
           <mat-icon color="warn">error</mat-icon>
-          <p>Erro ao carregar unidades. Tente novamente mais tarde.</p>
+          <p>Error loading units. Please try again later.</p>
           <button mat-stroked-button color="primary" (click)="loadUnits()">
-            Tentar Novamente
+            Try Again
           </button>
         </mat-card-content>
       </mat-card>
@@ -22,7 +22,7 @@
   } @else {
     <div class="add-unit-container mb-3">
       <button mat-raised-button color="primary" (click)="openNewUnitDialog()">
-        <mat-icon>add</mat-icon> Nova Unidade
+        <mat-icon>add</mat-icon> New Unit
       </button>
     </div>
 
@@ -32,25 +32,25 @@
           <table mat-table [dataSource]="units()" class="unit-table">
             <!-- Name Column -->
             <ng-container matColumnDef="name">
-              <th mat-header-cell *matHeaderCellDef>Nome</th>
+              <th mat-header-cell *matHeaderCellDef>Name</th>
               <td mat-cell *matCellDef="let element">{{ element.name }}</td>
             </ng-container>
 
             <!-- Symbol Column -->
             <ng-container matColumnDef="symbol">
-              <th mat-header-cell *matHeaderCellDef>Símbolo</th>
+              <th mat-header-cell *matHeaderCellDef>Symbol</th>
               <td mat-cell *matCellDef="let element">{{ element.symbol }}</td>
             </ng-container>
 
             <!-- Actions Column -->
             <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef>Ações</th>
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
               <td mat-cell *matCellDef="let element">
                 <button
                   mat-icon-button
                   color="primary"
                   (click)="editUnit(element)"
-                  aria-label="Editar unidade"
+                  aria-label="Edit Unit"
                 >
                   <mat-icon>edit</mat-icon>
                 </button>
@@ -58,7 +58,7 @@
                   mat-icon-button
                   color="warn"
                   (click)="deleteUnit(element)"
-                  aria-label="Excluir unidade"
+                  aria-label="Delete Unit"
                 >
                   <mat-icon>delete</mat-icon>
                 </button>
@@ -73,13 +73,13 @@
     } @else {
       <mat-card appearance="outlined" class="empty-state">
         <mat-card-content>
-          <p>Nenhuma unidade cadastrada.</p>
+          <p>No units registered.</p>
           <button
             mat-raised-button
             color="primary"
             (click)="openNewUnitDialog()"
           >
-            Cadastrar Primeira Unidade
+            Add First Unit
           </button>
         </mat-card-content>
       </mat-card>

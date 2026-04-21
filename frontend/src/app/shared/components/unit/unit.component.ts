@@ -1,8 +1,8 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  inject,
   OnInit,
+  inject,
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -67,7 +67,7 @@ export class UnitComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: () => {
-        this.feedback.error('Erro ao carregar unidades');
+        this.feedback.error('Error loading units');
         this.isLoading.set(false);
       },
     });
@@ -97,14 +97,14 @@ export class UnitComponent implements OnInit {
       next: () => {
         this.feedback.success(
           editingId !== null
-            ? 'Unidade atualizada com sucesso'
-            : 'Unidade criada com sucesso',
+            ? 'Unit updated successfully'
+            : 'Unit created successfully',
         );
         this.resetForm();
         this.loadUnits();
       },
       error: () => {
-        this.feedback.error('Erro ao salvar unidade');
+        this.feedback.error('Error saving unit');
       },
     });
   }
@@ -120,20 +120,20 @@ export class UnitComponent implements OnInit {
   deleteUnit(id: number): void {
     this.confirmDialog
       .open({
-        title: 'Excluir unidade',
-        message: 'Tem certeza que deseja excluir esta unidade?',
-        confirmText: 'Excluir',
+        title: 'Delete Unit',
+        message: 'Are you sure you want to delete this unit?',
+        confirmText: 'Delete',
       })
-      .subscribe((confirmed: boolean) => {
+      .subscribe((confirmed) => {
         if (!confirmed) return;
 
         this.unitService.deleteUnit(id).subscribe({
           next: () => {
-            this.feedback.success('Unidade excluída com sucesso');
+            this.feedback.success('Unit deleted successfully');
             this.loadUnits();
           },
           error: () => {
-            this.feedback.error('Erro ao excluir unidade');
+            this.feedback.error('Error deleting unit');
           },
         });
       });

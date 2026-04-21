@@ -90,7 +90,7 @@ export class UnitDialogComponent implements OnInit {
         this.updateNameValidator();
       },
       error: () => {
-        this.feedback.error('Erro ao carregar unidades para validação');
+        this.feedback.error('Error loading units for validation');
       },
     });
   }

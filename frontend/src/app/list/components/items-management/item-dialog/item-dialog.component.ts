@@ -107,7 +107,7 @@ export class ItemDialogComponent implements OnInit {
         this.updateNameValidator();
       },
       error: () => {
-        this.feedback.error('Erro ao carregar itens para validacao');
+        this.feedback.error('Error loading items for validation');
       },
     });
   }

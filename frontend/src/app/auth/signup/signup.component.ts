@@ -73,7 +73,7 @@ export class SignupComponent {
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: () => {
-          this.snackBar.open('Cadastro realizado com sucesso!', 'Fechar', {
+          this.snackBar.open('Account created successfully!', 'Close', {
             duration: 3000,
           });
           this.router.navigate(['/login']);
@@ -81,8 +81,8 @@ export class SignupComponent {
         error: (error) => {
           console.error('Signup error:', error);
           this.snackBar.open(
-            'Falha ao realizar cadastro. Tente novamente.',
-            'Fechar',
+            'Failed to create account. Please try again.',
+            'Close',
             { duration: 5000 },
           );
         },

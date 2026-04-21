@@ -2,23 +2,23 @@
   <div class="signup-container">
     <mat-card appearance="outlined">
       <mat-card-header>
-        <mat-card-title>Criar Conta</mat-card-title>
+        <mat-card-title>Create Account</mat-card-title>
       </mat-card-header>
 
       <mat-card-content>
         <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
           <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Nome Completo</mat-label>
+            <mat-label>Full Name</mat-label>
             <input
               matInput
               formControlName="fullName"
-              placeholder="Seu nome completo"
+              placeholder="Your full name"
             />
             @if (
               signupForm.get("fullName")?.hasError("required") &&
               signupForm.get("fullName")?.touched
             ) {
-              <mat-error>Nome completo é obrigatório</mat-error>
+              <mat-error>Full name is required</mat-error>
             }
           </mat-form-field>
 
@@ -28,24 +28,24 @@
               matInput
               type="email"
               formControlName="email"
-              placeholder="Seu email"
+              placeholder="Your email"
             />
             @if (
               signupForm.get("email")?.hasError("required") &&
               signupForm.get("email")?.touched
             ) {
-              <mat-error>Email é obrigatório</mat-error>
+              <mat-error>Email is required</mat-error>
             }
             @if (
               signupForm.get("email")?.hasError("email") &&
               !signupForm.get("email")?.hasError("required")
             ) {
-              <mat-error>Email é inválido</mat-error>
+              <mat-error>Email is invalid</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Senha</mat-label>
+            <mat-label>Password</mat-label>
             <input
               matInput
               [type]="hidePassword() ? 'password' : 'text'"
@@ -65,13 +65,13 @@
               signupForm.get("password")?.hasError("required") &&
               signupForm.get("password")?.touched
             ) {
-              <mat-error>Senha é obrigatória</mat-error>
+              <mat-error>Password is required</mat-error>
             }
             @if (
               signupForm.get("password")?.hasError("minlength") &&
               !signupForm.get("password")?.hasError("required")
             ) {
-              <mat-error>A senha deve conter pelo menos 6 caracteres</mat-error>
+              <mat-error>Password must be at least 6 characters long</mat-error>
             }
           </mat-form-field>
 
@@ -85,7 +85,7 @@
               @if (isLoading()) {
                 <mat-spinner diameter="24"></mat-spinner>
               } @else {
-                Criar Conta
+                Create Account
               }
             </button>
           </div>
@@ -93,8 +93,8 @@
       </mat-card-content>
 
       <mat-card-actions class="login-actions">
-        <span>Já possui uma conta?</span>
-        <a mat-button color="primary" routerLink="/login">Entrar</a>
+        <span>Already have an account?</span>
+        <a mat-button color="primary" routerLink="/login">Sign In</a>
       </mat-card-actions>
     </mat-card>
   </div>

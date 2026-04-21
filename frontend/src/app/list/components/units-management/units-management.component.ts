@@ -61,9 +61,7 @@ export class UnitsManagementComponent implements OnInit {
         catchError(() => {
           this.error.set(true);
           this.units.set([]);
-          this.feedback.error(
-            'Erro ao carregar unidades. Tente novamente mais tarde.',
-          );
+          this.feedback.error('Error loading units. Please try again later.');
           return of([]);
         }),
         finalize(() => {
@@ -84,10 +82,10 @@ export class UnitsManagementComponent implements OnInit {
         this.unitService.updateUnit(result).subscribe({
           next: () => {
             this.loadUnits();
-            this.feedback.success('Unidade atualizada com sucesso');
+            this.feedback.success('Unit updated successfully');
           },
           error: () => {
-            this.feedback.error('Erro ao atualizar unidade');
+            this.feedback.error('Error updating unit');
           },
         });
       }
@@ -97,9 +95,9 @@ export class UnitsManagementComponent implements OnInit {
   deleteUnit(unit: Unit): void {
     this.confirmDialog
       .open({
-        title: 'Excluir unidade',
-        message: `Tem certeza que deseja excluir a unidade "${unit.name}"?`,
-        confirmText: 'Excluir',
+        title: 'Delete Unit',
+        message: `Are you sure you want to delete the unit "${unit.name}"?`,
+        confirmText: 'Delete',
       })
       .subscribe((confirmed) => {
         if (!confirmed) return;
@@ -107,10 +105,10 @@ export class UnitsManagementComponent implements OnInit {
         this.unitService.deleteUnit(unit.id!).subscribe({
           next: () => {
             this.loadUnits();
-            this.feedback.success('Unidade excluida com sucesso');
+            this.feedback.success('Unit deleted successfully');
           },
           error: () => {
-            this.feedback.error('Erro ao excluir unidade');
+            this.feedback.error('Error deleting unit');
           },
         });
       });
@@ -127,10 +125,10 @@ export class UnitsManagementComponent implements OnInit {
         this.unitService.addUnit(result).subscribe({
           next: () => {
             this.loadUnits();
-            this.feedback.success('Unidade adicionada com sucesso');
+            this.feedback.success('Unit added successfully');
           },
           error: () => {
-            this.feedback.error('Erro ao adicionar unidade');
+            this.feedback.error('Error adding unit');
           },
         });
       }

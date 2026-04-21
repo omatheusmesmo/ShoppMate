@@ -92,7 +92,7 @@ export class ListShareDialogComponent implements OnInit {
           this.isLoading.set(false);
         },
         error: () => {
-          this.feedback.error('Erro ao carregar permissoes');
+          this.feedback.error('Error loading permissions');
           this.isLoading.set(false);
         },
       });
@@ -104,7 +104,7 @@ export class ListShareDialogComponent implements OnInit {
         this.users.set(users);
       },
       error: () => {
-        this.feedback.error('Erro ao carregar usuarios');
+        this.feedback.error('Error loading users');
       },
     });
   }
@@ -115,7 +115,7 @@ export class ListShareDialogComponent implements OnInit {
       const user = this.users().find((u) => u.email === email);
 
       if (!user || !user.id) {
-        this.feedback.error('Usuario nao encontrado com este e-mail');
+        this.feedback.error('User not found with this email');
         return;
       }
 
@@ -127,12 +127,12 @@ export class ListShareDialogComponent implements OnInit {
 
       this.listPermissionService.addListPermission(request).subscribe({
         next: () => {
-          this.feedback.success('Lista compartilhada com sucesso');
+          this.feedback.success('List shared successfully');
           this.shareForm.reset({ permission: Permission.READ });
           this.loadPermissions();
         },
         error: () => {
-          this.feedback.error('Erro ao compartilhar lista');
+          this.feedback.error('Error sharing list');
         },
       });
     }
@@ -141,9 +141,9 @@ export class ListShareDialogComponent implements OnInit {
   removePermission(permissionId: number): void {
     this.confirmDialog
       .open({
-        title: 'Remover permissao',
-        message: 'Tem certeza que deseja remover esta permissao?',
-        confirmText: 'Remover',
+        title: 'Remove Permission',
+        message: 'Are you sure you want to remove this permission?',
+        confirmText: 'Remove',
       })
       .subscribe((confirmed) => {
         if (!confirmed) return;
@@ -152,11 +152,11 @@ export class ListShareDialogComponent implements OnInit {
           .deleteListPermission(this.data.listId, permissionId)
           .subscribe({
             next: () => {
-              this.feedback.success('Permissao removida com sucesso');
+              this.feedback.success('Permission removed successfully');
               this.loadPermissions();
             },
             error: () => {
-              this.feedback.error('Erro ao remover permissao');
+              this.feedback.error('Error removing permission');
             },
           });
       });

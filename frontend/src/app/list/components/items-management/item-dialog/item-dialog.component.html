@@ -1,24 +1,24 @@
 <form [formGroup]="itemForm" (ngSubmit)="onSave()">
-  <h2 mat-dialog-title>{{ data.item ? "Editar" : "Novo" }} Item</h2>
+  <h2 mat-dialog-title>{{ data.item ? "Edit" : "New" }} Item</h2>
   <mat-dialog-content>
     <mat-form-field appearance="outline" class="w-100">
-      <mat-label>Nome</mat-label>
+      <mat-label>Name</mat-label>
       <input
         matInput
         formControlName="name"
-        placeholder="Digite o nome do item"
+        placeholder="Enter the item name"
         required
       />
       @if (itemForm.get("name")?.hasError("required")) {
-        <mat-error> Nome é obrigatório </mat-error>
+        <mat-error> Name is required </mat-error>
       }
       @if (itemForm.get("name")?.hasError("duplicateName")) {
-        <mat-error> Já existe um item com este nome </mat-error>
+        <mat-error> An item with this name already exists </mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="w-100">
-      <mat-label>Categoria</mat-label>
+      <mat-label>Category</mat-label>
       <mat-select formControlName="idCategory" required>
         @for (category of categories(); track category.id) {
           <mat-option [value]="category.id">
@@ -27,12 +27,12 @@
         }
       </mat-select>
       @if (itemForm.get("idCategory")?.hasError("required")) {
-        <mat-error> Categoria é obrigatória </mat-error>
+        <mat-error> Category is required </mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="w-100">
-      <mat-label>Unidade</mat-label>
+      <mat-label>Unit</mat-label>
       <mat-select formControlName="idUnit" required>
         @for (unit of units(); track unit.id) {
           <mat-option [value]="unit.id">
@@ -41,19 +41,19 @@
         }
       </mat-select>
       @if (itemForm.get("idUnit")?.hasError("required")) {
-        <mat-error> Unidade é obrigatória </mat-error>
+        <mat-error> Unit is required </mat-error>
       }
     </mat-form-field>
   </mat-dialog-content>
   <mat-dialog-actions align="end">
-    <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+    <button mat-button type="button" (click)="onCancel()">Cancel</button>
     <button
       mat-raised-button
       color="primary"
       type="submit"
       [disabled]="itemForm.invalid"
     >
-      Salvar
+      Save
     </button>
   </mat-dialog-actions>
 </form>

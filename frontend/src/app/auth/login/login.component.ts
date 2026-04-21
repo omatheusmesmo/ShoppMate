@@ -76,8 +76,8 @@ export class LoginComponent {
           console.error('Login error:', error);
           this.snackBar.open(
             error.message ||
-              'Falha ao fazer login. Verifique suas credenciais.',
-            'Fechar',
+              'Failed to sign in. Please check your credentials.',
+            'Close',
             {
               duration: 5000,
               panelClass: ['error-snackbar'],

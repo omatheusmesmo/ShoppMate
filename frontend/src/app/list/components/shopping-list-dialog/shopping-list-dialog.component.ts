@@ -77,21 +77,21 @@ export class ShoppingListDialogComponent {
           .updateShoppingList(this.data.list.idList, listData)
           .subscribe({
             next: () => {
-              this.feedback.success('Lista atualizada com sucesso');
+              this.feedback.success('List updated successfully');
               this.dialogRef.close(true);
             },
             error: () => {
-              this.feedback.error('Erro ao atualizar lista');
+              this.feedback.error('Error updating list');
             },
           });
       } else {
         this.shoppingListService.createShoppingList(listData).subscribe({
           next: () => {
-            this.feedback.success('Lista criada com sucesso');
+            this.feedback.success('List created successfully');
             this.dialogRef.close(true);
           },
           error: () => {
-            this.feedback.error('Erro ao criar lista');
+            this.feedback.error('Error creating list');
           },
         });
       }
