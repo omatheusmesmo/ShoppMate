@@ -4,6 +4,7 @@ import {
   OnInit,
   inject,
   signal,
+  computed,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -16,8 +17,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
-import { AsyncPipe } from '@angular/common';
-import { finalize, Observable } from 'rxjs';
+import { finalize } from 'rxjs';
 import { ItemDialogComponent } from './item-dialog/item-dialog.component';
 
 import { ItemService } from '../../../shared/services/item.service';
@@ -43,7 +43,6 @@ import { FeedbackService } from '../../../shared/services/feedback.service';
     MatPaginatorModule,
     MatProgressSpinnerModule,
     ReactiveFormsModule,
-    AsyncPipe,
   ],
   templateUrl: './items-management.component.html',
   styleUrls: ['./items-management.component.scss'],
@@ -59,10 +58,17 @@ export class ItemsManagementComponent implements OnInit {
   private fb = inject(FormBuilder);
 
   readonly loading = signal(true);
-  items$!: Observable<ItemResponseDTO[]>;
+  readonly displayedColumns = signal<string[]>([
+    'name',
+    'category',
+    'unit',
+    'actions',
+  ]);
+
+  private readonly itemsSignal = signal<ItemResponseDTO[]>([]);
   readonly categories = signal<Category[]>([]);
   readonly units = signal<Unit[]>([]);
-  displayedColumns: string[] = ['name', 'category', 'unit', 'actions'];
+  readonly items = computed(() => this.itemsSignal());
 
   ngOnInit(): void {
     this.loadReferenceData();
@@ -71,9 +77,13 @@ export class ItemsManagementComponent implements OnInit {
 
   loadItems(): void {
     this.loading.set(true);
-    this.items$ = this.itemService
+    this.itemService
       .getAllItems()
-      .pipe(finalize(() => this.loading.set(false)));
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: (items) => this.itemsSignal.set(items),
+        error: () => this.feedback.error('Error loading items'),
+      });
   }
 
   loadReferenceData(): void {

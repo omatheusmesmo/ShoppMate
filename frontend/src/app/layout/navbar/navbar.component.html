@@ -4,7 +4,7 @@
       <span class="app-title">ShoppMate</span>
       <span class="spacer"></span>
 
-      @if (isLoggedIn$ | async) {
+      @if (isLoggedIn()) {
         <div class="nav-links" [class.hidden-mobile]="!isLargeScreen()">
           <a mat-button routerLink="/lists" routerLinkActive="active-link">
             <mat-icon>list</mat-icon>

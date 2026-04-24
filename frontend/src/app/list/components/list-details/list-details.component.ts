@@ -4,6 +4,7 @@ import {
   OnInit,
   inject,
   signal,
+  computed,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -17,9 +18,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AsyncPipe } from '@angular/common';
 import { FormBuilder } from '@angular/forms';
-import { finalize, map, Observable } from 'rxjs';
+import { map, forkJoin, finalize } from 'rxjs';
 import { ListItemDialogComponent } from './list-item-dialog/list-item-dialog.component';
 
 import { ListItemService } from '../../../shared/services/list-item.service';
@@ -45,7 +45,6 @@ import { FeedbackService } from '../../../shared/services/feedback.service';
     MatProgressSpinnerModule,
     FormsModule,
     ReactiveFormsModule,
-    AsyncPipe,
   ],
   templateUrl: './list-details.component.html',
   styleUrls: ['./list-details.component.scss'],
@@ -63,9 +62,22 @@ export class ListDetailsComponent implements OnInit {
 
   listId!: number;
   readonly loading = signal(true);
-  list$!: Observable<ShoppingListResponseDTO>;
-  listItems$!: Observable<ListItemResponseDTO[]>;
-  displayedColumns: string[] = ['item', 'quantity', 'status', 'actions'];
+  readonly displayedColumns = signal<string[]>([
+    'item',
+    'quantity',
+    'status',
+    'actions',
+  ]);
+
+  private readonly listSignal = signal<ShoppingListResponseDTO | null>(null);
+  private readonly listItemsSignal = signal<ListItemResponseDTO[]>([]);
+
+  readonly list = computed(() => this.listSignal());
+  readonly listItems = computed(() => this.listItemsSignal());
+  readonly purchasedCount = computed(
+    () => this.listItemsSignal().filter((item) => item.purchased).length,
+  );
+  readonly totalCount = computed(() => this.listItemsSignal().length);
 
   ngOnInit(): void {
     this.listId = +this.route.snapshot.paramMap.get('id')!;
@@ -75,13 +87,22 @@ export class ListDetailsComponent implements OnInit {
   loadData(): void {
     this.loading.set(true);
 
-    this.list$ = this.shoppingListService
-      .getAllShoppingLists()
-      .pipe(map((lists) => lists.find((list) => list.idList === this.listId)!));
-
-    this.listItems$ = this.listItemService
-      .getAllListItemsByListId(this.listId)
-      .pipe(finalize(() => this.loading.set(false)));
+    forkJoin({
+      list: this.shoppingListService
+        .getAllShoppingLists()
+        .pipe(
+          map((lists) => lists.find((list) => list.idList === this.listId)!),
+        ),
+      items: this.listItemService.getAllListItemsByListId(this.listId),
+    })
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: ({ list, items }) => {
+          this.listSignal.set(list);
+          this.listItemsSignal.set(items);
+        },
+        error: () => this.feedback.error('Error loading list data'),
+      });
   }
 
   togglePurchased(item: ListItemResponseDTO): void {
