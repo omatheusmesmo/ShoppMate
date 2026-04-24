@@ -10,7 +10,7 @@
 
 .purchased {
   text-decoration: line-through;
-  color: #888;
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .item-info {
@@ -20,7 +20,7 @@
 
 .item-category {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--mat-sys-outline);
 }
 
 .empty-list {

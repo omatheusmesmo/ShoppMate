@@ -49,6 +49,7 @@
                     mat-icon-button
                     color="primary"
                     (click)="editItem(element)"
+                    [attr.aria-label]="'Edit ' + (element.name || 'item')"
                   >
                     <mat-icon>edit</mat-icon>
                   </button>
@@ -56,6 +57,7 @@
                     mat-icon-button
                     color="warn"
                     (click)="deleteItem(element)"
+                    [attr.aria-label]="'Delete ' + (element.name || 'item')"
                   >
                     <mat-icon>delete</mat-icon>
                   </button>

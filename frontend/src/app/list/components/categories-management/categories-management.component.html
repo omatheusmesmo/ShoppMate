@@ -19,6 +19,7 @@
                   mat-icon-button
                   color="primary"
                   (click)="openEditDialog(category)"
+                  [attr.aria-label]="'Edit category ' + category.name"
                 >
                   <mat-icon>edit</mat-icon>
                 </button>
@@ -26,6 +27,7 @@
                   mat-icon-button
                   color="warn"
                   (click)="category.id && deleteCategory(category.id)"
+                  [attr.aria-label]="'Delete category ' + category.name"
                 >
                   <mat-icon>delete</mat-icon>
                 </button>
