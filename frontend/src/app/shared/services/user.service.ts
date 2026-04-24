@@ -9,9 +9,7 @@ import { catchError } from 'rxjs/operators';
 })
 export class UserService extends BaseService {
   getAllUsers(): Observable<User[]> {
-    return this.http
-      .get<User[]>(`${this.baseUrl}/users/users`)
-      .pipe(catchError(this.handleError));
+    return this.http.get<User[]>(`${this.baseUrl}/users/users`).pipe(catchError(this.handleError));
   }
 
   getUserById(id: number): Observable<User> {

@@ -9,23 +9,15 @@
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Email</mat-label>
-            <input
-              matInput
-              type="email"
-              formControlName="email"
-              placeholder="Your email"
-            />
+            <input matInput type="email" formControlName="email" placeholder="Your email" />
 
-            @if (
-              loginForm.get("email")?.hasError("required") &&
-              loginForm.get("email")?.touched
-            ) {
+            @if (loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched) {
               <mat-error> Email is required </mat-error>
             }
 
             @if (
-              loginForm.get("email")?.hasError("email") &&
-              !loginForm.get("email")?.hasError("required")
+              loginForm.get('email')?.hasError('email') &&
+              !loginForm.get('email')?.hasError('required')
             ) {
               <mat-error> Email is invalid </mat-error>
             }
@@ -47,14 +39,11 @@
                 hidePassword() ? 'Show password' : 'Hide password'
               "
             >
-              <mat-icon>{{
-                hidePassword() ? "visibility_off" : "visibility"
-              }}</mat-icon>
+              <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
 
             @if (
-              loginForm.get("password")?.hasError("required") &&
-              loginForm.get("password")?.touched
+              loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched
             ) {
               <mat-error> Password is required </mat-error>
             }

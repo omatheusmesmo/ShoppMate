@@ -48,13 +48,13 @@ src/app/
 
 ```typescript
 // 1. Angular core
-import { ChangeDetectionStrategy, Component, inject, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 // 2. Angular Material
-import { MatButtonModule } from "@angular/material/button";
+import { MatButtonModule } from '@angular/material/button';
 // 3. Third-party
-import { catchError } from "rxjs/operators";
+import { catchError } from 'rxjs/operators';
 // 4. Application
-import { ItemService } from "../../services/item.service";
+import { ItemService } from '../../services/item.service';
 ```
 
 ### Components
@@ -63,11 +63,11 @@ import { ItemService } from "../../services/item.service";
 
 ```typescript
 @Component({
-  selector: "app-example",
+  selector: 'app-example',
   standalone: true,
   imports: [CommonModule, MatButtonModule],
-  templateUrl: "./example.component.html",
-  styleUrls: ["./example.component.scss"],
+  templateUrl: './example.component.html',
+  styleUrls: ['./example.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush, // REQUIRED
 })
 export class ExampleComponent implements OnInit {}
@@ -109,7 +109,7 @@ constructor(private itemService: ItemService) {}
 Extend `BaseService` for HTTP operations:
 
 ```typescript
-@Injectable({ providedIn: "root" })
+@Injectable({ providedIn: 'root' })
 export class ItemService extends BaseService {
   private apiUrl = `${environment.apiUrl}/item`;
 
@@ -141,10 +141,10 @@ Use `FeedbackService` for user messages:
 ```typescript
 this.itemService.deleteItem(id).subscribe({
   next: () => {
-    this.feedback.success("Item excluído com sucesso");
+    this.feedback.success('Item excluído com sucesso');
     this.loadInitialData();
   },
-  error: () => this.feedback.error("Erro ao excluir item"),
+  error: () => this.feedback.error('Erro ao excluir item'),
 });
 ```
 
@@ -154,8 +154,8 @@ Use typed forms with `nonNullable`:
 
 ```typescript
 loginForm = this.fb.nonNullable.group({
-  email: ["", [Validators.required, Validators.email]],
-  password: ["", Validators.required],
+  email: ['', [Validators.required, Validators.email]],
+  password: ['', Validators.required],
 });
 ```
 
@@ -178,9 +178,13 @@ Use Jasmine/Karma with TestBed. Mock services from `shared/mocks/mock-services.t
 
 ```typescript
 beforeEach(() => {
-  authServiceSpy = jasmine.createSpyObj("AuthService", ["getToken", "logout"]);
+  authServiceSpy = jasmine.createSpyObj('AuthService', ['getToken', 'logout']);
   TestBed.configureTestingModule({
-    providers: [provideHttpClient(withInterceptors([authInterceptor])), provideHttpClientTesting(), { provide: AuthService, useValue: authServiceSpy }],
+    providers: [
+      provideHttpClient(withInterceptors([authInterceptor])),
+      provideHttpClientTesting(),
+      { provide: AuthService, useValue: authServiceSpy },
+    ],
   });
 });
 

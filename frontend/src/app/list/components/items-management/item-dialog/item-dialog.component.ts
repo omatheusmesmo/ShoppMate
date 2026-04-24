@@ -1,10 +1,4 @@
-import {
-  Component,
-  OnInit,
-  inject,
-  signal,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -16,19 +10,12 @@ import {
   ValidationErrors,
   ValidatorFn,
 } from '@angular/forms';
-import {
-  MatDialogModule,
-  MatDialogRef,
-  MAT_DIALOG_DATA,
-} from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
-import {
-  ItemRequestDTO,
-  ItemResponseDTO,
-} from '../../../../shared/interfaces/item.interface';
+import { ItemRequestDTO, ItemResponseDTO } from '../../../../shared/interfaces/item.interface';
 import { CategoryService } from '../../../../shared/services/category.service';
 import { UnitService } from '../../../../shared/services/unit.service';
 import { ItemService } from '../../../../shared/services/item.service';
@@ -44,9 +31,7 @@ export function duplicateNameValidator(
     if (!control.value) return null;
     const name = control.value.trim().toLowerCase();
     if (originalName && name === originalName.trim().toLowerCase()) return null;
-    return existingNames.some(
-      (existingName) => existingName.trim().toLowerCase() === name,
-    )
+    return existingNames.some((existingName) => existingName.trim().toLowerCase() === name)
       ? { duplicateName: true }
       : null;
   };
@@ -116,9 +101,7 @@ export class ItemDialogComponent implements OnInit {
     const names = this.existingItems().map((i) => i.name);
     const originalName = this.data.item ? this.data.item.name : undefined;
 
-    this.itemForm
-      .get('name')
-      ?.addValidators(duplicateNameValidator(names, originalName));
+    this.itemForm.get('name')?.addValidators(duplicateNameValidator(names, originalName));
     this.itemForm.get('name')?.updateValueAndValidity();
   }
 

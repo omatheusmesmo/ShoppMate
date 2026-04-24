@@ -1,8 +1,4 @@
-import {
-  HttpClient,
-  HttpErrorResponse,
-  HttpHeaders,
-} from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, catchError, tap, throwError } from 'rxjs';
@@ -30,23 +26,19 @@ export class AuthService {
   };
 
   login(loginRequest: LoginRequest): Observable<string> {
-    return this.http
-      .post(`${this.API_BASE_URL}/auth/login`, loginRequest, this.httpOptions)
-      .pipe(
-        tap((token) => {
-          localStorage.setItem(this.AUTH_TOKEN_KEY, token);
-          this.isLoggedInSubject.next(true);
-        }),
-        catchError((error: HttpErrorResponse) => {
-          console.error('Login error:', error);
-          if (error.status === 403) {
-            return throwError(() => new Error('Credenciais inválidas'));
-          }
-          return throwError(
-            () => new Error('Erro ao fazer login. Tente novamente mais tarde.'),
-          );
-        }),
-      );
+    return this.http.post(`${this.API_BASE_URL}/auth/login`, loginRequest, this.httpOptions).pipe(
+      tap((token) => {
+        localStorage.setItem(this.AUTH_TOKEN_KEY, token);
+        this.isLoggedInSubject.next(true);
+      }),
+      catchError((error: HttpErrorResponse) => {
+        console.error('Login error:', error);
+        if (error.status === 403) {
+          return throwError(() => new Error('Credenciais inválidas'));
+        }
+        return throwError(() => new Error('Erro ao fazer login. Tente novamente mais tarde.'));
+      }),
+    );
   }
 
   register(user: User): Observable<User> {
@@ -60,10 +52,7 @@ export class AuthService {
       .pipe(
         catchError(() => {
           return throwError(
-            () =>
-              new Error(
-                'Erro ao registrar usuário. Tente novamente mais tarde.',
-              ),
+            () => new Error('Erro ao registrar usuário. Tente novamente mais tarde.'),
           );
         }),
       );

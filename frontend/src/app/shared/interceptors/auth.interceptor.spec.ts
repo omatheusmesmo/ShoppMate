@@ -1,13 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import {
-  HttpClient,
-  provideHttpClient,
-  withInterceptors,
-} from '@angular/common/http';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
+import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
 import { authInterceptor } from './auth.interceptor';
 import { AuthService } from '../services/auth.service';
@@ -19,10 +12,7 @@ describe('authInterceptor', () => {
   let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(() => {
-    authServiceSpy = jasmine.createSpyObj('AuthService', [
-      'getToken',
-      'logout',
-    ]);
+    authServiceSpy = jasmine.createSpyObj('AuthService', ['getToken', 'logout']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     TestBed.configureTestingModule({
@@ -49,9 +39,7 @@ describe('authInterceptor', () => {
 
     const result = httpTestingController.expectOne('/api/test');
     expect(result.request.headers.has('Authorization')).toBeTrue();
-    expect(result.request.headers.get('Authorization')).toBe(
-      'Bearer fake-token',
-    );
+    expect(result.request.headers.get('Authorization')).toBe('Bearer fake-token');
   });
 
   it('should NOT add an Authorization header when token is absent', () => {

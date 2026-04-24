@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -80,11 +75,9 @@ export class SignupComponent {
         },
         error: (error) => {
           console.error('Signup error:', error);
-          this.snackBar.open(
-            'Failed to create account. Please try again.',
-            'Close',
-            { duration: 5000 },
-          );
+          this.snackBar.open('Failed to create account. Please try again.', 'Close', {
+            duration: 5000,
+          });
         },
       });
   }

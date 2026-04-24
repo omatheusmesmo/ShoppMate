@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -75,8 +70,7 @@ export class LoginComponent {
         error: (error) => {
           console.error('Login error:', error);
           this.snackBar.open(
-            error.message ||
-              'Failed to sign in. Please check your credentials.',
+            error.message || 'Failed to sign in. Please check your credentials.',
             'Close',
             {
               duration: 5000,

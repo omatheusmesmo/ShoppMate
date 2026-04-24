@@ -1,7 +1,7 @@
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
-const srcDir = path.join(__dirname, "../src");
+const srcDir = path.join(__dirname, '../src');
 let hasErrors = false;
 
 function walkDir(dir, callback) {
@@ -12,29 +12,26 @@ function walkDir(dir, callback) {
   });
 }
 
-console.log("--- Custom Lint: OnPush and Signals ---");
+console.log('--- Custom Lint: OnPush and Signals ---');
 
 walkDir(srcDir, (filePath) => {
-  if (filePath.endsWith(".component.ts")) {
-    const content = fs.readFileSync(filePath, "utf8");
-    const templatePath = filePath.replace(".component.ts", ".component.html");
+  if (filePath.endsWith('.component.ts')) {
+    const content = fs.readFileSync(filePath, 'utf8');
+    const templatePath = filePath.replace('.component.ts', '.component.html');
     const templateContent = fs.existsSync(templatePath)
-      ? fs.readFileSync(templatePath, "utf8")
-      : "";
+      ? fs.readFileSync(templatePath, 'utf8')
+      : '';
 
     // Check for ChangeDetectionStrategy.OnPush
-    if (!content.includes("ChangeDetectionStrategy.OnPush")) {
-      console.error(
-        `Error: Component at ${filePath} does not use ChangeDetectionStrategy.OnPush`,
-      );
+    if (!content.includes('ChangeDetectionStrategy.OnPush')) {
+      console.error(`Error: Component at ${filePath} does not use ChangeDetectionStrategy.OnPush`);
       hasErrors = true;
     }
 
     const signalPattern =
       /\bsignal\s*(?:<[^>]+>)?\s*\(|computed\s*(?:<[^>]+>)?\s*\(|effect\s*\(|input\s*\(|input\.required\s*\(/;
     const usesSignals = signalPattern.test(content);
-    const usesAsyncPipe =
-      /\bAsyncPipe\b/.test(content) || /\|\s*async\b/.test(templateContent);
+    const usesAsyncPipe = /\bAsyncPipe\b/.test(content) || /\|\s*async\b/.test(templateContent);
 
     const hasUiStateProperty =
       /^\s*(?:public|private|protected)?\s*(?:isLoading|loading|shoppingLists|listItems|availableItems|items|categories|units|users|permissions|selected[A-Z]\w*|editing[A-Z]\w*|hidePassword|isLargeScreen|quantity)\s*(?::[^=\n]+)?=\s*.*;\s*$/m.test(
@@ -61,9 +58,9 @@ walkDir(srcDir, (filePath) => {
 });
 
 if (hasErrors) {
-  console.error("\nCustom linting failed.");
+  console.error('\nCustom linting failed.');
   process.exit(1);
 } else {
-  console.log("\nCustom linting passed!");
+  console.log('\nCustom linting passed!');
   process.exit(0);
 }

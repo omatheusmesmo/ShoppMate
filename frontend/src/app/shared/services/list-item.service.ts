@@ -1,9 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import {
-  ListItemRequestDTO,
-  ListItemResponseDTO,
-} from '../interfaces/list-item.interface';
+import { ListItemRequestDTO, ListItemResponseDTO } from '../interfaces/list-item.interface';
 import { BaseService } from './base.service';
 import { catchError } from 'rxjs/operators';
 
@@ -14,9 +11,7 @@ export class ListItemService extends BaseService {
   private readonly endpoint = `${this.baseUrl}/lists`;
 
   getAllListItemsByListId(listId: number): Observable<ListItemResponseDTO[]> {
-    return this.http.get<ListItemResponseDTO[]>(
-      `${this.endpoint}/${listId}/items`,
-    );
+    return this.http.get<ListItemResponseDTO[]>(`${this.endpoint}/${listId}/items`);
   }
 
   getListItemsByListId(listId: number): Observable<ListItemResponseDTO[]> {
@@ -25,10 +20,7 @@ export class ListItemService extends BaseService {
       .pipe(catchError(this.handleError));
   }
 
-  getListItemById(
-    listId: number,
-    itemId: number,
-  ): Observable<ListItemResponseDTO> {
+  getListItemById(listId: number, itemId: number): Observable<ListItemResponseDTO> {
     return this.http
       .get<ListItemResponseDTO>(`${this.endpoint}/${listId}/items/${itemId}`)
       .pipe(catchError(this.handleError));
@@ -53,10 +45,7 @@ export class ListItemService extends BaseService {
     item: ListItemRequestDTO,
   ): Observable<ListItemResponseDTO> {
     return this.http
-      .put<ListItemResponseDTO>(
-        `${this.endpoint}/${listId}/items/${itemId}`,
-        item,
-      )
+      .put<ListItemResponseDTO>(`${this.endpoint}/${listId}/items/${itemId}`, item)
       .pipe(catchError(this.handleError));
   }
 

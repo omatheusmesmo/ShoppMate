@@ -1,20 +1,10 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ShoppingListService } from '../../../shared/services/shopping-list.service';
 import {
   ShoppingListResponseDTO,
@@ -52,10 +42,7 @@ export class ShoppingListDialogComponent {
 
   readonly isEdit = signal(this.data.isEdit);
   readonly listForm: FormGroup = this.fb.group({
-    name: [
-      this.data.list?.listName ?? '',
-      [Validators.required, Validators.minLength(3)],
-    ],
+    name: [this.data.list?.listName ?? '', [Validators.required, Validators.minLength(3)]],
   });
 
   onSubmit(): void {
@@ -73,17 +60,15 @@ export class ShoppingListDialogComponent {
       };
 
       if (this.isEdit() && this.data.list) {
-        this.shoppingListService
-          .updateShoppingList(this.data.list.idList, listData)
-          .subscribe({
-            next: () => {
-              this.feedback.success('List updated successfully');
-              this.dialogRef.close(true);
-            },
-            error: () => {
-              this.feedback.error('Error updating list');
-            },
-          });
+        this.shoppingListService.updateShoppingList(this.data.list.idList, listData).subscribe({
+          next: () => {
+            this.feedback.success('List updated successfully');
+            this.dialogRef.close(true);
+          },
+          error: () => {
+            this.feedback.error('Error updating list');
+          },
+        });
       } else {
         this.shoppingListService.createShoppingList(listData).subscribe({
           next: () => {

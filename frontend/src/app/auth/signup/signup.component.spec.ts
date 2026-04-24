@@ -1,10 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SignupComponent } from './signup.component';
 import { AuthService } from '../../shared/services/auth.service';
-import {
-  MockAuthService,
-  MockMatSnackBar,
-} from '../../shared/mocks/mock-services';
+import { MockAuthService, MockMatSnackBar } from '../../shared/mocks/mock-services';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';

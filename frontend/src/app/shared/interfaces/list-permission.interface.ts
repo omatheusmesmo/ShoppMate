@@ -1,7 +1,4 @@
-import {
-  ShoppingList,
-  ShoppingListResponseDTO,
-} from './shopping-list.interface';
+import { ShoppingList, ShoppingListResponseDTO } from './shopping-list.interface';
 import { User, UserResponseDTO } from './user.interface';
 
 export enum Permission {

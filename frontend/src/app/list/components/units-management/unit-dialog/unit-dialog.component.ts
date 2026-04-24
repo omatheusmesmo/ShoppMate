@@ -1,10 +1,4 @@
-import {
-  Component,
-  OnInit,
-  inject,
-  signal,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -16,11 +10,7 @@ import {
   ValidationErrors,
   ValidatorFn,
 } from '@angular/forms';
-import {
-  MatDialogModule,
-  MatDialogRef,
-  MAT_DIALOG_DATA,
-} from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -36,9 +26,7 @@ export function duplicateNameValidator(
     if (!control.value) return null;
     const name = control.value.trim().toLowerCase();
     if (originalName && name === originalName.trim().toLowerCase()) return null;
-    return existingNames.some(
-      (existingName) => existingName.trim().toLowerCase() === name,
-    )
+    return existingNames.some((existingName) => existingName.trim().toLowerCase() === name)
       ? { duplicateName: true }
       : null;
   };
@@ -99,9 +87,7 @@ export class UnitDialogComponent implements OnInit {
     const names = this.existingUnits().map((u) => u.name);
     const originalName = this.data.unit ? this.data.unit.name : undefined;
 
-    this.unitForm
-      .get('name')
-      ?.addValidators(duplicateNameValidator(names, originalName));
+    this.unitForm.get('name')?.addValidators(duplicateNameValidator(names, originalName));
     this.unitForm.get('name')?.updateValueAndValidity();
   }
 

@@ -9,14 +9,10 @@
         <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Full Name</mat-label>
-            <input
-              matInput
-              formControlName="fullName"
-              placeholder="Your full name"
-            />
+            <input matInput formControlName="fullName" placeholder="Your full name" />
             @if (
-              signupForm.get("fullName")?.hasError("required") &&
-              signupForm.get("fullName")?.touched
+              signupForm.get('fullName')?.hasError('required') &&
+              signupForm.get('fullName')?.touched
             ) {
               <mat-error>Full name is required</mat-error>
             }
@@ -24,21 +20,15 @@
 
           <mat-form-field appearance="outline" class="form-field">
             <mat-label>Email</mat-label>
-            <input
-              matInput
-              type="email"
-              formControlName="email"
-              placeholder="Your email"
-            />
+            <input matInput type="email" formControlName="email" placeholder="Your email" />
             @if (
-              signupForm.get("email")?.hasError("required") &&
-              signupForm.get("email")?.touched
+              signupForm.get('email')?.hasError('required') && signupForm.get('email')?.touched
             ) {
               <mat-error>Email is required</mat-error>
             }
             @if (
-              signupForm.get("email")?.hasError("email") &&
-              !signupForm.get("email")?.hasError("required")
+              signupForm.get('email')?.hasError('email') &&
+              !signupForm.get('email')?.hasError('required')
             ) {
               <mat-error>Email is invalid</mat-error>
             }
@@ -60,19 +50,17 @@
                 hidePassword() ? 'Show password' : 'Hide password'
               "
             >
-              <mat-icon>{{
-                hidePassword() ? "visibility_off" : "visibility"
-              }}</mat-icon>
+              <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
             @if (
-              signupForm.get("password")?.hasError("required") &&
-              signupForm.get("password")?.touched
+              signupForm.get('password')?.hasError('required') &&
+              signupForm.get('password')?.touched
             ) {
               <mat-error>Password is required</mat-error>
             }
             @if (
-              signupForm.get("password")?.hasError("minlength") &&
-              !signupForm.get("password")?.hasError("required")
+              signupForm.get('password')?.hasError('minlength') &&
+              !signupForm.get('password')?.hasError('required')
             ) {
               <mat-error>Password must be at least 6 characters long</mat-error>
             }

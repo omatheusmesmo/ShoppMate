@@ -5,18 +5,11 @@
     <form [formGroup]="shareForm" (ngSubmit)="onShare()" class="share-form">
       <mat-form-field appearance="outline" class="email-field">
         <mat-label>User Email</mat-label>
-        <input
-          matInput
-          formControlName="email"
-          placeholder="example@email.com"
-          type="email"
-        />
+        <input matInput formControlName="email" placeholder="example@email.com" type="email" />
         <mat-error *ngIf="shareForm.get('email')?.hasError('required')"
           >Email is required</mat-error
         >
-        <mat-error *ngIf="shareForm.get('email')?.hasError('email')"
-          >Invalid email</mat-error
-        >
+        <mat-error *ngIf="shareForm.get('email')?.hasError('email')">Invalid email</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="permission-field">
@@ -45,12 +38,7 @@
   <div class="permissions-list">
     <h3>Users with access</h3>
 
-    <table
-      mat-table
-      [dataSource]="permissions()"
-      class="w-100"
-      *ngIf="permissions().length > 0"
-    >
+    <table mat-table [dataSource]="permissions()" class="w-100" *ngIf="permissions().length > 0">
       <ng-container matColumnDef="user">
         <th mat-header-cell *matHeaderCellDef>User</th>
         <td mat-cell *matCellDef="let p">
@@ -90,18 +78,12 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
 
-    <div
-      *ngIf="permissions().length === 0 && !isLoading()"
-      class="no-permissions"
-    >
+    <div *ngIf="permissions().length === 0 && !isLoading()" class="no-permissions">
       No other users have access to this list yet.
     </div>
 
     <div *ngIf="isLoading()" class="loading-container">
-      <mat-progress-spinner
-        mode="indeterminate"
-        diameter="40"
-      ></mat-progress-spinner>
+      <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
     </div>
   </div>
 </mat-dialog-content>

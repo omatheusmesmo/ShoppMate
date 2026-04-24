@@ -1,22 +1,7 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnInit,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import {
-  MatDialogRef,
-  MAT_DIALOG_DATA,
-  MatDialogModule,
-} from '@angular/material/dialog';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -84,18 +69,16 @@ export class ListShareDialogComponent implements OnInit {
 
   loadPermissions(): void {
     this.isLoading.set(true);
-    this.listPermissionService
-      .getAllListPermissions(this.data.listId)
-      .subscribe({
-        next: (permissions: ListPermissionSummaryDTO[]) => {
-          this.permissions.set(permissions);
-          this.isLoading.set(false);
-        },
-        error: () => {
-          this.feedback.error('Error loading permissions');
-          this.isLoading.set(false);
-        },
-      });
+    this.listPermissionService.getAllListPermissions(this.data.listId).subscribe({
+      next: (permissions: ListPermissionSummaryDTO[]) => {
+        this.permissions.set(permissions);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.feedback.error('Error loading permissions');
+        this.isLoading.set(false);
+      },
+    });
   }
 
   loadUsers(): void {
@@ -148,17 +131,15 @@ export class ListShareDialogComponent implements OnInit {
       .subscribe((confirmed) => {
         if (!confirmed) return;
 
-        this.listPermissionService
-          .deleteListPermission(this.data.listId, permissionId)
-          .subscribe({
-            next: () => {
-              this.feedback.success('Permission removed successfully');
-              this.loadPermissions();
-            },
-            error: () => {
-              this.feedback.error('Error removing permission');
-            },
-          });
+        this.listPermissionService.deleteListPermission(this.data.listId, permissionId).subscribe({
+          next: () => {
+            this.feedback.success('Permission removed successfully');
+            this.loadPermissions();
+          },
+          error: () => {
+            this.feedback.error('Error removing permission');
+          },
+        });
       });
   }
 

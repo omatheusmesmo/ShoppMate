@@ -1,11 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnInit,
-  inject,
-  signal,
-  computed,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -18,8 +11,9 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { FormBuilder } from '@angular/forms';
-import { map, forkJoin, finalize } from 'rxjs';
+import { finalize, map, Observable } from 'rxjs';
 import { ListItemDialogComponent } from './list-item-dialog/list-item-dialog.component';
 
 import { ListItemService } from '../../../shared/services/list-item.service';
@@ -45,6 +39,7 @@ import { FeedbackService } from '../../../shared/services/feedback.service';
     MatProgressSpinnerModule,
     FormsModule,
     ReactiveFormsModule,
+    AsyncPipe,
   ],
   templateUrl: './list-details.component.html',
   styleUrls: ['./list-details.component.scss'],
@@ -62,22 +57,9 @@ export class ListDetailsComponent implements OnInit {
 
   listId!: number;
   readonly loading = signal(true);
-  readonly displayedColumns = signal<string[]>([
-    'item',
-    'quantity',
-    'status',
-    'actions',
-  ]);
-
-  private readonly listSignal = signal<ShoppingListResponseDTO | null>(null);
-  private readonly listItemsSignal = signal<ListItemResponseDTO[]>([]);
-
-  readonly list = computed(() => this.listSignal());
-  readonly listItems = computed(() => this.listItemsSignal());
-  readonly purchasedCount = computed(
-    () => this.listItemsSignal().filter((item) => item.purchased).length,
-  );
-  readonly totalCount = computed(() => this.listItemsSignal().length);
+  list$!: Observable<ShoppingListResponseDTO>;
+  listItems$!: Observable<ListItemResponseDTO[]>;
+  displayedColumns: string[] = ['item', 'quantity', 'status', 'actions'];
 
   ngOnInit(): void {
     this.listId = +this.route.snapshot.paramMap.get('id')!;
@@ -87,22 +69,13 @@ export class ListDetailsComponent implements OnInit {
   loadData(): void {
     this.loading.set(true);
 
-    forkJoin({
-      list: this.shoppingListService
-        .getAllShoppingLists()
-        .pipe(
-          map((lists) => lists.find((list) => list.idList === this.listId)!),
-        ),
-      items: this.listItemService.getAllListItemsByListId(this.listId),
-    })
-      .pipe(finalize(() => this.loading.set(false)))
-      .subscribe({
-        next: ({ list, items }) => {
-          this.listSignal.set(list);
-          this.listItemsSignal.set(items);
-        },
-        error: () => this.feedback.error('Error loading list data'),
-      });
+    this.list$ = this.shoppingListService
+      .getAllShoppingLists()
+      .pipe(map((lists) => lists.find((list) => list.idList === this.listId)!));
+
+    this.listItems$ = this.listItemService
+      .getAllListItemsByListId(this.listId)
+      .pipe(finalize(() => this.loading.set(false)));
   }
 
   togglePurchased(item: ListItemResponseDTO): void {
@@ -113,14 +86,12 @@ export class ListDetailsComponent implements OnInit {
       purchased: !item.purchased,
     };
 
-    this.listItemService
-      .updateListItem(this.listId, item.idListItem, updatedItem)
-      .subscribe({
-        next: () => this.loadData(),
-        error: () => {
-          this.feedback.error('Erro ao atualizar status do item');
-        },
-      });
+    this.listItemService.updateListItem(this.listId, item.idListItem, updatedItem).subscribe({
+      next: () => this.loadData(),
+      error: () => {
+        this.feedback.error('Erro ao atualizar status do item');
+      },
+    });
   }
 
   openAddItemDialog(): void {
@@ -152,17 +123,15 @@ export class ListDetailsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.listItemService
-          .updateListItem(this.listId, item.idListItem, result)
-          .subscribe({
-            next: () => {
-              this.loadData();
-              this.feedback.success('Item updated successfully');
-            },
-            error: () => {
-              this.feedback.error('Error updating item');
-            },
-          });
+        this.listItemService.updateListItem(this.listId, item.idListItem, result).subscribe({
+          next: () => {
+            this.loadData();
+            this.feedback.success('Item updated successfully');
+          },
+          error: () => {
+            this.feedback.error('Error updating item');
+          },
+        });
       }
     });
   }
@@ -177,17 +146,15 @@ export class ListDetailsComponent implements OnInit {
       .subscribe((confirmed) => {
         if (!confirmed) return;
 
-        this.listItemService
-          .deleteListItem(this.listId, item.idListItem)
-          .subscribe({
-            next: () => {
-              this.loadData();
-              this.feedback.success('Item removed successfully');
-            },
-            error: () => {
-              this.feedback.error('Error removing item');
-            },
-          });
+        this.listItemService.deleteListItem(this.listId, item.idListItem).subscribe({
+          next: () => {
+            this.loadData();
+            this.feedback.success('Item removed successfully');
+          },
+          error: () => {
+            this.feedback.error('Error removing item');
+          },
+        });
       });
   }
 }

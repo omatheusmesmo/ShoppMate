@@ -1,5 +1,5 @@
 <h2 mat-dialog-title>
-  {{ data.listItem ? "Edit Item in List" : "Add Item to List" }}
+  {{ data.listItem ? 'Edit Item in List' : 'Add Item to List' }}
 </h2>
 <mat-dialog-content [formGroup]="form">
   <mat-form-field appearance="outline" class="w-100">
@@ -18,12 +18,7 @@
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button (click)="onCancel()">Cancel</button>
-  <button
-    mat-raised-button
-    color="primary"
-    (click)="onSave()"
-    [disabled]="form.invalid"
-  >
+  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="form.invalid">
     Save
   </button>
 </mat-dialog-actions>

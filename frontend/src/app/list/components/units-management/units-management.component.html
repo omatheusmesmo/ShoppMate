@@ -13,9 +13,7 @@
         <mat-card-content>
           <mat-icon color="warn">error</mat-icon>
           <p>Error loading units. Please try again later.</p>
-          <button mat-stroked-button color="primary" (click)="loadUnits()">
-            Try Again
-          </button>
+          <button mat-stroked-button color="primary" (click)="loadUnits()">Try Again</button>
         </mat-card-content>
       </mat-card>
     </div>
@@ -74,11 +72,7 @@
       <mat-card appearance="outlined" class="empty-state">
         <mat-card-content>
           <p>No units registered.</p>
-          <button
-            mat-raised-button
-            color="primary"
-            (click)="openNewUnitDialog()"
-          >
+          <button mat-raised-button color="primary" (click)="openNewUnitDialog()">
             Add First Unit
           </button>
         </mat-card-content>

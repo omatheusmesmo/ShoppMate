@@ -1,18 +1,13 @@
 <form [formGroup]="itemForm" (ngSubmit)="onSave()">
-  <h2 mat-dialog-title>{{ data.item ? "Edit" : "New" }} Item</h2>
+  <h2 mat-dialog-title>{{ data.item ? 'Edit' : 'New' }} Item</h2>
   <mat-dialog-content>
     <mat-form-field appearance="outline" class="w-100">
       <mat-label>Name</mat-label>
-      <input
-        matInput
-        formControlName="name"
-        placeholder="Enter the item name"
-        required
-      />
-      @if (itemForm.get("name")?.hasError("required")) {
+      <input matInput formControlName="name" placeholder="Enter the item name" required />
+      @if (itemForm.get('name')?.hasError('required')) {
         <mat-error> Name is required </mat-error>
       }
-      @if (itemForm.get("name")?.hasError("duplicateName")) {
+      @if (itemForm.get('name')?.hasError('duplicateName')) {
         <mat-error> An item with this name already exists </mat-error>
       }
     </mat-form-field>
@@ -26,7 +21,7 @@
           </mat-option>
         }
       </mat-select>
-      @if (itemForm.get("idCategory")?.hasError("required")) {
+      @if (itemForm.get('idCategory')?.hasError('required')) {
         <mat-error> Category is required </mat-error>
       }
     </mat-form-field>
@@ -35,24 +30,17 @@
       <mat-label>Unit</mat-label>
       <mat-select formControlName="idUnit" required>
         @for (unit of units(); track unit.id) {
-          <mat-option [value]="unit.id">
-            {{ unit.name }} ({{ unit.symbol }})
-          </mat-option>
+          <mat-option [value]="unit.id"> {{ unit.name }} ({{ unit.symbol }}) </mat-option>
         }
       </mat-select>
-      @if (itemForm.get("idUnit")?.hasError("required")) {
+      @if (itemForm.get('idUnit')?.hasError('required')) {
         <mat-error> Unit is required </mat-error>
       }
     </mat-form-field>
   </mat-dialog-content>
   <mat-dialog-actions align="end">
     <button mat-button type="button" (click)="onCancel()">Cancel</button>
-    <button
-      mat-raised-button
-      color="primary"
-      type="submit"
-      [disabled]="itemForm.invalid"
-    >
+    <button mat-raised-button color="primary" type="submit" [disabled]="itemForm.invalid">
       Save
     </button>
   </mat-dialog-actions>

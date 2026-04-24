@@ -5,10 +5,7 @@ import {
   ShoppingListResponseDTO,
   ShoppingListRequestDTO,
 } from '../interfaces/shopping-list.interface';
-import {
-  ListItemRequestDTO,
-  ListItemResponseDTO,
-} from '../interfaces/list-item.interface';
+import { ListItemRequestDTO, ListItemResponseDTO } from '../interfaces/list-item.interface';
 import { catchError } from 'rxjs/operators';
 import { BaseService } from './base.service';
 
@@ -19,9 +16,7 @@ export class ShoppingListService extends BaseService {
   private apiUrl = `${environment.apiUrl}/lists`;
 
   getAllShoppingLists(): Observable<ShoppingListResponseDTO[]> {
-    return this.http
-      .get<ShoppingListResponseDTO[]>(this.apiUrl)
-      .pipe(catchError(this.handleError));
+    return this.http.get<ShoppingListResponseDTO[]>(this.apiUrl).pipe(catchError(this.handleError));
   }
 
   getShoppingListById(id: number): Observable<ShoppingListResponseDTO> {
@@ -30,9 +25,7 @@ export class ShoppingListService extends BaseService {
       .pipe(catchError(this.handleError));
   }
 
-  createShoppingList(
-    list: ShoppingListRequestDTO,
-  ): Observable<ShoppingListResponseDTO> {
+  createShoppingList(list: ShoppingListRequestDTO): Observable<ShoppingListResponseDTO> {
     return this.http
       .post<ShoppingListResponseDTO>(this.apiUrl, list)
       .pipe(catchError(this.handleError));
@@ -48,9 +41,7 @@ export class ShoppingListService extends BaseService {
   }
 
   deleteShoppingList(id: number): Observable<void> {
-    return this.http
-      .delete<void>(`${this.apiUrl}/${id}`)
-      .pipe(catchError(this.handleError));
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(catchError(this.handleError));
   }
 
   getAllListItems(listId: number): Observable<ListItemResponseDTO[]> {
@@ -61,10 +52,7 @@ export class ShoppingListService extends BaseService {
 
   addListItem(listItem: ListItemRequestDTO): Observable<ListItemResponseDTO> {
     return this.http
-      .post<ListItemResponseDTO>(
-        `${this.apiUrl}/${listItem.listId}/items`,
-        listItem,
-      )
+      .post<ListItemResponseDTO>(`${this.apiUrl}/${listItem.listId}/items`, listItem)
       .pipe(catchError(this.handleError));
   }
 
@@ -74,10 +62,7 @@ export class ShoppingListService extends BaseService {
     listItem: ListItemRequestDTO,
   ): Observable<ListItemResponseDTO> {
     return this.http
-      .put<ListItemResponseDTO>(
-        `${this.apiUrl}/${listId}/items/${itemId}`,
-        listItem,
-      )
+      .put<ListItemResponseDTO>(`${this.apiUrl}/${listId}/items/${itemId}`, listItem)
       .pipe(catchError(this.handleError));
   }
 
