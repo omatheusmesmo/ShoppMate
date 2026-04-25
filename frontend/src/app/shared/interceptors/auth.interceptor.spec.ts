@@ -1,5 +1,10 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
+import {
+  HttpClient,
+  provideHttpClient,
+  withInterceptors,
+  withXsrfConfiguration,
+} from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
 import { authInterceptor } from './auth.interceptor';
@@ -17,7 +22,13 @@ describe('authInterceptor', () => {
 
     TestBed.configureTestingModule({
       providers: [
-        provideHttpClient(withInterceptors([authInterceptor])),
+        provideHttpClient(
+          withXsrfConfiguration({
+            cookieName: 'XSRF-TOKEN',
+            headerName: 'X-XSRF-TOKEN',
+          }),
+          withInterceptors([authInterceptor]),
+        ),
         provideHttpClientTesting(),
         { provide: AuthService, useValue: authServiceSpy },
         { provide: Router, useValue: routerSpy },
@@ -65,7 +76,7 @@ describe('authInterceptor', () => {
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
   });
 
-  it('should logout and redirect to login on 403 Forbidden', () => {
+  it('should NOT logout on 403 Forbidden (may be CSRF-related)', () => {
     authServiceSpy.getToken.and.returnValue('fake-token');
 
     httpClient.get('/api/test').subscribe({
@@ -75,8 +86,8 @@ describe('authInterceptor', () => {
     const result = httpTestingController.expectOne('/api/test');
     result.flush('Forbidden', { status: 403, statusText: 'Forbidden' });
 
-    expect(authServiceSpy.logout).toHaveBeenCalled();
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
+    expect(authServiceSpy.logout).not.toHaveBeenCalled();
+    expect(routerSpy.navigate).not.toHaveBeenCalled();
   });
 
   it('should logout and redirect to login on 401 even without a token', () => {

@@ -6,6 +6,7 @@
     "logLevel": "debug",
     "pathRewrite": {
       "^/api": ""
-    }
+    },
+    "cookiePropagation": true
   }
 }

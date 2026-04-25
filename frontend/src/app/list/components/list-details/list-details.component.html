@@ -57,8 +57,7 @@
                     color="primary"
                     (click)="editItem(element)"
                     [attr.aria-label]="
-                      'Edit ' +
-                      (element.item?.name || element.item?.title || 'item')
+                      'Edit ' + (element.item?.name || element.item?.title || 'item')
                     "
                   >
                     <mat-icon>edit</mat-icon>

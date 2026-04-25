@@ -25,20 +25,12 @@
         </div>
 
         @if (!isLargeScreen()) {
-          <button
-            mat-icon-button
-            [matMenuTriggerFor]="navMenu"
-            aria-label="Open navigation menu"
-          >
+          <button mat-icon-button [matMenuTriggerFor]="navMenu" aria-label="Open navigation menu">
             <mat-icon>menu</mat-icon>
           </button>
         }
 
-        <button
-          mat-icon-button
-          [matMenuTriggerFor]="profileMenu"
-          aria-label="Open profile menu"
-        >
+        <button mat-icon-button [matMenuTriggerFor]="profileMenu" aria-label="Open profile menu">
           <mat-icon>account_circle</mat-icon>
         </button>
       } @else {
