@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SignupComponent } from './signup.component';
 import { AuthService } from '../../shared/services/auth.service';
-import { MockAuthService, MockMatSnackBar } from '../../shared/mocks/mock-services';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MockAuthService } from '../../shared/mocks/mock-services';
+import { FeedbackService } from '../../shared/services/feedback.service';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 
@@ -15,7 +15,10 @@ describe('SignupComponent', () => {
       imports: [SignupComponent, NoopAnimationsModule],
       providers: [
         { provide: AuthService, useClass: MockAuthService },
-        { provide: MatSnackBar, useClass: MockMatSnackBar },
+        {
+          provide: FeedbackService,
+          useValue: { success: jasmine.createSpy('success'), error: jasmine.createSpy('error') },
+        },
         provideRouter([]),
       ],
     }).compileComponents();

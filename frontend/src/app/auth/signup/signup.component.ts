@@ -13,9 +13,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterLink } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../shared/services/auth.service';
+import { FeedbackService } from '../../shared/services/feedback.service';
 import { User } from '../../shared/interfaces/user.interface';
 
 @Component({
@@ -38,7 +38,7 @@ import { User } from '../../shared/interfaces/user.interface';
 export class SignupComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
-  private snackBar = inject(MatSnackBar);
+  private feedback = inject(FeedbackService);
   private router = inject(Router);
 
   signupForm: FormGroup<{
@@ -68,16 +68,12 @@ export class SignupComponent {
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: () => {
-          this.snackBar.open('Account created successfully!', 'Close', {
-            duration: 3000,
-          });
+          this.feedback.success('Account created successfully!');
           this.router.navigate(['/login']);
         },
         error: (error) => {
           console.error('Signup error:', error);
-          this.snackBar.open('Failed to create account. Please try again.', 'Close', {
-            duration: 5000,
-          });
+          this.feedback.error('Failed to create account. Please try again.');
         },
       });
   }

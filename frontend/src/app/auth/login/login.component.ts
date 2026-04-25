@@ -12,10 +12,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../shared/services/auth.service';
+import { FeedbackService } from '../../shared/services/feedback.service';
 
 @Component({
   selector: 'app-login',
@@ -38,7 +38,7 @@ export class LoginComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
-  private snackBar = inject(MatSnackBar);
+  private feedback = inject(FeedbackService);
 
   loginForm: FormGroup<{
     email: FormControl<string>;
@@ -65,18 +65,12 @@ export class LoginComponent {
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: () => {
+          this.feedback.success('Login successful!');
           this.router.navigate(['/lists']);
         },
         error: (error) => {
           console.error('Login error:', error);
-          this.snackBar.open(
-            error.message || 'Failed to sign in. Please check your credentials.',
-            'Close',
-            {
-              duration: 5000,
-              panelClass: ['error-snackbar'],
-            },
-          );
+          this.feedback.error(error.message || 'Failed to sign in. Please check your credentials.');
         },
       });
   }
