@@ -115,8 +115,9 @@ public class JwtService {
     }
 
     private JWTClaimsSet buildToken(UserDetails userDetails) {
+        var now = new Date();
         return new JWTClaimsSet.Builder().subject(userDetails.getUsername())
-                .expirationTime(new Date(new Date().getTime() + tokenExpiration)).notBeforeTime(new Date())
+                .expirationTime(new Date(now.getTime() + tokenExpiration)).notBeforeTime(now)
                 .jwtID(UUID.randomUUID().toString()).build();
     }
 

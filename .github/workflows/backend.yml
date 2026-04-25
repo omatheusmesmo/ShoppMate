@@ -66,13 +66,15 @@ jobs:
 
       - name: Commit and Push Auto-fixes
         if: github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          BRANCH_REF: ${{ github.event.pull_request.head.ref }}
         run: |
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor }}@users.noreply.github.com"
           if [ -n "$(git status --porcelain)" ]; then
             git add -A
             git commit -m "chore: auto-fix formatting and lint issues"
-            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+            git push origin HEAD:"$BRANCH_REF"
           fi
 
       - name: Build and Verify

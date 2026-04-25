@@ -36,24 +36,22 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         String token = null;
         String username = null;
 
-        if ((authHeader != null) && authHeader.startsWith("Bearer ")) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
             try {
                 username = jwtService.decryptToken(token).getSubject();
             } catch (Exception e) {
-                logger.error("Failed to validate JWT Token ", e);
+                logger.error("Failed to validate JWT Token", e);
             }
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
                 if (jwtService.validateToken(token)) {
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities());
+                    var authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
+                            userDetails.getAuthorities());
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             } catch (UsernameNotFoundException e) {
@@ -62,12 +60,10 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
-
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String path = request.getRequestURI();
-        return path.startsWith("/auth");
+        return request.getRequestURI().startsWith("/auth") || request.getMethod().equals("OPTIONS");
     }
 }

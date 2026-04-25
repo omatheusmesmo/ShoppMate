@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
@@ -70,18 +71,6 @@ public class SecurityConfig {
 
         return new ProviderManager(provider);
     }
-
-    // @Bean
-    // public UserDetailsService userDetailsService() {
-    // InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-    // UserDetails user = User.withDefaultPasswordEncoder()
-    // .username("user")
-    // .password("password")
-    // .roles("USER")
-    // .build();
-    // manager.createUser(user);
-    // return manager;
-    // }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
