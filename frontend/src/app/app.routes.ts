@@ -1,8 +1,4 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './auth/login/login.component';
-import { SignupComponent } from './auth/signup/signup.component';
-import { ShoppingListComponent } from './list/components/shopping-list/shopping-list.component';
-import { ListDetailsComponent } from './list/components/list-details/list-details.component';
 import { LandingComponent } from './layout/landing/landing.component';
 import { authGuard } from './auth/guards/auth.guard';
 import { loggedInAuthGuard } from './auth/guards/logged-in-auth.guard';
@@ -15,22 +11,28 @@ export const AppRoutes: Routes = [
   },
   {
     path: 'login',
-    component: LoginComponent,
+    loadComponent: () => import('./auth/login/login.component').then((m) => m.LoginComponent),
     canActivate: [loggedInAuthGuard],
   },
   {
     path: 'signup',
-    component: SignupComponent,
+    loadComponent: () => import('./auth/signup/signup.component').then((m) => m.SignupComponent),
     canActivate: [loggedInAuthGuard],
   },
   {
     path: 'lists',
-    component: ShoppingListComponent,
+    loadComponent: () =>
+      import('./list/components/shopping-list/shopping-list.component').then(
+        (m) => m.ShoppingListComponent,
+      ),
     canActivate: [authGuard],
   },
   {
     path: 'lists/:id',
-    component: ListDetailsComponent,
+    loadComponent: () =>
+      import('./list/components/list-details/list-details.component').then(
+        (m) => m.ListDetailsComponent,
+      ),
     canActivate: [authGuard],
   },
   {
