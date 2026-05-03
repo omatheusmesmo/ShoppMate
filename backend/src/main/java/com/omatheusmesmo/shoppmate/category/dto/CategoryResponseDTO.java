@@ -1,4 +1,6 @@
 package com.omatheusmesmo.shoppmate.category.dto;
 
-public record CategoryResponseDTO(Long id, String name) {
+import com.omatheusmesmo.shoppmate.user.dtos.UserResponseDTO;
+
+public record CategoryResponseDTO(Long id, String name, boolean isSystemStandard, UserResponseDTO owner) {
 }

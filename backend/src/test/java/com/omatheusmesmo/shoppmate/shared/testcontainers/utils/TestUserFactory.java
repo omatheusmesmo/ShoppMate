@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class TestUserFactory {
 
+    public static final String TEST_USER_EMAIL = "user@gmail.com";
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -20,7 +22,7 @@ public class TestUserFactory {
     }
 
     public String createTokenForTestUser() {
-        String email = "user@gmail.com";
+        String email = TEST_USER_EMAIL;
 
         User user = userRepository.findByEmail(email).orElseGet(() -> {
             User newUser = new User();

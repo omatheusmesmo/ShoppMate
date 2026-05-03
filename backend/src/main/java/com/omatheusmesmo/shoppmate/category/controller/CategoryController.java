@@ -5,10 +5,12 @@ import com.omatheusmesmo.shoppmate.category.dto.CategoryResponseDTO;
 import com.omatheusmesmo.shoppmate.category.entity.Category;
 import com.omatheusmesmo.shoppmate.category.mapper.CategoryMapper;
 import com.omatheusmesmo.shoppmate.category.service.CategoryService;
+import com.omatheusmesmo.shoppmate.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +30,6 @@ import java.util.List;
 public class CategoryController {
 
     private final CategoryService categoryService;
-
     private final CategoryMapper categoryMapper;
 
     public CategoryController(CategoryService categoryService, CategoryMapper categoryMapper) {
@@ -36,44 +37,41 @@ public class CategoryController {
         this.categoryMapper = categoryMapper;
     }
 
-    @Operation(summary = "Return all categories")
+    @Operation(summary = "Return all accessible categories")
     @GetMapping
-    public ResponseEntity<List<CategoryResponseDTO>> getAllCategories() {
-        List<Category> categories = categoryService.findAll();
+    public ResponseEntity<List<CategoryResponseDTO>> getAllCategories(@AuthenticationPrincipal User user) {
+        List<Category> categories = categoryService.findAllAccessibleByUser(user.getId());
         List<CategoryResponseDTO> responseDTOS = categories.stream().map(categoryMapper::toResponseDTO).toList();
         return ResponseEntity.ok(responseDTOS);
     }
 
     @Operation(summary = "Add a new category")
     @PostMapping
-    public ResponseEntity<CategoryResponseDTO> addCategory(@RequestBody @Valid CategoryRequestDTO categoryDTO) {
-
-        Category category = categoryMapper.toEntity(categoryDTO);
+    public ResponseEntity<CategoryResponseDTO> addCategory(@RequestBody @Valid CategoryRequestDTO categoryDTO,
+            @AuthenticationPrincipal User user) {
+        Category category = categoryMapper.toEntity(categoryDTO, user);
         Category savedCategory = categoryService.saveCategory(category);
         CategoryResponseDTO responseDTO = categoryMapper.toResponseDTO(savedCategory);
-
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(savedCategory.getId()).toUri();
-
         return ResponseEntity.created(location).body(responseDTO);
     }
 
     @Operation(summary = "Delete a category by id")
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCategory(@PathVariable Long id) {
-        categoryService.removeCategory(id);
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        categoryService.removeCategory(id, user);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Update a category")
     @PutMapping("/{id}")
     public ResponseEntity<CategoryResponseDTO> updateCategory(@PathVariable Long id,
-            @RequestBody @Valid CategoryRequestDTO categoryDTO) {
-        Category category = categoryService.findCategoryById(id);
-        category.setName(categoryDTO.name());
-        Category updatedCategory = categoryService.saveCategory(category);
+            @RequestBody @Valid CategoryRequestDTO categoryDTO, @AuthenticationPrincipal User user) {
+        Category category = categoryMapper.toEntity(categoryDTO, user);
+        categoryService.editCategory(id, category, user);
+        Category updatedCategory = categoryService.findCategoryById(id);
         CategoryResponseDTO responseDTO = categoryMapper.toResponseDTO(updatedCategory);
-
         return ResponseEntity.ok(responseDTO);
     }
 }

@@ -16,10 +16,9 @@ import com.omatheusmesmo.shoppmate.shared.testutils.ItemTestFactory;
 import com.omatheusmesmo.shoppmate.shared.testutils.UnitTestFactory;
 import com.omatheusmesmo.shoppmate.unit.entity.Unit;
 import com.omatheusmesmo.shoppmate.unit.repository.UnitRepository;
+import com.omatheusmesmo.shoppmate.user.entity.User;
+import com.omatheusmesmo.shoppmate.user.repository.UserRepository;
 import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.filter.log.LogDetail;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -53,11 +52,15 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
     @Autowired
     private ItemRepository itemRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     private static RequestSpecification specification;
     private static ObjectMapper objectMapper;
 
     static ItemResponseDTO itemResponseDTOCreated;
     static ItemResponseDTO itemResponseDTOUpdated;
+    private User testUser;
 
     @BeforeEach
     void init() {
@@ -66,6 +69,7 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
         categoryRepository.deleteAll();
 
         String jwtToken = testUserFactory.createTokenForTestUser();
+        testUser = userRepository.findByEmail(TestUserFactory.TEST_USER_EMAIL).orElseThrow();
 
         Response response = given().port(port).header("Authorization", "Bearer " + jwtToken).when().get("/item").then()
                 .statusCode(200).extract().response();
@@ -166,6 +170,7 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
     void IntegrationTestPutEditItem_NotFound() throws Exception {
         Category categoryEntity = createCategoryToTest();
         Unit unitEntity = createUnitToTest();
+
         ItemRequestDTO invalidItem = ItemTestFactory.createValidItemRequestDTO(categoryEntity.getId(),
                 unitEntity.getId());
 
@@ -174,23 +179,25 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
                 .body().asString();
     }
 
-    Category createCategoryToTest() {
+    private Category createCategoryToTest() {
         Category categoryEntity = CategoryTestFactory.createValidCategory();
-        categoryEntity.setId(null); // Let DB generate ID
-        categoryEntity = categoryRepository.save(categoryEntity);
-        return categoryEntity;
+        categoryEntity.setId(null);
+        categoryEntity.setOwner(testUser);
+        categoryEntity.setSystemStandard(false);
+        return categoryRepository.save(categoryEntity);
     }
 
-    Unit createUnitToTest() {
+    private Unit createUnitToTest() {
         Unit unitEntity = UnitTestFactory.createValidUnit();
-        unitEntity.setId(null); // Let DB generate ID
-        unitEntity = unitRepository.save(unitEntity);
-        return unitEntity;
+        unitEntity.setId(null);
+        unitEntity.setOwner(testUser);
+        unitEntity.setSystemStandard(false);
+        return unitRepository.save(unitEntity);
     }
 
     Item createItemToTest() {
         Item itemEntity = ItemTestFactory.createValidItem();
-        itemEntity.setId(null); // Let DB generate ID
+        itemEntity.setId(null);
         itemEntity.setCategory(createCategoryToTest());
         itemEntity.setUnit(createUnitToTest());
         return itemRepository.save(itemEntity);

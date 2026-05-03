@@ -11,6 +11,8 @@ import com.omatheusmesmo.shoppmate.shared.testcontainers.utils.TestUserFactory;
 import com.omatheusmesmo.shoppmate.category.dto.CategoryRequestDTO;
 import com.omatheusmesmo.shoppmate.category.dto.CategoryResponseDTO;
 import com.omatheusmesmo.shoppmate.shared.testutils.CategoryTestFactory;
+import com.omatheusmesmo.shoppmate.user.entity.User;
+import com.omatheusmesmo.shoppmate.user.repository.UserRepository;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -41,6 +43,9 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private ItemRepository itemRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     private static RequestSpecification specification;
     private static ObjectMapper objectMapper;
@@ -79,6 +84,7 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
         assertNotNull(createdCategory.id());
         assertTrue(createdCategory.id() > 0);
         assertEquals(request.name(), createdCategory.name());
+        assertFalse(createdCategory.isSystemStandard());
     }
 
     @Test
@@ -139,8 +145,66 @@ class CategoryControllerWithIntegrationTest extends AbstractIntegrationTest {
     }
 
     private Category createCategoryToTest() {
+        User testUser = userRepository.findByEmail(TestUserFactory.TEST_USER_EMAIL).orElseThrow();
         Category categoryEntity = CategoryTestFactory.createValidCategory();
-        categoryEntity.setId(null); // Let DB generate ID
+        categoryEntity.setId(null);
+        categoryEntity.setOwner(testUser);
+        categoryEntity.setSystemStandard(false);
         return categoryRepository.save(categoryEntity);
+    }
+
+    private Category createSystemCategoryToTest() {
+        Category categoryEntity = CategoryTestFactory.createValidCategory();
+        categoryEntity.setId(null);
+        categoryEntity.setOwner(null);
+        categoryEntity.setSystemStandard(true);
+        return categoryRepository.save(categoryEntity);
+    }
+
+    private Category createOtherUserCategoryToTest() {
+        User otherUser = new User();
+        otherUser.setEmail("other-" + System.currentTimeMillis() + "@example.com");
+        otherUser.setFullName("Other User");
+        otherUser.setPassword("$2a$10$encoded");
+        otherUser.setRole("USER");
+        otherUser = userRepository.save(otherUser);
+
+        Category categoryEntity = CategoryTestFactory.createValidCategory();
+        categoryEntity.setId(null);
+        categoryEntity.setOwner(otherUser);
+        categoryEntity.setSystemStandard(false);
+        return categoryRepository.save(categoryEntity);
+    }
+
+    @Test
+    void testDeleteSystemCategory_Forbid() {
+        Category systemCategory = createSystemCategoryToTest();
+
+        given(specification).pathParam("id", systemCategory.getId()).when().delete("{id}").then().statusCode(403);
+    }
+
+    @Test
+    void testPutSystemCategory_Forbid() throws Exception {
+        Category systemCategory = createSystemCategoryToTest();
+        CategoryRequestDTO updateRequest = new CategoryRequestDTO(systemCategory.getName() + " Updated");
+
+        given(specification).contentType(MediaType.APPLICATION_JSON_VALUE).pathParam("id", systemCategory.getId())
+                .body(updateRequest).when().put("{id}").then().statusCode(403);
+    }
+
+    @Test
+    void testDeleteOtherUserCategory_Forbid() {
+        Category otherUserCategory = createOtherUserCategoryToTest();
+
+        given(specification).pathParam("id", otherUserCategory.getId()).when().delete("{id}").then().statusCode(403);
+    }
+
+    @Test
+    void testPutOtherUserCategory_Forbid() throws Exception {
+        Category otherUserCategory = createOtherUserCategoryToTest();
+        CategoryRequestDTO updateRequest = new CategoryRequestDTO(otherUserCategory.getName() + " Updated");
+
+        given(specification).contentType(MediaType.APPLICATION_JSON_VALUE).pathParam("id", otherUserCategory.getId())
+                .body(updateRequest).when().put("{id}").then().statusCode(403);
     }
 }

@@ -69,13 +69,15 @@ class ItemControllerTest {
         }
 
         CategoryResponseDTO categoryDTO1 = new CategoryResponseDTO(item1.getCategory().getId(),
-                item1.getCategory().getName());
-        UnitResponseDTO unitDTO1 = new UnitResponseDTO(item1.getUnit().getId(), item1.getUnit().getName());
+                item1.getCategory().getName(), false, null);
+        UnitResponseDTO unitDTO1 = new UnitResponseDTO(item1.getUnit().getId(), item1.getUnit().getName(),
+                item1.getUnit().getSymbol(), false, null);
         itemResponseDTO1 = new ItemResponseDTO(item1.getId(), item1.getName(), categoryDTO1, unitDTO1);
 
         CategoryResponseDTO categoryDTO2 = new CategoryResponseDTO(item2.getCategory().getId(),
-                item2.getCategory().getName());
-        UnitResponseDTO unitDTO2 = new UnitResponseDTO(item2.getUnit().getId(), item2.getUnit().getName());
+                item2.getCategory().getName(), false, null);
+        UnitResponseDTO unitDTO2 = new UnitResponseDTO(item2.getUnit().getId(), item2.getUnit().getName(),
+                item2.getUnit().getSymbol(), false, null);
         itemResponseDTO2 = new ItemResponseDTO(item2.getId(), item2.getName(), categoryDTO2, unitDTO2);
     }
 

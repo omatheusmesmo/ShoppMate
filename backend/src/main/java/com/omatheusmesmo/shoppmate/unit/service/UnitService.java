@@ -1,8 +1,10 @@
 package com.omatheusmesmo.shoppmate.unit.service;
 
+import com.omatheusmesmo.shoppmate.shared.service.AuditService;
 import com.omatheusmesmo.shoppmate.unit.entity.Unit;
 import com.omatheusmesmo.shoppmate.unit.repository.UnitRepository;
-import com.omatheusmesmo.shoppmate.shared.service.AuditService;
+import com.omatheusmesmo.shoppmate.user.entity.User;
+import com.omatheusmesmo.shoppmate.utils.exception.ResourceOwnershipException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,7 +15,6 @@ import java.util.Optional;
 public class UnitService {
 
     private final UnitRepository unitRepository;
-
     private final AuditService auditService;
 
     public UnitService(UnitRepository unitRepository, AuditService auditService) {
@@ -28,21 +29,22 @@ public class UnitService {
         return unit;
     }
 
-    public void editUnit(Unit unit) {
-        isUnitValid(unit);
-        if (!unitExists(unit)) {
-            throw new NoSuchElementException("Unit not found");
-        }
-        auditService.setAuditData(unit, false);
-        saveUnit(unit);
+    public void editUnit(Long id, Unit unit, User currentUser) {
+        Unit existingUnit = findUnitById(id).orElseThrow(() -> new NoSuchElementException("Unit not found"));
+        verifyOwnershipOrSystem(existingUnit, currentUser);
+        existingUnit.setName(unit.getName());
+        existingUnit.setSymbol(unit.getSymbol());
+        isUnitValid(existingUnit);
+        auditService.setAuditData(existingUnit, false);
+        unitRepository.save(existingUnit);
     }
 
-    public List<Unit> findAll() {
-        return unitRepository.findAll();
+    public List<Unit> findAllAccessibleByUser(Long userId) {
+        return unitRepository.findAllAccessibleByUserId(userId);
     }
 
     public Optional<Unit> findUnitById(Long id) {
-        return unitRepository.findById(id);
+        return unitRepository.findByIdAndDeletedFalse(id);
     }
 
     public Optional<Unit> findUnitBySymbol(String symbol) {
@@ -53,20 +55,21 @@ public class UnitService {
         return unitRepository.findByName(name);
     }
 
-    public void removeUnit(Unit unit) {
+    public void removeUnitById(Long id, User currentUser) {
+        Unit unit = findUnitById(id).orElseThrow(() -> new NoSuchElementException("Unit not found"));
+        verifyOwnershipOrSystem(unit, currentUser);
         auditService.softDelete(unit);
-        saveUnit(unit);
+        auditService.setAuditData(unit, false);
+        unitRepository.save(unit);
     }
 
-    public void removeUnitById(Long id) {
-        Optional<Unit> unit = findUnitById(id);
-        Unit deletedUnit = unit.get();
-        auditService.softDelete(deletedUnit);
-        saveUnit(deletedUnit);
-    }
-
-    private boolean unitExists(Unit unit) {
-        return unitRepository.existsById(unit.getId());
+    public void verifyOwnershipOrSystem(Unit unit, User currentUser) {
+        if (unit.isSystemStandard()) {
+            throw new ResourceOwnershipException("System standard units cannot be modified or deleted!");
+        }
+        if (unit.getOwner() == null || !unit.getOwner().getId().equals(currentUser.getId())) {
+            throw new ResourceOwnershipException("You can only modify or delete units you own!");
+        }
     }
 
     public void isUnitValid(Unit unit) {
