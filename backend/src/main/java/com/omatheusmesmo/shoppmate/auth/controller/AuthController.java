@@ -1,5 +1,4 @@
 package com.omatheusmesmo.shoppmate.auth.controller;
-
 import com.omatheusmesmo.shoppmate.user.dtos.RegisterUserDTO;
 import com.omatheusmesmo.shoppmate.user.dtos.UserResponseDTO;
 import com.omatheusmesmo.shoppmate.auth.dtos.LoginRequest;
