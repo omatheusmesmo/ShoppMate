@@ -8,10 +8,16 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import jakarta.persistence.EntityListeners;
 
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
 
 @MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 public abstract class DomainEntity implements AuditableEntity {
@@ -24,9 +30,13 @@ public abstract class DomainEntity implements AuditableEntity {
 
     private String name;
 
-    @Column(name = "created_at")
+    @CreatedDate
+    @Setter(AccessLevel.NONE)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
+    @Setter(AccessLevel.NONE)
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 

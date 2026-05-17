@@ -18,12 +18,16 @@ import lombok.Setter;
 
 import com.omatheusmesmo.shoppmate.shared.domain.BaseAuditableEntity;
 import com.omatheusmesmo.shoppmate.user.dtos.RegisterUserDTO;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Entity
+@SQLDelete(sql = "UPDATE users SET deleted = true WHERE id=?")
+@Where(clause = "deleted = false")
 @Table(name = "users")
 public class User extends BaseAuditableEntity implements UserDetails {
 

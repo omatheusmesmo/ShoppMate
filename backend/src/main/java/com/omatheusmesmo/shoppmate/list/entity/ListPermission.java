@@ -13,9 +13,13 @@ import lombok.Setter;
 
 import com.omatheusmesmo.shoppmate.shared.domain.BaseAuditableEntity;
 import com.omatheusmesmo.shoppmate.user.entity.User;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "list_user_permissions")
+@SQLDelete(sql = "UPDATE list_user_permissions SET deleted = true WHERE id=?")
+@Where(clause = "deleted = false")
 @Getter
 @Setter
 public class ListPermission extends BaseAuditableEntity {
