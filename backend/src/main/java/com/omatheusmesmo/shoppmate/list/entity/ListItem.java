@@ -13,8 +13,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
+@SQLDelete(sql = "UPDATE list_items SET deleted = true WHERE id=?")
+@Where(clause = "deleted = false")
 @Table(name = "list_items")
 @Getter
 @Setter
