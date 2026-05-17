@@ -12,8 +12,12 @@ import lombok.Setter;
 import com.omatheusmesmo.shoppmate.category.entity.Category;
 import com.omatheusmesmo.shoppmate.shared.domain.DomainEntity;
 import com.omatheusmesmo.shoppmate.unit.entity.Unit;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @NoArgsConstructor
+@SQLDelete(sql = "UPDATE items SET deleted = true WHERE id=?")
+@Where(clause = "deleted = false")
 @Getter
 @Setter
 @Entity
