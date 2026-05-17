@@ -3,6 +3,7 @@ CREATE TABLE list_items (
     id_list BIGINT NOT NULL,
     id_item BIGINT NOT NULL,
     quantity INTEGER NOT NULL,
+    unit_price DECIMAL(19, 2) DEFAULT 0.00,
     purchased BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
