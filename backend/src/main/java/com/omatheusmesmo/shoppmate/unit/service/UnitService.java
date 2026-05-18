@@ -1,6 +1,7 @@
 package com.omatheusmesmo.shoppmate.unit.service;
 
 import com.omatheusmesmo.shoppmate.shared.service.AuditService;
+import com.omatheusmesmo.shoppmate.unit.dto.UnitRequestDTO;
 import com.omatheusmesmo.shoppmate.unit.entity.Unit;
 import com.omatheusmesmo.shoppmate.unit.repository.UnitRepository;
 import com.omatheusmesmo.shoppmate.user.entity.User;
@@ -29,11 +30,11 @@ public class UnitService {
         return unit;
     }
 
-    public void editUnit(Long id, Unit unit, User currentUser) {
+    public void editUnit(Long id, UnitRequestDTO requestDTO, User currentUser) {
         Unit existingUnit = findUnitById(id).orElseThrow(() -> new NoSuchElementException("Unit not found"));
         verifyOwnershipOrSystem(existingUnit, currentUser);
-        existingUnit.setName(unit.getName());
-        existingUnit.setSymbol(unit.getSymbol());
+        existingUnit.setName(requestDTO.name());
+        existingUnit.setSymbol(requestDTO.symbol());
         isUnitValid(existingUnit);
         auditService.setAuditData(existingUnit, false);
         unitRepository.save(existingUnit);

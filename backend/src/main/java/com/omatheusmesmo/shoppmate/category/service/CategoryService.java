@@ -1,5 +1,6 @@
 package com.omatheusmesmo.shoppmate.category.service;
 
+import com.omatheusmesmo.shoppmate.category.dto.CategoryRequestDTO;
 import com.omatheusmesmo.shoppmate.category.entity.Category;
 import com.omatheusmesmo.shoppmate.category.repository.CategoryRepository;
 import com.omatheusmesmo.shoppmate.shared.service.AuditService;
@@ -46,10 +47,10 @@ public class CategoryService {
         categoryRepository.save(category);
     }
 
-    public void editCategory(Long id, Category category, User currentUser) {
+    public void editCategory(Long id, CategoryRequestDTO requestDTO, User currentUser) {
         Category existingCategory = findCategoryById(id);
         verifyOwnershipOrSystem(existingCategory, currentUser);
-        existingCategory.setName(category.getName());
+        existingCategory.setName(requestDTO.name());
         isCategoryValid(existingCategory);
         auditService.setAuditData(existingCategory, false);
         categoryRepository.save(existingCategory);

@@ -134,7 +134,7 @@ class CategoryControllerTest {
         CategoryResponseDTO responseDTO = new CategoryResponseDTO(id, updatedName, false, null);
 
         when(categoryMapper.toEntity(any(CategoryRequestDTO.class), any(User.class))).thenReturn(category1);
-        doNothing().when(categoryService).editCategory(eq(id), any(Category.class), any(User.class));
+        doNothing().when(categoryService).editCategory(eq(id), any(CategoryRequestDTO.class), any(User.class));
         when(categoryService.findCategoryById(id)).thenReturn(updatedCategory);
         when(categoryMapper.toResponseDTO(updatedCategory)).thenReturn(responseDTO);
 

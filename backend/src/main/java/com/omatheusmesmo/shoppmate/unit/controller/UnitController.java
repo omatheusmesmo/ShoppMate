@@ -69,9 +69,7 @@ public class UnitController {
     @PutMapping("/{id}")
     public ResponseEntity<UnitResponseDTO> updateUnit(@PathVariable Long id,
             @RequestBody @Valid UnitRequestDTO unitRequestDTO, @AuthenticationPrincipal User user) {
-        Unit unit = unitMapper.toEntity(unitRequestDTO, user);
-        unit.setId(id);
-        unitService.editUnit(id, unit, user);
+        unitService.editUnit(id, unitRequestDTO, user);
         Unit updatedUnit = unitService.findUnitById(id).orElseThrow(() -> new NoSuchElementException("Unit not found"));
         UnitResponseDTO responseDTO = unitMapper.toResponseDTO(updatedUnit);
         return ResponseEntity.ok(responseDTO);
