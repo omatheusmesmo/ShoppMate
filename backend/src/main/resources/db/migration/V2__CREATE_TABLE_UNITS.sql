@@ -1,6 +1,6 @@
 CREATE TABLE units (
     id BIGINT PRIMARY KEY,
-    name VARCHAR(100) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
     symbol VARCHAR(20),
     is_system_standard BOOLEAN NOT NULL DEFAULT FALSE,
     owner_id BIGINT,
@@ -9,7 +9,8 @@ CREATE TABLE units (
     deleted BOOLEAN DEFAULT FALSE
 );
 
-CREATE UNIQUE INDEX idx_units_name ON units (name);
+CREATE UNIQUE INDEX idx_units_name_system ON units (name) WHERE is_system_standard = TRUE;
+CREATE UNIQUE INDEX idx_units_owner_name ON units (owner_id, name) WHERE owner_id IS NOT NULL;
 CREATE INDEX idx_units_deleted ON units (deleted);
 
 ALTER TABLE units

@@ -1,6 +1,6 @@
 CREATE TABLE categories (
     id BIGINT PRIMARY KEY,
-    name VARCHAR(100) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
     is_system_standard BOOLEAN NOT NULL DEFAULT FALSE,
     owner_id BIGINT,
     created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
@@ -8,7 +8,8 @@ CREATE TABLE categories (
     deleted BOOLEAN DEFAULT FALSE
 );
 
-CREATE UNIQUE INDEX idx_categories_name ON categories (name);
+CREATE UNIQUE INDEX idx_categories_name_system ON categories (name) WHERE is_system_standard = TRUE;
+CREATE UNIQUE INDEX idx_categories_owner_name ON categories (owner_id, name) WHERE owner_id IS NOT NULL;
 CREATE INDEX idx_categories_deleted ON categories (deleted);
 
 ALTER TABLE categories
