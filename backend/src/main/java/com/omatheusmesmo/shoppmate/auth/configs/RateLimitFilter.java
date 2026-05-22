@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -14,13 +15,20 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Per-IP rate limiter for authentication endpoints.
+ * Applies to configured HTTP methods and path patterns.
+ */
 @Component
 public class RateLimitFilter  extends OncePerRequestFilter {
+
     private final RateLimitProperties properties;
+    private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+
     public RateLimitFilter(RateLimitProperties properties) {
         this.properties = properties;
     }
-    private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
 
     private Bucket createNewBucket() {
         return Bucket.builder()
@@ -42,9 +50,14 @@ public class RateLimitFilter  extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        String path = request.getRequestURI();
+        System.out.println("RATE LIMIT CHECK: method="
+                + request.getMethod()
+                + ", path="
+                + request.getRequestURI()
+                + ", shouldRateLimit="
+                + shouldRateLimit(request));
 
-        if (path.equals("/auth/login")) {
+        if (shouldRateLimit(request)) {
 
             String ip = request.getRemoteAddr();
 
@@ -62,4 +75,20 @@ public class RateLimitFilter  extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+    private boolean shouldRateLimit(HttpServletRequest request) {
+        return isRateLimitedMethod(request) && isRateLimitedPath(request);
+    }
+
+    private boolean isRateLimitedMethod(HttpServletRequest request) {
+        return properties.getEnabledMethods().stream()
+                .anyMatch(method -> method.equalsIgnoreCase(request.getMethod()));
+    }
+
+    private boolean isRateLimitedPath(HttpServletRequest request) {
+        String path = request.getRequestURI();
+
+        return properties.getIncludedPaths().stream()
+                .anyMatch(pattern -> pathMatcher.match(pattern, path));
+    }
 }
+
