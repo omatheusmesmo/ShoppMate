@@ -2,6 +2,7 @@ package com.omatheusmesmo.shoppmate.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.omatheusmesmo.shoppmate.auth.service.JwtService;
+import com.omatheusmesmo.shoppmate.test.config.BaseWebMvcControllerTest;
 import com.omatheusmesmo.shoppmate.user.dtos.RegisterUserDTO;
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import com.omatheusmesmo.shoppmate.user.service.UserService;
@@ -20,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = AuthController.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class AuthControllerTest {
+public class AuthControllerTest  extends BaseWebMvcControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

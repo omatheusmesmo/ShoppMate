@@ -7,6 +7,7 @@ import com.omatheusmesmo.shoppmate.category.dto.CategoryResponseDTO;
 import com.omatheusmesmo.shoppmate.category.entity.Category;
 import com.omatheusmesmo.shoppmate.category.mapper.CategoryMapper;
 import com.omatheusmesmo.shoppmate.category.service.CategoryService;
+import com.omatheusmesmo.shoppmate.test.config.BaseWebMvcControllerTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -30,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = CategoryController.class)
 @AutoConfigureMockMvc(addFilters = false)
-class CategoryControllerTest {
+class CategoryControllerTest  extends BaseWebMvcControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
