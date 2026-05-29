@@ -3,3 +3,10 @@
 gha-creds-*.json
 postgres-data/
 **/postgres-data/
+
+# Eclipse IDE
+.settings/
+.factorypath
+.env
+certs/
+.env

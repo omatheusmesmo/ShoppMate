@@ -19,14 +19,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@TestPropertySource(properties = {
-        "security.rate-limit.capacity=1",
-        "security.rate-limit.refill-tokens=1",
-        "security.rate-limit.refill-duration=PT5S",
-        "security.rate-limit.short-burst-enabled=false",
-        "security.rate-limit.enabled-methods[0]=POST",
-        "security.rate-limit.included-paths[0]=/auth/**"
-})
+@TestPropertySource(properties = { "security.rate-limit.capacity=1", "security.rate-limit.refill-tokens=1",
+        "security.rate-limit.refill-duration=PT5S", "security.rate-limit.short-burst-enabled=false",
+        "security.rate-limit.enabled-methods[0]=POST", "security.rate-limit.included-paths[0]=/auth/**",
+        "security.rate-limit.penalty-threshold=1" })
 class RateLimitPenaltyIntegrationTest extends AbstractIntegrationTest {
 
     private static final String TEST_CLIENT_IP = "203.0.113.50";
@@ -45,29 +41,27 @@ class RateLimitPenaltyIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void shouldStorePenaltyAndBlockRepeatedRequestsDuringActivePenaltyWindow() throws Exception {
-        // First request consumes the only available token.
-        // It may return 404 because the fake user does not exist, but it should not be rate-limited yet.
-        mockMvc.perform(post("/auth/login")
-                        .contentType(APPLICATION_JSON)
-                        .content(loginPayload())
-                        .with(request -> {
-                            request.setRemoteAddr(TEST_CLIENT_IP);
-                            return request;
-                        }))
-                .andExpect(result -> assertThat(result.getResponse().getStatus()).isNotEqualTo(429));
+        mockMvc.perform(post("/auth/login").contentType(APPLICATION_JSON).content(loginPayload()).with(request -> {
+            request.setRemoteAddr(TEST_CLIENT_IP);
+            return request;
+        })).andExpect(result -> assertThat(result.getResponse().getStatus()).isNotEqualTo(429));
 
-        // First blocked request creates the penalty record.
         int firstRetryAfter = performBlockedLoginAndReturnRetryAfter();
 
-        Integer violationCount = jdbcTemplate.queryForObject(
-                "SELECT violation_count FROM rate_limit_violation",
-                Integer.class
-        );
+        Integer violationCount = jdbcTemplate.queryForObject("""
+                SELECT violation_count
+                FROM rate_limit_violation
+                """, Integer.class);
+
+        Integer activePenaltyCount = jdbcTemplate.queryForObject("""
+                SELECT COUNT(*)
+                FROM rate_limit_violation
+                WHERE penalty_until IS NOT NULL
+                """, Integer.class);
 
         assertThat(violationCount).isEqualTo(1);
+        assertThat(activePenaltyCount).isEqualTo(1);
 
-        // Second blocked request is blocked by the active penalty window.
-        // Retry-After can be lower because it is now showing the remaining penalty time.
         int secondRetryAfter = performBlockedLoginAndReturnRetryAfter();
 
         assertThat(firstRetryAfter).isGreaterThan(0);
@@ -76,16 +70,11 @@ class RateLimitPenaltyIntegrationTest extends AbstractIntegrationTest {
     }
 
     private int performBlockedLoginAndReturnRetryAfter() throws Exception {
-        MvcResult result = mockMvc.perform(post("/auth/login")
-                        .contentType(APPLICATION_JSON)
-                        .content(loginPayload())
-                        .with(request -> {
-                            request.setRemoteAddr(TEST_CLIENT_IP);
-                            return request;
-                        }))
-                .andExpect(status().isTooManyRequests())
-                .andExpect(header().exists("Retry-After"))
-                .andReturn();
+        MvcResult result = mockMvc
+                .perform(post("/auth/login").contentType(APPLICATION_JSON).content(loginPayload()).with(request -> {
+                    request.setRemoteAddr(TEST_CLIENT_IP);
+                    return request;
+                })).andExpect(status().isTooManyRequests()).andExpect(header().exists("Retry-After")).andReturn();
 
         return Integer.parseInt(result.getResponse().getHeader("Retry-After"));
     }

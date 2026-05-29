@@ -1,4 +1,6 @@
 package com.omatheusmesmo.shoppmate.unit.dto;
 
-public record UnitResponseDTO(Long id, String symbol) {
+import com.omatheusmesmo.shoppmate.user.dtos.UserResponseDTO;
+
+public record UnitResponseDTO(Long id, String name, String symbol, boolean isSystemStandard, UserResponseDTO owner) {
 }

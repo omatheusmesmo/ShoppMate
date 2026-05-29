@@ -1,16 +1,6 @@
-import {
-  Component,
-  inject,
-  OnInit,
-  signal,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  MatDialogRef,
-  MAT_DIALOG_DATA,
-  MatDialogModule,
-} from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -36,9 +26,7 @@ export function duplicateNameValidator(
     if (!control.value) return null;
     const name = control.value.trim().toLowerCase();
     if (originalName && name === originalName.trim().toLowerCase()) return null;
-    return existingNames.some(
-      (existingName) => existingName.trim().toLowerCase() === name,
-    )
+    return existingNames.some((existingName) => existingName.trim().toLowerCase() === name)
       ? { duplicateName: true }
       : null;
   };
@@ -101,12 +89,9 @@ export class CategoryDialogComponent implements OnInit {
 
   updateNameValidator(): void {
     const names = this.existingCategories().map((c) => c.name);
-    const originalName =
-      this.isEdit() && this.data.category ? this.data.category.name : undefined;
+    const originalName = this.isEdit() && this.data.category ? this.data.category.name : undefined;
 
-    this.categoryForm
-      .get('name')
-      ?.addValidators(duplicateNameValidator(names, originalName));
+    this.categoryForm.get('name')?.addValidators(duplicateNameValidator(names, originalName));
     this.categoryForm.get('name')?.updateValueAndValidity();
   }
 
@@ -115,10 +100,7 @@ export class CategoryDialogComponent implements OnInit {
       const { name } = this.categoryForm.getRawValue();
       const categoryData: Category = {
         name,
-        id:
-          this.isEdit() && this.data.category
-            ? this.data.category.id
-            : undefined,
+        id: this.isEdit() && this.data.category ? this.data.category.id : undefined,
         createdAt:
           this.isEdit() && this.data.category
             ? this.data.category.createdAt

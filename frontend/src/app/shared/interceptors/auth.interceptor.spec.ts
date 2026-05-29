@@ -3,11 +3,9 @@ import {
   HttpClient,
   provideHttpClient,
   withInterceptors,
+  withXsrfConfiguration,
 } from '@angular/common/http';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
 import { authInterceptor } from './auth.interceptor';
 import { AuthService } from '../services/auth.service';
@@ -19,15 +17,18 @@ describe('authInterceptor', () => {
   let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(() => {
-    authServiceSpy = jasmine.createSpyObj('AuthService', [
-      'getToken',
-      'logout',
-    ]);
+    authServiceSpy = jasmine.createSpyObj('AuthService', ['getToken', 'logout']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     TestBed.configureTestingModule({
       providers: [
-        provideHttpClient(withInterceptors([authInterceptor])),
+        provideHttpClient(
+          withXsrfConfiguration({
+            cookieName: 'XSRF-TOKEN',
+            headerName: 'X-XSRF-TOKEN',
+          }),
+          withInterceptors([authInterceptor]),
+        ),
         provideHttpClientTesting(),
         { provide: AuthService, useValue: authServiceSpy },
         { provide: Router, useValue: routerSpy },
@@ -49,9 +50,7 @@ describe('authInterceptor', () => {
 
     const result = httpTestingController.expectOne('/api/test');
     expect(result.request.headers.has('Authorization')).toBeTrue();
-    expect(result.request.headers.get('Authorization')).toBe(
-      'Bearer fake-token',
-    );
+    expect(result.request.headers.get('Authorization')).toBe('Bearer fake-token');
   });
 
   it('should NOT add an Authorization header when token is absent', () => {
@@ -77,7 +76,7 @@ describe('authInterceptor', () => {
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
   });
 
-  it('should logout and redirect to login on 403 Forbidden', () => {
+  it('should NOT logout on 403 Forbidden (may be CSRF-related)', () => {
     authServiceSpy.getToken.and.returnValue('fake-token');
 
     httpClient.get('/api/test').subscribe({
@@ -87,8 +86,8 @@ describe('authInterceptor', () => {
     const result = httpTestingController.expectOne('/api/test');
     result.flush('Forbidden', { status: 403, statusText: 'Forbidden' });
 
-    expect(authServiceSpy.logout).toHaveBeenCalled();
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
+    expect(authServiceSpy.logout).not.toHaveBeenCalled();
+    expect(routerSpy.navigate).not.toHaveBeenCalled();
   });
 
   it('should logout and redirect to login on 401 even without a token', () => {

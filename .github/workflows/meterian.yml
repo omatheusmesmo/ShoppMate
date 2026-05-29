@@ -1,0 +1,68 @@
+name: Meterian CI
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - ".github/workflows/meterian.yml"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - ".github/workflows/meterian.yml"
+
+concurrency:
+  group: meterian-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  meterian_scan:
+    name: Meterian Scan (${{ matrix.project }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [backend, frontend]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        if: matrix.project == 'backend'
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: "maven"
+
+      - name: Set up Node.js
+        if: matrix.project == 'frontend'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Meterian Scanner
+        uses: MeterianHQ/meterian-github-action@v1
+        id: meterian
+        if: ${{ secrets.METERIAN_API_TOKEN != '' }}
+        with:
+          oss: true
+          cli_args: "--project-path=${{ matrix.project }} --report-sarif=report.sarif"
+        env:
+          METERIAN_API_TOKEN: ${{ secrets.METERIAN_API_TOKEN }}
+
+      - name: Upload SARIF report
+        uses: github/codeql-action/upload-sarif@v3
+        if: ${{ always() && hashFiles('report.sarif') != '' }}
+        with:
+          sarif_file: report.sarif

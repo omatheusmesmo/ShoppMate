@@ -15,14 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ActiveProfiles("test")
-@TestPropertySource(properties = {
-        "security.rate-limit.capacity=2",
-        "security.rate-limit.refill-tokens=2",
-        "security.rate-limit.refill-duration=PT1S",
-        "security.rate-limit.short-burst-enabled=false",
-        "security.rate-limit.enabled-methods[0]=POST",
-        "security.rate-limit.included-paths[0]=/auth/**"
-})
+@TestPropertySource(properties = { "security.rate-limit.capacity=2", "security.rate-limit.refill-tokens=2",
+        "security.rate-limit.refill-duration=PT1S", "security.rate-limit.short-burst-enabled=false",
+        "security.rate-limit.enabled-methods[0]=POST", "security.rate-limit.included-paths[0]=/auth/**" })
 class DistributedLifecycleIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired

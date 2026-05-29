@@ -30,9 +30,7 @@ describe('ItemDialogComponent - Duplicate Validation', () => {
 
   beforeEach(async () => {
     itemServiceSpy = jasmine.createSpyObj('ItemService', ['getAllItems']);
-    categoryServiceSpy = jasmine.createSpyObj('CategoryService', [
-      'getAllCategories',
-    ]);
+    categoryServiceSpy = jasmine.createSpyObj('CategoryService', ['getAllCategories']);
     unitServiceSpy = jasmine.createSpyObj('UnitService', ['getAllUnits']);
 
     itemServiceSpy.getAllItems.and.returnValue(of(mockItems));

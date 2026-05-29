@@ -10,6 +10,10 @@ post {
   auth: none
 }
 
+headers {
+  X-XSRF-TOKEN: {{xsrfToken}}
+}
+
 body:json {
   {
     "email": "user@example.com",
@@ -20,5 +24,17 @@ body:json {
 script:post-response {
   if (res.getStatus() === 200) {
     bru.setVar("token", res.getBody());
+  }
+
+  const raw = res.getHeaders()["set-cookie"];
+  const cookies = Array.isArray(raw) ? raw : raw ? [raw] : [];
+  if (cookies.length > 0) {
+    const xsrfCookie = cookies.find(cookie => cookie.includes("XSRF-TOKEN="));
+    if (xsrfCookie) {
+      const match = xsrfCookie.match(/XSRF-TOKEN=([^;]+)/);
+      if (match && match[1]) {
+        bru.setVar("xsrfToken", decodeURIComponent(match[1]));
+      }
+    }
   }
 }

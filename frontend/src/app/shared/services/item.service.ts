@@ -12,9 +12,7 @@ export class ItemService extends BaseService {
   private apiUrl = `${environment.apiUrl}/item`;
 
   getAllItems(): Observable<ItemResponseDTO[]> {
-    return this.http
-      .get<ItemResponseDTO[]>(this.apiUrl)
-      .pipe(catchError(this.handleError));
+    return this.http.get<ItemResponseDTO[]>(this.apiUrl).pipe(catchError(this.handleError));
   }
 
   getItemById(id: number): Observable<ItemResponseDTO> {
@@ -24,9 +22,7 @@ export class ItemService extends BaseService {
   }
 
   addItem(item: ItemRequestDTO): Observable<ItemResponseDTO> {
-    return this.http
-      .post<ItemResponseDTO>(this.apiUrl, item)
-      .pipe(catchError(this.handleError));
+    return this.http.post<ItemResponseDTO>(this.apiUrl, item).pipe(catchError(this.handleError));
   }
 
   updateItem(id: number, item: ItemRequestDTO): Observable<ItemResponseDTO> {
@@ -36,8 +32,6 @@ export class ItemService extends BaseService {
   }
 
   deleteItem(id: number): Observable<void> {
-    return this.http
-      .delete<void>(`${this.apiUrl}/${id}`)
-      .pipe(catchError(this.handleError));
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(catchError(this.handleError));
   }
 }

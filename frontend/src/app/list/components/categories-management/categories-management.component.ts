@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnInit,
-  signal,
-  inject,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,13 +14,7 @@ import { FeedbackService } from '../../../shared/services/feedback.service';
 @Component({
   selector: 'app-categories-management',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-  ],
+  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule],
   templateUrl: './categories-management.component.html',
   styleUrls: ['./categories-management.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -87,20 +75,20 @@ export class CategoriesManagementComponent implements OnInit {
   deleteCategory(id: number): void {
     this.confirmDialog
       .open({
-        title: 'Excluir categoria',
-        message: 'Tem certeza que deseja excluir esta categoria?',
-        confirmText: 'Excluir',
+        title: 'Delete category',
+        message: 'Are you sure you want to delete this category?',
+        confirmText: 'Delete',
       })
       .subscribe((confirmed) => {
         if (!confirmed) return;
 
         this.categoryService.deleteCategory(id).subscribe({
           next: () => {
-            this.feedback.success('Categoria excluida com sucesso');
+            this.feedback.success('Category deleted successfully');
             this.loadCategories();
           },
           error: () => {
-            this.feedback.error('Erro ao excluir categoria');
+            this.feedback.error('Error deleting category');
           },
         });
       });

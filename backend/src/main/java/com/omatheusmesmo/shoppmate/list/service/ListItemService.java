@@ -9,6 +9,7 @@ import com.omatheusmesmo.shoppmate.list.mapper.ListItemMapper;
 import com.omatheusmesmo.shoppmate.list.repository.ListItemRepository;
 import com.omatheusmesmo.shoppmate.item.service.ItemService;
 import com.omatheusmesmo.shoppmate.shared.service.AuditService;
+import com.omatheusmesmo.shoppmate.user.entity.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.NoSuchElementException;
 @Service
 public class ListItemService {
 
-    private final ListItemRepository ListItemRepository;
+    private final ListItemRepository listItemRepository;
 
     private final ShoppingListService shoppingListService;
 
@@ -29,62 +30,68 @@ public class ListItemService {
 
     public ListItemService(ListItemRepository listItemRepository, ShoppingListService shoppingListService,
             ItemService itemService, AuditService auditService, ListItemMapper listItemMapper) {
-        ListItemRepository = listItemRepository;
+        this.listItemRepository = listItemRepository;
         this.shoppingListService = shoppingListService;
         this.itemService = itemService;
         this.auditService = auditService;
         this.listItemMapper = listItemMapper;
     }
 
-    public ListItem addShoppItemList(ListItemRequestDTO listItemRequestDTO) {
+    public ListItem addShoppItemList(ListItemRequestDTO listItemRequestDTO, User user) {
         Item item = itemService.findById(listItemRequestDTO.itemId());
         ShoppingList shoppingList = shoppingListService.findListById(listItemRequestDTO.listId());
+        shoppingListService.verifyOwnership(listItemRequestDTO.listId(), user);
 
         ListItem listItem = listItemMapper.toEntity(listItemRequestDTO, item, shoppingList);
 
         isListItemValid(listItem);
         auditService.setAuditData(listItem, true);
-        ListItemRepository.save(listItem);
+        listItemRepository.save(listItem);
         return listItem;
     }
 
-    public void isListItemValid(ListItem ListItem) throws NoSuchElementException {
-        itemService.isItemValid(ListItem.getItem());
-        shoppingListService.isListValid(ListItem.getShoppList());
+    public void isListItemValid(ListItem listItem) throws NoSuchElementException {
+        itemService.isItemValid(listItem.getItem());
+        shoppingListService.isListValid(listItem.getShoppList());
 
-        checkQuantity(ListItem);
+        checkQuantity(listItem);
     }
 
-    private void checkQuantity(ListItem ListItem) {
-        if (ListItem.getQuantity() == null || ListItem.getQuantity() <= 0) {
+    private void checkQuantity(ListItem listItem) {
+        if (listItem.getQuantity() == null || listItem.getQuantity() <= 0) {
             throw new IllegalArgumentException("Quantity must be informed and greater than 0!");
         }
     }
 
-    public ListItem findListItemById(Long id) {
-        return ListItemRepository.findByIdAndDeletedFalse(id)
+    public ListItem findListItemById(Long listId, Long id, User user) {
+        // Verify access first to prevent existence leakage
+        shoppingListService.verifyOwnership(listId, user);
+
+        // Query constrained by shoppListId - fails if item doesn't belong to the authorized list
+        return listItemRepository.findByIdAndShoppListIdAndDeletedFalseFetchShoppList(id, listId)
                 .orElseThrow(() -> new NoSuchElementException("ListItem not found"));
     }
 
-    public void removeList(Long id) {
-        ListItem deletedItem = findListItemById(id);
+    public void removeList(Long listId, Long id, User user) {
+        ListItem deletedItem = findListItemById(listId, id, user);
         auditService.softDelete(deletedItem);
-        ListItemRepository.save(deletedItem);
+        listItemRepository.save(deletedItem);
     }
 
-    public ListItem editList(Long id, ListItemUpdateRequestDTO listItemUpdateRequestDTO) {
-        ListItem existingListItem = findListItemById(id);
+    public ListItem editList(Long listId, Long id, ListItemUpdateRequestDTO listItemUpdateRequestDTO, User user) {
+        ListItem existingListItem = findListItemById(listId, id, user);
 
         existingListItem.setQuantity(listItemUpdateRequestDTO.quantity());
         existingListItem.setPurchased(listItemUpdateRequestDTO.purchased());
         existingListItem.setUnitPrice(listItemUpdateRequestDTO.unitPrice());
 
         auditService.setAuditData(existingListItem, false);
-        ListItemRepository.save(existingListItem);
+        listItemRepository.save(existingListItem);
         return existingListItem;
     }
 
-    public List<ListItem> findAll(Long idList) {
-        return ListItemRepository.findByShoppListIdAndDeletedFalse(idList);
+    public List<ListItem> findAll(Long idList, User user) {
+        shoppingListService.verifyOwnership(idList, user);
+        return listItemRepository.findByShoppListIdAndDeletedFalse(idList);
     }
 }

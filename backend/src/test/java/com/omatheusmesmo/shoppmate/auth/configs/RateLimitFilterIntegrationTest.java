@@ -1,5 +1,7 @@
 package com.omatheusmesmo.shoppmate.auth.configs;
 
+import java.sql.SQLException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +11,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+
 import com.omatheusmesmo.shoppmate.shared.testcontainers.AbstractIntegrationTest;
-import java.sql.SQLException;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -22,25 +24,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@TestPropertySource(properties = {
-        "security.rate-limit.capacity=5",
-        "security.rate-limit.refill-tokens=5",
-        "security.rate-limit.refill-duration=PT1M",
-        "security.rate-limit.enabled-methods[0]=POST",
-        "security.rate-limit.enabled-methods[1]=PUT",
-        "security.rate-limit.included-paths[0]=/auth/**",
-        "security.rate-limit.included-paths[1]=/category",
-        "security.rate-limit.included-paths[2]=/category/**",
-        "security.rate-limit.included-paths[3]=/lists",
-        "security.rate-limit.included-paths[4]=/lists/**",
-        "security.rate-limit.included-paths[5]=/item",
-        "security.rate-limit.included-paths[6]=/item/**",
-        "security.rate-limit.included-paths[7]=/unit",
-        "security.rate-limit.included-paths[8]=/unit/**"
-})
+@TestPropertySource(properties = { "security.rate-limit.capacity=5", "security.rate-limit.refill-tokens=5",
+        "security.rate-limit.refill-duration=PT1M", "security.rate-limit.enabled-methods[0]=POST",
+        "security.rate-limit.enabled-methods[1]=PUT", "security.rate-limit.included-paths[0]=/auth/**",
+        "security.rate-limit.included-paths[1]=/category", "security.rate-limit.included-paths[2]=/category/**",
+        "security.rate-limit.included-paths[3]=/lists", "security.rate-limit.included-paths[4]=/lists/**",
+        "security.rate-limit.included-paths[5]=/item", "security.rate-limit.included-paths[6]=/item/**",
+        "security.rate-limit.included-paths[7]=/unit", "security.rate-limit.included-paths[8]=/unit/**" })
 
 class RateLimitFilterIntegrationTest extends AbstractIntegrationTest {
-
 
     @Autowired
     private MockMvc mockMvc;
@@ -49,63 +41,46 @@ class RateLimitFilterIntegrationTest extends AbstractIntegrationTest {
     private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
-    void clearRateLimitBuckets() throws SQLException {
+    void clearRateLimitState() throws SQLException {
+        jdbcTemplate.update("DELETE FROM rate_limit_violation");
         jdbcTemplate.update("DELETE FROM bucket");
     }
 
     private void assertRateLimitedOnPost(String endpoint, String payload, String ip) throws Exception {
         for (int i = 0; i < 5; i++) {
-            mockMvc.perform(post(endpoint)
-                            .contentType(APPLICATION_JSON)
-                            .content(payload)
-                            .with(request -> {
-                                request.setRemoteAddr(ip);
-                                return request;
-                            }))
-                    .andExpect(result -> {
-                        if (result.getResponse().getStatus() == 429) {
-                            throw new AssertionError("Rate limit triggered too early for " + endpoint);
-                        }
-                    });
+            mockMvc.perform(post(endpoint).contentType(APPLICATION_JSON).content(payload).with(request -> {
+                request.setRemoteAddr(ip);
+                return request;
+            })).andExpect(result -> {
+                if (result.getResponse().getStatus() == 429) {
+                    throw new AssertionError("Rate limit triggered too early for " + endpoint);
+                }
+            });
         }
 
-        mockMvc.perform(post(endpoint)
-                        .contentType(APPLICATION_JSON)
-                        .content(payload)
-                        .with(request -> {
-                            request.setRemoteAddr(ip);
-                            return request;
-                        }))
-                .andExpect(status().isTooManyRequests())
-                .andExpect(header().exists("Retry-After"))
+        mockMvc.perform(post(endpoint).contentType(APPLICATION_JSON).content(payload).with(request -> {
+            request.setRemoteAddr(ip);
+            return request;
+        })).andExpect(status().isTooManyRequests()).andExpect(header().exists("Retry-After"))
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON));
     }
 
     private void assertRateLimitedOnPut(String endpoint, String payload, String ip) throws Exception {
         for (int i = 0; i < 5; i++) {
-            mockMvc.perform(put(endpoint)
-                            .contentType(APPLICATION_JSON)
-                            .content(payload)
-                            .with(request -> {
-                                request.setRemoteAddr(ip);
-                                return request;
-                            }))
-                    .andExpect(result -> {
-                        if (result.getResponse().getStatus() == 429) {
-                            throw new AssertionError("Rate limit triggered too early for " + endpoint);
-                        }
-                    });
+            mockMvc.perform(put(endpoint).contentType(APPLICATION_JSON).content(payload).with(request -> {
+                request.setRemoteAddr(ip);
+                return request;
+            })).andExpect(result -> {
+                if (result.getResponse().getStatus() == 429) {
+                    throw new AssertionError("Rate limit triggered too early for " + endpoint);
+                }
+            });
         }
 
-        mockMvc.perform(put(endpoint)
-                        .contentType(APPLICATION_JSON)
-                        .content(payload)
-                        .with(request -> {
-                            request.setRemoteAddr(ip);
-                            return request;
-                        }))
-                .andExpect(status().isTooManyRequests())
-                .andExpect(header().exists("Retry-After"))
+        mockMvc.perform(put(endpoint).contentType(APPLICATION_JSON).content(payload).with(request -> {
+            request.setRemoteAddr(ip);
+            return request;
+        })).andExpect(status().isTooManyRequests()).andExpect(header().exists("Retry-After"))
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON));
     }
 

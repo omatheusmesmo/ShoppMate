@@ -1,6 +1,5 @@
 package com.omatheusmesmo.shoppmate.user.dtos;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Pattern;
 
 public record RegisterUserDTO(String email,

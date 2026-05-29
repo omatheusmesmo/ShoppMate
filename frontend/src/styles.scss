@@ -1,4 +1,4 @@
-@use "@angular/material" as mat;
+@use '@angular/material' as mat;
 
 // Define variables for colors based on Design Tokens
 $primary-token: var(--mat-sys-color-primary);
@@ -20,7 +20,7 @@ body {
   background: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
   height: 100%;
 }
 

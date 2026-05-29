@@ -1,26 +1,15 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ShoppingListService } from '../../../shared/services/shopping-list.service';
 import {
   ShoppingListResponseDTO,
   ShoppingListRequestDTO,
 } from '../../../shared/interfaces/shopping-list.interface';
-import { AuthService } from '../../../shared/services/auth.service';
 import { MatDialogActions } from '@angular/material/dialog';
 import { MatDialogContent } from '@angular/material/dialog';
 import { FeedbackService } from '../../../shared/services/feedback.service';
@@ -46,7 +35,6 @@ export class ShoppingListDialogComponent {
   private fb = inject(FormBuilder);
   private shoppingListService = inject(ShoppingListService);
   private feedback = inject(FeedbackService);
-  private authService = inject(AuthService);
   private data = inject(MAT_DIALOG_DATA) as {
     list?: ShoppingListResponseDTO;
     isEdit: boolean;
@@ -54,23 +42,11 @@ export class ShoppingListDialogComponent {
 
   readonly isEdit = signal(this.data.isEdit);
   readonly listForm: FormGroup = this.fb.group({
-    name: [
-      this.data.list?.listName ?? '',
-      [Validators.required, Validators.minLength(3)],
-    ],
+    name: [this.data.list?.listName ?? '', [Validators.required, Validators.minLength(3)]],
   });
 
   onSubmit(): void {
     if (this.listForm.valid) {
-      const userId = this.authService.getCurrentUserId();
-
-      if (userId == null) {
-        this.feedback.error(
-          'Usuario nao identificado. Por favor, faca login novamente.',
-        );
-        return;
-      }
-
       const name = (this.listForm.value.name ?? '').trim();
       if (!name) {
         const control = this.listForm.get('name');
@@ -80,30 +56,27 @@ export class ShoppingListDialogComponent {
       }
 
       const listData: ShoppingListRequestDTO = {
-        name,
-        idUser: userId,
+        name: this.listForm.value.name,
       };
 
       if (this.isEdit() && this.data.list) {
-        this.shoppingListService
-          .updateShoppingList(this.data.list.idList, listData)
-          .subscribe({
-            next: () => {
-              this.feedback.success('Lista atualizada com sucesso');
-              this.dialogRef.close(true);
-            },
-            error: () => {
-              this.feedback.error('Erro ao atualizar lista');
-            },
-          });
-      } else {
-        this.shoppingListService.createShoppingList(listData).subscribe({
+        this.shoppingListService.updateShoppingList(this.data.list.idList, listData).subscribe({
           next: () => {
-            this.feedback.success('Lista criada com sucesso');
+            this.feedback.success('List updated successfully');
             this.dialogRef.close(true);
           },
           error: () => {
-            this.feedback.error('Erro ao criar lista');
+            this.feedback.error('Error updating list');
+          },
+        });
+      } else {
+        this.shoppingListService.createShoppingList(listData).subscribe({
+          next: () => {
+            this.feedback.success('List created successfully');
+            this.dialogRef.close(true);
+          },
+          error: () => {
+            this.feedback.error('Error creating list');
           },
         });
       }

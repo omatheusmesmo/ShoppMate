@@ -102,6 +102,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(ResourceOwnershipException.class)
+    public ResponseEntity<ApiError> handleResourceOwnership(ResourceOwnershipException ex) {
+        log.warn("Resource ownership violation: {}", ex.getMessage());
+        ApiError apiError = new ApiError(HttpStatus.FORBIDDEN, "Access Denied", ex.getMessage());
+        return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
+    }
+
     // TODO -> InvalidDataAccessApiUsageException
 
     // TODO: Tratar DataIntegrityViolationException

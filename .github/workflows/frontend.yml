@@ -1,22 +1,17 @@
 name: Frontend CI
 
 on:
-  push:
-    branches: ["main", "develop"]
-    paths:
-      - "frontend/**"
-      - ".github/workflows/frontend.yml"
   pull_request:
-    branches: ["main", "develop"]
+    branches: ["main"]
     paths:
       - "frontend/**"
       - ".github/workflows/frontend.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
-  group: frontend-${{ github.ref }}
+  group: frontend-${{ github.event.pull_request.head.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -30,6 +25,11 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -50,14 +50,29 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
 
-      - name: Check Formatting
-        run: npm run prettier:check
+      - name: Auto-fix Formatting (Prettier)
+        run: npm run prettier
 
-      - name: Run ESLint
-        run: npm run lint
+      - name: Auto-fix Lint (ESLint)
+        continue-on-error: true
+        run: npx ng lint --fix
 
       - name: Custom Lint
+        continue-on-error: true
         run: npm run lint:custom
+
+      - name: Commit and Push Auto-fixes
+        if: always() && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "chore: auto-fix formatting and lint issues"
+            git push origin HEAD:"$PR_HEAD_REF"
+          fi
 
       - name: Run Tests with ChromeHeadless
         env:

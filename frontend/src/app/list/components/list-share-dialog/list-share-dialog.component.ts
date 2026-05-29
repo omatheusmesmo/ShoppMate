@@ -1,22 +1,7 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnInit,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import {
-  MatDialogRef,
-  MAT_DIALOG_DATA,
-  MatDialogModule,
-} from '@angular/material/dialog';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -84,18 +69,16 @@ export class ListShareDialogComponent implements OnInit {
 
   loadPermissions(): void {
     this.isLoading.set(true);
-    this.listPermissionService
-      .getAllListPermissions(this.data.listId)
-      .subscribe({
-        next: (permissions: ListPermissionSummaryDTO[]) => {
-          this.permissions.set(permissions);
-          this.isLoading.set(false);
-        },
-        error: () => {
-          this.feedback.error('Erro ao carregar permissoes');
-          this.isLoading.set(false);
-        },
-      });
+    this.listPermissionService.getAllListPermissions(this.data.listId).subscribe({
+      next: (permissions: ListPermissionSummaryDTO[]) => {
+        this.permissions.set(permissions);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.feedback.error('Error loading permissions');
+        this.isLoading.set(false);
+      },
+    });
   }
 
   loadUsers(): void {
@@ -104,7 +87,7 @@ export class ListShareDialogComponent implements OnInit {
         this.users.set(users);
       },
       error: () => {
-        this.feedback.error('Erro ao carregar usuarios');
+        this.feedback.error('Error loading users');
       },
     });
   }
@@ -115,7 +98,7 @@ export class ListShareDialogComponent implements OnInit {
       const user = this.users().find((u) => u.email === email);
 
       if (!user || !user.id) {
-        this.feedback.error('Usuario nao encontrado com este e-mail');
+        this.feedback.error('User not found with this email');
         return;
       }
 
@@ -127,12 +110,12 @@ export class ListShareDialogComponent implements OnInit {
 
       this.listPermissionService.addListPermission(request).subscribe({
         next: () => {
-          this.feedback.success('Lista compartilhada com sucesso');
+          this.feedback.success('List shared successfully');
           this.shareForm.reset({ permission: Permission.READ });
           this.loadPermissions();
         },
         error: () => {
-          this.feedback.error('Erro ao compartilhar lista');
+          this.feedback.error('Error sharing list');
         },
       });
     }
@@ -141,24 +124,22 @@ export class ListShareDialogComponent implements OnInit {
   removePermission(permissionId: number): void {
     this.confirmDialog
       .open({
-        title: 'Remover permissao',
-        message: 'Tem certeza que deseja remover esta permissao?',
-        confirmText: 'Remover',
+        title: 'Remove Permission',
+        message: 'Are you sure you want to remove this permission?',
+        confirmText: 'Remove',
       })
       .subscribe((confirmed) => {
         if (!confirmed) return;
 
-        this.listPermissionService
-          .deleteListPermission(this.data.listId, permissionId)
-          .subscribe({
-            next: () => {
-              this.feedback.success('Permissao removida com sucesso');
-              this.loadPermissions();
-            },
-            error: () => {
-              this.feedback.error('Erro ao remover permissao');
-            },
-          });
+        this.listPermissionService.deleteListPermission(this.data.listId, permissionId).subscribe({
+          next: () => {
+            this.feedback.success('Permission removed successfully');
+            this.loadPermissions();
+          },
+          error: () => {
+            this.feedback.error('Error removing permission');
+          },
+        });
       });
   }
 

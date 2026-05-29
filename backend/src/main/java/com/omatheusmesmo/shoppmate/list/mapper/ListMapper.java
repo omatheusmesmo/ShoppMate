@@ -25,14 +25,12 @@ public class ListMapper {
         this.userMapper = userMapper;
     }
 
-    public ShoppingList toEntity(ShoppingListRequestDTO dto) {
+    public ShoppingList toEntity(ShoppingListRequestDTO dto, User owner) {
         if (dto == null) {
             return null;
         }
         ShoppingList entity = new ShoppingList();
         entity.setName(dto.name());
-
-        User owner = userService.findUser(dto.idUser());
         entity.setOwner(owner);
 
         return entity;

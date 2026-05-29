@@ -11,7 +11,6 @@ export interface ShoppingList {
 
 export interface ShoppingListRequestDTO {
   name: string;
-  idUser: number;
 }
 
 export interface ShoppingListResponseDTO {

@@ -1,7 +1,7 @@
 <div class="lists-container">
   <mat-card>
     <mat-card-header>
-      <mat-card-title>Minhas Listas de Compras</mat-card-title>
+      <mat-card-title>My Shopping Lists</mat-card-title>
     </mat-card-header>
 
     <mat-card-content>
@@ -15,9 +15,7 @@
             <mat-card class="list-card">
               <mat-card-header>
                 <mat-card-title>{{ list.listName }}</mat-card-title>
-                <mat-card-subtitle
-                  >Criada por: {{ list.owner.fullName }}</mat-card-subtitle
-                >
+                <mat-card-subtitle>Created by: {{ list.owner.fullName }}</mat-card-subtitle>
               </mat-card-header>
 
               <mat-card-actions>
@@ -25,7 +23,7 @@
                   mat-icon-button
                   color="primary"
                   (click)="openEditDialog(list)"
-                  title="Editar"
+                  [attr.aria-label]="'Edit ' + list.listName"
                 >
                   <mat-icon>edit</mat-icon>
                 </button>
@@ -33,7 +31,7 @@
                   mat-icon-button
                   color="accent"
                   [routerLink]="['/lists', list.idList]"
-                  title="Visualizar"
+                  [attr.aria-label]="'View ' + list.listName"
                 >
                   <mat-icon>visibility</mat-icon>
                 </button>
@@ -41,7 +39,7 @@
                   mat-icon-button
                   color="primary"
                   (click)="openShareDialog(list)"
-                  title="Compartilhar"
+                  [attr.aria-label]="'Share ' + list.listName"
                 >
                   <mat-icon>share</mat-icon>
                 </button>
@@ -49,7 +47,7 @@
                   mat-icon-button
                   color="warn"
                   (click)="deleteList(list.idList)"
-                  title="Excluir"
+                  [attr.aria-label]="'Delete ' + list.listName"
                 >
                   <mat-icon>delete</mat-icon>
                 </button>
@@ -57,13 +55,9 @@
             </mat-card>
           } @empty {
             <div class="no-lists">
-              <p>Você ainda não tem nenhuma lista de compras</p>
-              <button
-                mat-raised-button
-                color="primary"
-                (click)="openNewListDialog()"
-              >
-                Criar Primeira Lista
+              <p>You don't have any shopping lists yet</p>
+              <button mat-raised-button color="primary" (click)="openNewListDialog()">
+                Create First List
               </button>
             </div>
           }
@@ -74,7 +68,7 @@
     <mat-card-actions>
       <button mat-raised-button color="primary" (click)="openNewListDialog()">
         <mat-icon>add</mat-icon>
-        Nova Lista
+        Create New List
       </button>
     </mat-card-actions>
   </mat-card>

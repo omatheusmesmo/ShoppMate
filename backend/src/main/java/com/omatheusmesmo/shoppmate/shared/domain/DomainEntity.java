@@ -1,7 +1,10 @@
 package com.omatheusmesmo.shoppmate.shared.domain;
 
 import com.omatheusmesmo.shoppmate.shared.utils.SnowflakeIdentifierGenerator;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;

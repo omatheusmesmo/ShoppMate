@@ -1,7 +1,7 @@
 <div class="categories-container">
   <mat-card>
     <mat-card-header>
-      <mat-card-title>Gerenciamento de Categorias</mat-card-title>
+      <mat-card-title>Category Management”</mat-card-title>
     </mat-card-header>
 
     <mat-card-content>
@@ -19,6 +19,7 @@
                   mat-icon-button
                   color="primary"
                   (click)="openEditDialog(category)"
+                  [attr.aria-label]="'Edit category ' + category.name"
                 >
                   <mat-icon>edit</mat-icon>
                 </button>
@@ -26,6 +27,7 @@
                   mat-icon-button
                   color="warn"
                   (click)="category.id && deleteCategory(category.id)"
+                  [attr.aria-label]="'Delete category ' + category.name"
                 >
                   <mat-icon>delete</mat-icon>
                 </button>
@@ -33,7 +35,7 @@
             </div>
           } @empty {
             <div class="no-categories">
-              <p>Nenhuma categoria cadastrada</p>
+              <p>No categories registered</p>
             </div>
           }
         </div>
@@ -41,13 +43,9 @@
     </mat-card-content>
 
     <mat-card-actions>
-      <button
-        mat-raised-button
-        color="primary"
-        (click)="openNewCategoryDialog()"
-      >
+      <button mat-raised-button color="primary" (click)="openNewCategoryDialog()">
         <mat-icon>add</mat-icon>
-        Nova Categoria
+        New Category
       </button>
     </mat-card-actions>
   </mat-card>

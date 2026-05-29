@@ -3,14 +3,14 @@ package com.omatheusmesmo.shoppmate.auth.configs;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.convert.DurationUnit;
 
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Getter
 @Setter
-@Configuration
 @ConfigurationProperties(prefix = "security.rate-limit")
 public class RateLimitProperties {
 
@@ -22,6 +22,7 @@ public class RateLimitProperties {
 
     private int refillTokens;
 
+    @DurationUnit(ChronoUnit.SECONDS)
     private Duration refillDuration;
 
     private List<String> includedPaths;
@@ -34,5 +35,6 @@ public class RateLimitProperties {
 
     private int shortBurstRefillTokens;
 
+    @DurationUnit(ChronoUnit.MILLIS)
     private Duration shortBurstRefillDuration;
 }

@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnInit,
-  signal,
-  inject,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -55,7 +49,7 @@ export class ShoppingListComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: () => {
-        this.feedback.error('Erro ao carregar listas');
+        this.feedback.error('Error loading lists');
         this.isLoading.set(false);
       },
     });
@@ -90,9 +84,9 @@ export class ShoppingListComponent implements OnInit {
   deleteList(id: number): void {
     this.confirmDialog
       .open({
-        title: 'Excluir lista',
-        message: 'Tem certeza que deseja excluir esta lista?',
-        confirmText: 'Excluir',
+        title: 'Delete List',
+        message: 'Are you sure you want to delete this list?',
+        confirmText: 'Delete',
       })
       .subscribe((confirmed) => {
         if (!confirmed) return;
@@ -100,10 +94,10 @@ export class ShoppingListComponent implements OnInit {
         this.shoppingListService.deleteShoppingList(id).subscribe({
           next: () => {
             this.loadLists();
-            this.feedback.success('Lista excluída com sucesso');
+            this.feedback.success('List deleted successfully');
           },
           error: () => {
-            this.feedback.error('Erro ao excluir lista');
+            this.feedback.error('Error deleting list');
           },
         });
       });

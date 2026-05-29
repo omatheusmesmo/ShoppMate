@@ -1,1 +1,0 @@
-ALTER TABLE list_items ADD COLUMN unit_price DECIMAL(19, 2) DEFAULT 0.00;

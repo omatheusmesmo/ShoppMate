@@ -1,19 +1,21 @@
 package com.omatheusmesmo.shoppmate.auth.service;
 
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.omatheusmesmo.shoppmate.shared.testutils.FakerUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 class JwtServiceTest {
@@ -23,19 +25,22 @@ class JwtServiceTest {
 
     private JwtService jwtService;
     private AutoCloseable mocks;
+    private String agnosticUsername;
+    private static final String SECRET_KEY = "0123456789012345678901234567890123456789012345678901234567890123"; // 64
+                                                                                                                 // chars
+                                                                                                                 // for
+                                                                                                                 // HS256
 
     @BeforeEach
     void setUp() {
         mocks = MockitoAnnotations.openMocks(this);
+        agnosticUsername = FakerUtil.getFaker().internet().username();
 
-        KeyPair keyPair = generateRSAKeys();
-        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+        jwtService = new JwtService();
+        ReflectionTestUtils.setField(jwtService, "tokenExpiration", 3600000L);
+        ReflectionTestUtils.setField(jwtService, "secretKey", SECRET_KEY);
 
-        long tokenExpiration = 3600000L;
-        jwtService = new JwtService(publicKey, privateKey, tokenExpiration);
-
-        when(userDetails.getUsername()).thenReturn("testuser");
+        when(userDetails.getUsername()).thenReturn(agnosticUsername);
     }
 
     @AfterEach
@@ -44,93 +49,103 @@ class JwtServiceTest {
     }
 
     @Test
-    void shouldGenerateAndValidateValidToken() {
+    void generateToken_ValidUserDetails_ReturnsValidToken() {
+        // Act
         String token = jwtService.generateToken(userDetails);
 
+        // Assert
         assertNotNull(token);
         assertFalse(token.isEmpty());
         assertTrue(jwtService.validateToken(token), "Generated token should be valid");
     }
 
     @Test
-    void shouldDecryptTokenAndExtractUsername() {
+    void decryptToken_ValidToken_ExtractsUsername() {
+        // Arrange
         String token = jwtService.generateToken(userDetails);
+
+        // Act
         JWTClaimsSet claimsSet = jwtService.decryptToken(token);
 
-        assertEquals("testuser", claimsSet.getSubject());
+        // Assert
+        assertEquals(agnosticUsername, claimsSet.getSubject());
         assertNotNull(claimsSet.getExpirationTime());
         assertNotNull(claimsSet.getJWTID());
     }
 
     @Test
-    void shouldGenerateUniqueJwtIdsForDifferentTokens() {
+    void generateToken_MultipleCalls_ReturnsUniqueJwtIds() {
+        // Act
         String token1 = jwtService.generateToken(userDetails);
         String token2 = jwtService.generateToken(userDetails);
 
         JWTClaimsSet claims1 = jwtService.decryptToken(token1);
         JWTClaimsSet claims2 = jwtService.decryptToken(token2);
 
+        // Assert
         assertNotEquals(claims1.getJWTID(), claims2.getJWTID());
     }
 
     @Test
-    void shouldNotValidateExpiredToken() {
-        // Use a negative expiration to create a token that is already expired
-        JwtService shortLivedService = createServiceWithExpiration(-1000L);
+    void validateToken_ExpiredToken_ReturnsFalse() {
+        // Arrange
+        JwtService shortLivedService = new JwtService();
+        ReflectionTestUtils.setField(shortLivedService, "tokenExpiration", -1000L);
+        ReflectionTestUtils.setField(shortLivedService, "secretKey", SECRET_KEY);
+
         String token = shortLivedService.generateToken(userDetails);
 
+        // Act & Assert
         assertFalse(shortLivedService.validateToken(token), "Expired token should not be valid");
     }
 
     @Test
-    void shouldNotValidateInvalidTokens() {
+    void validateToken_InvalidInputs_ReturnsFalse() {
+        // Act & Assert
         assertFalse(jwtService.validateToken("invalid_token"));
         assertFalse(jwtService.validateToken(""));
         assertFalse(jwtService.validateToken(null));
     }
 
     @Test
-    void shouldNotValidateMalformedJweToken() {
-        String malformedJwe = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+    void validateToken_MalformedJwe_ReturnsFalse() {
+        // Arrange
+        String malformedJwe = String.join(".", "not", "a", "valid", "jwe", "token");
 
+        // Act & Assert
         assertFalse(jwtService.validateToken(malformedJwe));
     }
 
     @Test
-    void shouldNotValidateTokenEncryptedWithDifferentKeys() {
-        JwtService otherService = createServiceWithExpiration(3600000L);
+    void validateToken_DifferentKeys_ReturnsFalse() {
+        // Arrange
+        JwtService otherService = new JwtService();
+        ReflectionTestUtils.setField(otherService, "tokenExpiration", 3600000L);
+        ReflectionTestUtils.setField(otherService, "secretKey",
+                "different_secret_key_different_secret_key_different_secret_key_64_chars");
         String token = otherService.generateToken(userDetails);
 
+        // Act & Assert
         assertFalse(jwtService.validateToken(token));
     }
 
     @Test
-    void shouldThrowExceptionWhenDecryptingInvalidToken() {
+    void decryptToken_InvalidToken_ThrowsException() {
+        // Act & Assert
         assertThrows(JwtServiceException.class, () -> jwtService.decryptToken("invalid"));
     }
 
     @Test
-    void shouldUseDifferentUsernameForToken() {
-        when(userDetails.getUsername()).thenReturn("anotheruser");
+    void generateToken_DifferentUser_ReturnsTokenWithCorrectSubject() {
+        // Arrange
+        String anotherUser = agnosticUsername + "-different";
+        when(userDetails.getUsername()).thenReturn(anotherUser);
 
+        // Act
         String token = jwtService.generateToken(userDetails);
         JWTClaimsSet claims = jwtService.decryptToken(token);
 
-        assertEquals("anotheruser", claims.getSubject());
-    }
-
-    private JwtService createServiceWithExpiration(long expiration) {
-        KeyPair keyPair = generateRSAKeys();
-        return new JwtService((RSAPublicKey) keyPair.getPublic(), (RSAPrivateKey) keyPair.getPrivate(), expiration);
-    }
-
-    private KeyPair generateRSAKeys() {
-        try {
-            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-            generator.initialize(2048);
-            return generator.genKeyPair();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to generate RSA keys", e);
-        }
+        // Assert
+        assertEquals(anotherUser, claims.getSubject());
     }
 }

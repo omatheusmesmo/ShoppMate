@@ -26,11 +26,7 @@ describe('CategoryDialogComponent - Duplicate Validation', () => {
     categoryServiceSpy.getAllCategories.and.returnValue(of(mockCategories));
 
     await TestBed.configureTestingModule({
-      imports: [
-        CategoryDialogComponent,
-        ReactiveFormsModule,
-        NoopAnimationsModule,
-      ],
+      imports: [CategoryDialogComponent, ReactiveFormsModule, NoopAnimationsModule],
       providers: [
         {
           provide: MatDialogRef,
@@ -61,9 +57,7 @@ describe('CategoryDialogComponent - Duplicate Validation', () => {
   });
 
   it('should disable the submit button when the form is invalid', () => {
-    const submitBtn = fixture.nativeElement.querySelector(
-      'button[color="primary"]',
-    );
+    const submitBtn = fixture.nativeElement.querySelector('button[color="primary"]');
     const nameControl = component.categoryForm.get('name');
 
     // Case: Empty name
@@ -88,11 +82,7 @@ describe('CategoryDialogComponent - Duplicate Validation', () => {
     const originalCategory = mockCategories[0]; // "Fruits"
 
     await TestBed.configureTestingModule({
-      imports: [
-        CategoryDialogComponent,
-        ReactiveFormsModule,
-        NoopAnimationsModule,
-      ],
+      imports: [CategoryDialogComponent, ReactiveFormsModule, NoopAnimationsModule],
       providers: [
         {
           provide: MatDialogRef,

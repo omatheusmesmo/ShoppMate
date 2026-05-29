@@ -11,12 +11,14 @@ import com.omatheusmesmo.shoppmate.shared.testcontainers.AbstractIntegrationTest
 import com.omatheusmesmo.shoppmate.shared.testcontainers.utils.TestUserFactory;
 import com.omatheusmesmo.shoppmate.item.dto.ItemRequestDTO;
 import com.omatheusmesmo.shoppmate.item.dto.ItemResponseDTO;
+import com.omatheusmesmo.shoppmate.shared.testutils.CategoryTestFactory;
+import com.omatheusmesmo.shoppmate.shared.testutils.ItemTestFactory;
+import com.omatheusmesmo.shoppmate.shared.testutils.UnitTestFactory;
 import com.omatheusmesmo.shoppmate.unit.entity.Unit;
 import com.omatheusmesmo.shoppmate.unit.repository.UnitRepository;
+import com.omatheusmesmo.shoppmate.user.entity.User;
+import com.omatheusmesmo.shoppmate.user.repository.UserRepository;
 import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.filter.log.LogDetail;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -50,11 +52,15 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
     @Autowired
     private ItemRepository itemRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     private static RequestSpecification specification;
     private static ObjectMapper objectMapper;
 
     static ItemResponseDTO itemResponseDTOCreated;
     static ItemResponseDTO itemResponseDTOUpdated;
+    private User testUser;
 
     @BeforeEach
     void init() {
@@ -63,6 +69,7 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
         categoryRepository.deleteAll();
 
         String jwtToken = testUserFactory.createTokenForTestUser();
+        testUser = userRepository.findByEmail(TestUserFactory.TEST_USER_EMAIL).orElseThrow();
 
         Response response = given().port(port).header("Authorization", "Bearer " + jwtToken).when().get("/item").then()
                 .statusCode(200).extract().response();
@@ -85,7 +92,8 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
         Category categoryEntity = createCategoryToTest();
         Unit unitEntity = createUnitToTest();
 
-        ItemRequestDTO requestDTO = new ItemRequestDTO("Feijão", categoryEntity.getId(), unitEntity.getId());
+        ItemRequestDTO requestDTO = ItemTestFactory.createValidItemRequestDTO(categoryEntity.getId(),
+                unitEntity.getId());
 
         var content = given(specification).contentType(MediaType.APPLICATION_JSON_VALUE).body(requestDTO).when().post()
                 .then().statusCode(201).contentType(MediaType.APPLICATION_JSON_VALUE).extract().body().asString();
@@ -96,7 +104,7 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
         assertNotNull(createdItem.id());
         assertTrue(createdItem.id() > 0);
 
-        assertEquals("Feijão", createdItem.name());
+        assertEquals(requestDTO.name(), createdItem.name());
         assertEquals(categoryEntity.getId(), createdItem.category().id());
         assertEquals(unitEntity.getId(), createdItem.unit().id());
     }
@@ -105,7 +113,7 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
     void testPutEditItem() throws Exception {
         Item itemEntity = createItemToTest();
 
-        ItemRequestDTO requestDTO = new ItemRequestDTO("Arroz", itemEntity.getCategory().getId(),
+        ItemRequestDTO requestDTO = ItemTestFactory.createValidItemRequestDTO(itemEntity.getCategory().getId(),
                 itemEntity.getUnit().getId());
 
         var content = given(specification).contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -118,14 +126,14 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
         assertNotNull(updatedItem.id());
         assertTrue(updatedItem.id() > 0);
 
-        assertEquals("Arroz", updatedItem.name());
+        assertEquals(requestDTO.name(), updatedItem.name());
         assertEquals(requestDTO.idCategory(), updatedItem.category().id());
         assertEquals(requestDTO.idUnit(), updatedItem.unit().id());
     }
 
     @Test
     void testGetAllItems() throws Exception {
-        createItemToTest();
+        Item itemEntity = createItemToTest();
 
         var content = given(specification).accept(MediaType.APPLICATION_JSON_VALUE).when().get().then().statusCode(200)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).extract().body().asString();
@@ -137,7 +145,7 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
         assertNotNull(itemOne.id());
         assertTrue(itemOne.id() > 0);
 
-        assertEquals("Arroz", itemOne.name());
+        assertEquals(itemEntity.getName(), itemOne.name());
     }
 
     @Test
@@ -162,34 +170,36 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
     void IntegrationTestPutEditItem_NotFound() throws Exception {
         Category categoryEntity = createCategoryToTest();
         Unit unitEntity = createUnitToTest();
-        ItemRequestDTO invalidItem = new ItemRequestDTO("Feijão", categoryEntity.getId(), unitEntity.getId());
+
+        ItemRequestDTO invalidItem = ItemTestFactory.createValidItemRequestDTO(categoryEntity.getId(),
+                unitEntity.getId());
 
         given(specification).contentType(MediaType.APPLICATION_JSON_VALUE).pathParam("id", 999L).body(invalidItem)
                 .when().put("/{id}").then().statusCode(404).contentType(MediaType.APPLICATION_JSON_VALUE).extract()
                 .body().asString();
     }
 
-    Category createCategoryToTest() {
-        Category categoryEntity = new Category();
-        categoryEntity.setName("Food");
-        categoryEntity = categoryRepository.save(categoryEntity);
-        return categoryEntity;
+    private Category createCategoryToTest() {
+        Category categoryEntity = CategoryTestFactory.createValidCategory();
+        categoryEntity.setId(null);
+        categoryEntity.setOwner(testUser);
+        categoryEntity.setSystemStandard(false);
+        return categoryRepository.save(categoryEntity);
     }
 
-    Unit createUnitToTest() {
-        Unit unitEntity = new Unit();
-        unitEntity.setSymbol("KG");
-        unitEntity.setName("Kilogram");
-        unitEntity = unitRepository.save(unitEntity);
-        return unitEntity;
+    private Unit createUnitToTest() {
+        Unit unitEntity = UnitTestFactory.createValidUnit();
+        unitEntity.setId(null);
+        unitEntity.setOwner(testUser);
+        unitEntity.setSystemStandard(false);
+        return unitRepository.save(unitEntity);
     }
 
     Item createItemToTest() {
-        Item itemEntity = new Item();
-        itemEntity.setName("Arroz");
+        Item itemEntity = ItemTestFactory.createValidItem();
+        itemEntity.setId(null);
         itemEntity.setCategory(createCategoryToTest());
         itemEntity.setUnit(createUnitToTest());
-        itemRepository.save(itemEntity);
-        return itemEntity;
+        return itemRepository.save(itemEntity);
     }
 }

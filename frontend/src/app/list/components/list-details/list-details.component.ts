@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnInit,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -92,14 +86,12 @@ export class ListDetailsComponent implements OnInit {
       purchased: !item.purchased,
     };
 
-    this.listItemService
-      .updateListItem(this.listId, item.idListItem, updatedItem)
-      .subscribe({
-        next: () => this.loadData(),
-        error: () => {
-          this.feedback.error('Erro ao atualizar status do item');
-        },
-      });
+    this.listItemService.updateListItem(this.listId, item.idListItem, updatedItem).subscribe({
+      next: () => this.loadData(),
+      error: () => {
+        this.feedback.error('Erro ao atualizar status do item');
+      },
+    });
   }
 
   openAddItemDialog(): void {
@@ -113,10 +105,10 @@ export class ListDetailsComponent implements OnInit {
         this.listItemService.addListItem(this.listId, result).subscribe({
           next: () => {
             this.loadData();
-            this.feedback.success('Item adicionado com sucesso');
+            this.feedback.success('Item added successfully');
           },
           error: () => {
-            this.feedback.error('Erro ao adicionar item');
+            this.feedback.error('Error adding item');
           },
         });
       }
@@ -131,17 +123,15 @@ export class ListDetailsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.listItemService
-          .updateListItem(this.listId, item.idListItem, result)
-          .subscribe({
-            next: () => {
-              this.loadData();
-              this.feedback.success('Item atualizado com sucesso');
-            },
-            error: () => {
-              this.feedback.error('Erro ao atualizar item');
-            },
-          });
+        this.listItemService.updateListItem(this.listId, item.idListItem, result).subscribe({
+          next: () => {
+            this.loadData();
+            this.feedback.success('Item updated successfully');
+          },
+          error: () => {
+            this.feedback.error('Error updating item');
+          },
+        });
       }
     });
   }
@@ -149,24 +139,22 @@ export class ListDetailsComponent implements OnInit {
   removeItem(item: ListItemResponseDTO): void {
     this.confirmDialog
       .open({
-        title: 'Remover item',
-        message: `Tem certeza que deseja remover ${item.item.name} da lista?`,
-        confirmText: 'Remover',
+        title: 'Remove Item',
+        message: `Are you sure you want to remove ${item.item.name} from the list?`,
+        confirmText: 'Remove',
       })
       .subscribe((confirmed) => {
         if (!confirmed) return;
 
-        this.listItemService
-          .deleteListItem(this.listId, item.idListItem)
-          .subscribe({
-            next: () => {
-              this.loadData();
-              this.feedback.success('Item removido com sucesso');
-            },
-            error: () => {
-              this.feedback.error('Erro ao remover item');
-            },
-          });
+        this.listItemService.deleteListItem(this.listId, item.idListItem).subscribe({
+          next: () => {
+            this.loadData();
+            this.feedback.success('Item removed successfully');
+          },
+          error: () => {
+            this.feedback.error('Error removing item');
+          },
+        });
       });
   }
 }

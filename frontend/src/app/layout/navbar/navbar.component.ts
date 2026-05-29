@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  HostListener,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, inject, signal } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { AsyncPipe } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../shared/services/auth.service';
 
 @Component({
@@ -27,7 +21,6 @@ import { AuthService } from '../../shared/services/auth.service';
     MatMenuModule,
     RouterLink,
     RouterLinkActive,
-    AsyncPipe,
   ],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss'],
@@ -38,7 +31,7 @@ export class NavbarComponent {
   private router = inject(Router);
 
   readonly isLargeScreen = signal(window.innerWidth >= 768);
-  isLoggedIn$ = this.authService.isLoggedIn$;
+  readonly isLoggedIn = toSignal(this.authService.isLoggedIn$, { initialValue: false });
 
   @HostListener('window:resize', ['$event'])
   onResize(event: UIEvent) {

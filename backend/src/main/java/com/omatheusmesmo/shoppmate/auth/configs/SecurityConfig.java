@@ -1,4 +1,5 @@
 package com.omatheusmesmo.shoppmate.auth.configs;
+
 import org.springframework.security.web.csrf.CsrfFilter;
 import com.omatheusmesmo.shoppmate.auth.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
@@ -29,8 +31,8 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final RateLimitFilter rateLimitFilter;
 
-    public SecurityConfig(JWTAuthenticationFilter jwtAuthenticationFilter,
-            CustomUserDetailsService userDetailsService, RateLimitFilter rateLimitFilter) {
+    public SecurityConfig(JWTAuthenticationFilter jwtAuthenticationFilter, CustomUserDetailsService userDetailsService,
+            RateLimitFilter rateLimitFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userDetailsService = userDetailsService;
         this.rateLimitFilter = rateLimitFilter;
@@ -73,18 +75,6 @@ public class SecurityConfig {
 
         return new ProviderManager(provider);
     }
-
-    // @Bean
-    // public UserDetailsService userDetailsService() {
-    // InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-    // UserDetails user = User.withDefaultPasswordEncoder()
-    // .username("user")
-    // .password("password")
-    // .roles("USER")
-    // .build();
-    // manager.createUser(user);
-    // return manager;
-    // }
 
     @Bean
     public PasswordEncoder passwordEncoder() {

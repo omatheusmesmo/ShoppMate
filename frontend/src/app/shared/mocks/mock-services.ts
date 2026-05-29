@@ -7,7 +7,6 @@ export class MockAuthService {
   register = jasmine.createSpy('register').and.returnValue(of({}));
   logout = jasmine.createSpy('logout');
   getToken = jasmine.createSpy('getToken').and.returnValue('mock-token');
-  getCurrentUserId = jasmine.createSpy('getCurrentUserId').and.returnValue(1);
 }
 
 export class MockUnitService {

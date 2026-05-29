@@ -9,6 +9,7 @@ import com.omatheusmesmo.shoppmate.list.repository.ListPermissionRepository;
 import com.omatheusmesmo.shoppmate.shared.service.AuditService;
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import com.omatheusmesmo.shoppmate.user.service.UserService;
+import com.omatheusmesmo.shoppmate.utils.exception.ResourceOwnershipException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,8 +39,14 @@ public class ListPermissionService {
         this.listPermissionMapper = listPermissionMapper;
     }
 
-    public ListPermission addListPermission(ListPermissionRequestDTO listPermissionRequestDTO) {
+    public ListPermission addListPermission(ListPermissionRequestDTO listPermissionRequestDTO, User requester) {
         ShoppingList shoppingList = shoppingListService.findListById(listPermissionRequestDTO.idList());
+
+        if (!shoppingList.getOwner().getId().equals(requester.getId())) {
+            throw new ResourceOwnershipException(
+                    "User does not have permission to grant access to this list. Only the list owner can grant permissions.");
+        }
+
         User user = userService.findUserById(listPermissionRequestDTO.idUser());
 
         ListPermission listPermission = listPermissionMapper.toEntity(listPermissionRequestDTO, shoppingList, user);
@@ -56,7 +63,7 @@ public class ListPermissionService {
     }
 
     public Optional<ListPermission> findListItem(ListPermission listPermission) {
-        Optional<ListPermission> foundList = listPermissionRepository.findById(listPermission.getId());
+        Optional<ListPermission> foundList = listPermissionRepository.findByIdAndDeletedFalse(listPermission.getId());
         if (foundList.isPresent()) {
             return foundList;
         } else {
@@ -64,19 +71,25 @@ public class ListPermissionService {
         }
     }
 
-    public ListPermission findListUserPermissionById(Long id) {
-        return listPermissionRepository.findById(id)
+    public ListPermission findListUserPermissionById(Long id, User user) {
+        ListPermission listPermission = listPermissionRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new NoSuchElementException("ListPermission not found"));
+
+        if (!listPermission.getShoppingList().getOwner().getId().equals(user.getId())) {
+            throw new ResourceOwnershipException("Only the list owner can manage permissions");
+        }
+
+        return listPermission;
     }
 
-    public void removeList(Long id) {
-        ListPermission listPermission = findListUserPermissionById(id);
+    public void removeList(Long id, User user) {
+        ListPermission listPermission = findListUserPermissionById(id, user);
         auditService.softDelete(listPermission);
         listPermissionRepository.save(listPermission);
     }
 
-    public ListPermission editList(Long id, ListPermissionUpdateRequestDTO listPermissionUpdateRequestDTO) {
-        ListPermission listPermission = findListUserPermissionById(id);
+    public ListPermission editList(Long id, ListPermissionUpdateRequestDTO listPermissionUpdateRequestDTO, User user) {
+        ListPermission listPermission = findListUserPermissionById(id, user);
         listPermission.setPermission(listPermissionUpdateRequestDTO.permission());
         isListValid(listPermission);
         auditService.setAuditData(listPermission, false);
@@ -84,7 +97,13 @@ public class ListPermissionService {
         return listPermission;
     }
 
-    public List<ListPermission> findAllPermissionsByListId(Long id) {
+    public List<ListPermission> findAllPermissionsByListId(Long id, User user) {
+        ShoppingList list = shoppingListService.findAndVerifyAccess(id, user);
+
+        if (!list.getOwner().getId().equals(user.getId())) {
+            throw new ResourceOwnershipException("Only the list owner can view permissions");
+        }
+
         return listPermissionRepository.findByShoppingListIdAndDeletedFalse(id);
     }
 }

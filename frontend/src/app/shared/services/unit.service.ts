@@ -12,15 +12,11 @@ export class UnitService extends BaseService {
   private apiUrl = `${environment.apiUrl}/unit`;
 
   getAllUnits(): Observable<Unit[]> {
-    return this.http
-      .get<Unit[]>(this.apiUrl)
-      .pipe(catchError(this.handleError));
+    return this.http.get<Unit[]>(this.apiUrl).pipe(catchError(this.handleError));
   }
 
   addUnit(unit: Unit): Observable<Unit> {
-    return this.http
-      .post<Unit>(this.apiUrl, unit)
-      .pipe(catchError(this.handleError));
+    return this.http.post<Unit>(this.apiUrl, unit).pipe(catchError(this.handleError));
   }
 
   updateUnit(unit: Unit): Observable<Unit> {
@@ -29,14 +25,10 @@ export class UnitService extends BaseService {
       name: unit.name,
       abbreviation: unit.symbol, // Map symbol to abbreviation for API
     };
-    return this.http
-      .put<Unit>(this.apiUrl, requestBody)
-      .pipe(catchError(this.handleError));
+    return this.http.put<Unit>(this.apiUrl, requestBody).pipe(catchError(this.handleError));
   }
 
   deleteUnit(id: number): Observable<void> {
-    return this.http
-      .delete<void>(`${this.apiUrl}/${id}`)
-      .pipe(catchError(this.handleError));
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(catchError(this.handleError));
   }
 }
