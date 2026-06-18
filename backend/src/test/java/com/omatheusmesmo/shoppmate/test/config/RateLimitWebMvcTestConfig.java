@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import io.github.bucket4j.distributed.proxy.ProxyManager;
 
 import com.omatheusmesmo.shoppmate.auth.configs.RateLimitProperties;
-import com.omatheusmesmo.shoppmate.auth.configs.RateLimitViolationTracker;
+import com.omatheusmesmo.shoppmate.auth.service.RateLimitViolationTracker;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;

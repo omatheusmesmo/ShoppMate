@@ -1,10 +1,9 @@
 package com.omatheusmesmo.shoppmate.auth.configs;
 
-import com.omatheusmesmo.shoppmate.shared.testcontainers.AbstractIntegrationTest;
-import com.omatheusmesmo.shoppmate.unit.entity.Unit;
-import com.omatheusmesmo.shoppmate.unit.service.UnitService;
-import com.omatheusmesmo.shoppmate.user.entity.User;
-import com.omatheusmesmo.shoppmate.user.repository.UserRepository;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -18,9 +17,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.List;
+import com.omatheusmesmo.shoppmate.auth.repository.RateLimitViolationRepository;
+import com.omatheusmesmo.shoppmate.shared.testcontainers.AbstractIntegrationTest;
+import com.omatheusmesmo.shoppmate.unit.entity.Unit;
+import com.omatheusmesmo.shoppmate.unit.service.UnitService;
+import com.omatheusmesmo.shoppmate.user.entity.User;
+import com.omatheusmesmo.shoppmate.user.repository.UserRepository;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
@@ -32,40 +34,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @TestPropertySource(properties = { "security.rate-limit.capacity=2", "security.rate-limit.refill-tokens=2",
         "security.rate-limit.refill-duration=PT2S", "security.rate-limit.enabled-methods[0]=PUT",
-        "security.rate-limit.included-paths[0]=/unit", "security.rate-limit.included-paths[1]=/unit/**",
+        "security.rate-limit.included-paths[0]=/unit", "security.rate-limit.included-paths[1]=/unit/**" })
 
-        // Your app/test logging
-        "logging.level.com.omatheusmesmo.shoppmate.auth.configs.RateLimitFilter=TRACE",
-        "logging.level.com.omatheusmesmo.shoppmate.auth.configs.RateLimitFilterWindowingIntegrationTest=TRACE",
-        "logging.level.com.omatheusmesmo.shoppmate.unit=TRACE",
-
-        // Spring MVC routing/controller invocation
-        "logging.level.org.springframework.web.servlet.DispatcherServlet=TRACE",
-        "logging.level.org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping=TRACE",
-        "logging.level.org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod=TRACE",
-
-        // Spring Security filter chain
-        "logging.level.org.springframework.security.web.FilterChainProxy=TRACE",
-        "logging.level.org.springframework.security.web.csrf=TRACE",
-        "logging.level.org.springframework.security.web.access=TRACE",
-
-        // Hibernate SQL
-        "logging.level.org.hibernate.SQL=DEBUG",
-
-        // Hibernate 6 bind parameter values
-        "logging.level.org.hibernate.orm.jdbc.bind=TRACE",
-
-        // Hibernate result extraction
-        "logging.level.org.hibernate.orm.jdbc.extract=TRACE",
-
-        // JPA transaction boundaries
-        "logging.level.org.springframework.orm.jpa=DEBUG", "logging.level.org.springframework.transaction=TRACE",
-
-        // JdbcTemplate statements/count checks
-        "logging.level.org.springframework.jdbc.core.JdbcTemplate=DEBUG",
-
-        // Bucket4j
-        "logging.level.io.github.bucket4j=TRACE" })
 class RateLimitFilterWindowingIntegrationTest extends AbstractIntegrationTest {
 
     private static final Logger log = LoggerFactory.getLogger(RateLimitFilterWindowingIntegrationTest.class);
@@ -77,21 +47,24 @@ class RateLimitFilterWindowingIntegrationTest extends AbstractIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @Autowired
     private UnitService unitService;
 
     @Autowired
     private UserRepository userRepository;
 
-    private Unit persistedUnit;
+    @Autowired
+    private RateLimitViolationRepository rateLimitViolationRepository;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    private Unit persistedUnit;
     private User testUser;
 
     @BeforeEach
     void setUp() {
         jdbcTemplate.update("DELETE FROM bucket");
+        rateLimitViolationRepository.deleteAll();
 
         /*
          * Clear dependent rows first so the unique constraint on units.name cannot leak from one test method into the

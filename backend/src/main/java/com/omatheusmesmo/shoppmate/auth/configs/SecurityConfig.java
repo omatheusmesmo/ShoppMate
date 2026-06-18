@@ -1,7 +1,7 @@
 package com.omatheusmesmo.shoppmate.auth.configs;
 
-import org.springframework.security.web.csrf.CsrfFilter;
-import com.omatheusmesmo.shoppmate.auth.service.CustomUserDetailsService;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,12 +16,12 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
+import com.omatheusmesmo.shoppmate.auth.service.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity

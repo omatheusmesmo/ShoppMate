@@ -1,5 +1,6 @@
 package com.omatheusmesmo.shoppmate.auth.configs;
 
+import com.omatheusmesmo.shoppmate.auth.service.RateLimitViolationTracker;
 import com.omatheusmesmo.shoppmate.shared.testcontainers.AbstractIntegrationTest;
 import io.github.bucket4j.distributed.proxy.ProxyManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +11,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -29,14 +31,17 @@ class DistributedLifecycleIntegrationTest extends AbstractIntegrationTest {
     @Autowired
     private ProxyManager<Long> proxyManager;
 
+    @Autowired
+    private HandlerExceptionResolver handlerExceptionResolver;
+
     private RateLimitFilter nodeAServer;
     private RateLimitFilter nodeBServer;
 
     @BeforeEach
     void setUp() {
         // Separate filter instances simulate separate app nodes sharing the same distributed bucket store.
-        this.nodeAServer = new RateLimitFilter(properties, proxyManager, violationTracker);
-        this.nodeBServer = new RateLimitFilter(properties, proxyManager, violationTracker);
+        this.nodeAServer = new RateLimitFilter(properties, proxyManager, violationTracker, handlerExceptionResolver);
+        this.nodeBServer = new RateLimitFilter(properties, proxyManager, violationTracker, handlerExceptionResolver);
     }
 
     @Test

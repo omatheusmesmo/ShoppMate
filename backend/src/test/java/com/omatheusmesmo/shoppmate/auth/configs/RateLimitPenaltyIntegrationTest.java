@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource(properties = { "security.rate-limit.capacity=1", "security.rate-limit.refill-tokens=1",
         "security.rate-limit.refill-duration=PT5S", "security.rate-limit.short-burst-enabled=false",
         "security.rate-limit.enabled-methods[0]=POST", "security.rate-limit.included-paths[0]=/auth/**",
-        "security.rate-limit.penalty-threshold=1" })
+        "security.rate-limit.penalty-threshold=1", })
 class RateLimitPenaltyIntegrationTest extends AbstractIntegrationTest {
 
     private static final String TEST_CLIENT_IP = "203.0.113.50";

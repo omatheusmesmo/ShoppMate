@@ -1,12 +1,13 @@
 package com.omatheusmesmo.shoppmate.auth.configs;
 
-import io.github.bucket4j.distributed.proxy.ProxyManager;
-import io.github.bucket4j.distributed.jdbc.SQLProxyConfiguration;
-import io.github.bucket4j.postgresql.PostgreSQLadvisoryLockBasedProxyManager;
+import javax.sql.DataSource;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.sql.DataSource;
+import io.github.bucket4j.distributed.jdbc.SQLProxyConfiguration;
+import io.github.bucket4j.distributed.proxy.ProxyManager;
+import io.github.bucket4j.postgresql.PostgreSQLadvisoryLockBasedProxyManager;
 
 @Configuration
 public class Bucket4jPostgresConfig {

@@ -16,16 +16,21 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.BucketConfiguration;
 import io.github.bucket4j.TokensInheritanceStrategy;
 import io.github.bucket4j.distributed.proxy.ProxyManager;
 import io.github.bucket4j.distributed.proxy.RemoteBucketBuilder;
+
+import com.omatheusmesmo.shoppmate.auth.service.RateLimitViolationTracker;
 
 @Component
 public class RateLimitFilter extends OncePerRequestFilter {
@@ -39,12 +44,14 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private final RateLimitViolationTracker violationTracker;
     private final BucketConfiguration bucketConfiguration;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
+    private final HandlerExceptionResolver handlerExceptionResolver;
 
     public RateLimitFilter(RateLimitProperties properties, ProxyManager<Long> proxyManager,
-            RateLimitViolationTracker violationTracker) {
+            RateLimitViolationTracker violationTracker, HandlerExceptionResolver handlerExceptionResolver) {
         this.properties = properties;
         this.proxyManager = proxyManager;
         this.violationTracker = violationTracker;
+        this.handlerExceptionResolver = handlerExceptionResolver;
         this.bucketConfiguration = createBucketConfiguration();
     }
 
@@ -62,10 +69,10 @@ public class RateLimitFilter extends OncePerRequestFilter {
             if (activePenaltySeconds.isPresent()) {
                 long secondsToWait = activePenaltySeconds.get();
 
-                logger.warn("PERMANENT_LIMIT_VIOLATION method={} path={} retryAfterSeconds={}", request.getMethod(),
+                logger.warn("RATE_LIMIT_PENALTY_ENFORCED method={} path={} retryAfterSeconds={}", request.getMethod(),
                         request.getRequestURI(), secondsToWait);
 
-                writeTooManyRequestsResponse(response, secondsToWait);
+                resolveTooManyRequestsException(request, response, secondsToWait);
                 return;
             }
 
@@ -82,10 +89,10 @@ public class RateLimitFilter extends OncePerRequestFilter {
                 long secondsToWait = violationTracker.recordViolationAndCalculatePenaltySeconds(bucketKey,
                         baseSecondsToWait);
 
-                logger.warn("PERMANENT_LIMIT_VIOLATION method={} path={} retryAfterSeconds={}", request.getMethod(),
+                logger.warn("RATE_LIMIT_PENALTY_ENFORCED method={} path={} retryAfterSeconds={}", request.getMethod(),
                         request.getRequestURI(), secondsToWait);
 
-                writeTooManyRequestsResponse(response, secondsToWait);
+                resolveTooManyRequestsException(request, response, secondsToWait);
                 return;
             }
 
@@ -114,16 +121,12 @@ public class RateLimitFilter extends OncePerRequestFilter {
                 && properties.getShortBurstRefillTokens() > 0 && properties.getShortBurstRefillDuration() != null;
     }
 
-    private void writeTooManyRequestsResponse(HttpServletResponse response, long secondsToWait) throws IOException {
-        response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-        response.setHeader("Retry-After", String.valueOf(secondsToWait));
-        response.setContentType("application/json");
-        response.getWriter().write("""
-                {
-                  "error": "Too Many Requests",
-                  "message": "Rate limit exceeded. Try again later."
-                }
-                """);
+    private void resolveTooManyRequestsException(HttpServletRequest request, HttpServletResponse response,
+            long secondsToWait) {
+        response.setHeader(HttpHeaders.RETRY_AFTER, String.valueOf(secondsToWait));
+
+        handlerExceptionResolver.resolveException(request, response, null,
+                new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "Rate limit exceeded. Try again later."));
     }
 
     private String resolveClientIp(HttpServletRequest request) {
