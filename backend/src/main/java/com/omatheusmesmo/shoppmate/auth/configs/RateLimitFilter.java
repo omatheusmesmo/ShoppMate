@@ -1,0 +1,170 @@
+package com.omatheusmesmo.shoppmate.auth.configs;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.BucketConfiguration;
+import io.github.bucket4j.TokensInheritanceStrategy;
+import io.github.bucket4j.distributed.proxy.ProxyManager;
+import io.github.bucket4j.distributed.proxy.RemoteBucketBuilder;
+
+import com.omatheusmesmo.shoppmate.auth.service.RateLimitViolationTracker;
+
+@Component
+public class RateLimitFilter extends OncePerRequestFilter {
+
+    private static final Logger logger = LoggerFactory.getLogger(RateLimitFilter.class);
+
+    private static final long BUCKET_CONFIGURATION_VERSION = 1L;
+
+    private final RateLimitProperties properties;
+    private final ProxyManager<Long> proxyManager;
+    private final RateLimitViolationTracker violationTracker;
+    private final BucketConfiguration bucketConfiguration;
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+    private final HandlerExceptionResolver handlerExceptionResolver;
+
+    public RateLimitFilter(RateLimitProperties properties, ProxyManager<Long> proxyManager,
+            RateLimitViolationTracker violationTracker, HandlerExceptionResolver handlerExceptionResolver) {
+        this.properties = properties;
+        this.proxyManager = proxyManager;
+        this.violationTracker = violationTracker;
+        this.handlerExceptionResolver = handlerExceptionResolver;
+        this.bucketConfiguration = createBucketConfiguration();
+    }
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+
+        if (shouldRateLimit(request)) {
+            String ip = resolveClientIp(request);
+
+            Long bucketKey = bucketKey(ip, request);
+
+            Optional<Long> activePenaltySeconds = violationTracker.getActivePenaltySeconds(bucketKey);
+
+            if (activePenaltySeconds.isPresent()) {
+                long secondsToWait = activePenaltySeconds.get();
+
+                logger.warn("RATE_LIMIT_PENALTY_ENFORCED method={} path={} retryAfterSeconds={}", request.getMethod(),
+                        request.getRequestURI(), secondsToWait);
+
+                resolveTooManyRequestsException(request, response, secondsToWait);
+                return;
+            }
+
+            RemoteBucketBuilder<Long> bucketBuilder = proxyManager.builder().withImplicitConfigurationReplacement(
+                    BUCKET_CONFIGURATION_VERSION, TokensInheritanceStrategy.RESET);
+
+            var bucket = bucketBuilder.build(bucketKey, bucketConfiguration);
+
+            var probe = bucket.tryConsumeAndReturnRemaining(1);
+
+            if (!probe.isConsumed()) {
+                long baseSecondsToWait = Math.max(1, TimeUnit.NANOSECONDS.toSeconds(probe.getNanosToWaitForRefill()));
+
+                long secondsToWait = violationTracker.recordViolationAndCalculatePenaltySeconds(bucketKey,
+                        baseSecondsToWait);
+
+                logger.warn("RATE_LIMIT_PENALTY_ENFORCED method={} path={} retryAfterSeconds={}", request.getMethod(),
+                        request.getRequestURI(), secondsToWait);
+
+                resolveTooManyRequestsException(request, response, secondsToWait);
+                return;
+            }
+
+            violationTracker.resetViolations(bucketKey);
+        }
+
+        filterChain.doFilter(request, response);
+    }
+
+    private BucketConfiguration createBucketConfiguration() {
+        var bucketConfigurationBuilder = BucketConfiguration.builder()
+                .addLimit(Bandwidth.builder().capacity(properties.getCapacity())
+                        .refillGreedy(properties.getRefillTokens(), properties.getRefillDuration()).build());
+
+        if (isShortBurstRateLimitEnabled()) {
+            bucketConfigurationBuilder.addLimit(Bandwidth.builder().capacity(properties.getShortBurstCapacity())
+                    .refillGreedy(properties.getShortBurstRefillTokens(), properties.getShortBurstRefillDuration())
+                    .build());
+        }
+
+        return bucketConfigurationBuilder.build();
+    }
+
+    private boolean isShortBurstRateLimitEnabled() {
+        return properties.isShortBurstEnabled() && properties.getShortBurstCapacity() > 0
+                && properties.getShortBurstRefillTokens() > 0 && properties.getShortBurstRefillDuration() != null;
+    }
+
+    private void resolveTooManyRequestsException(HttpServletRequest request, HttpServletResponse response,
+            long secondsToWait) {
+        response.setHeader(HttpHeaders.RETRY_AFTER, String.valueOf(secondsToWait));
+
+        handlerExceptionResolver.resolveException(request, response, null,
+                new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "Rate limit exceeded. Try again later."));
+    }
+
+    private String resolveClientIp(HttpServletRequest request) {
+        return request.getRemoteAddr();
+    }
+
+    private Long bucketKey(String ip, HttpServletRequest request) {
+        String rawKey = ip + ":" + request.getMethod() + ":" + matchedPathGroup(request.getRequestURI());
+        return stableLongHash(rawKey);
+    }
+
+    private Long stableLongHash(String rawKey) {
+        try {
+            byte[] digest = MessageDigest.getInstance("SHA-256").digest(rawKey.getBytes(StandardCharsets.UTF_8));
+
+            return ByteBuffer.wrap(digest).getLong();
+        } catch (NoSuchAlgorithmException exception) {
+            throw new IllegalStateException("SHA-256 is not available", exception);
+        }
+    }
+
+    private String matchedPathGroup(String path) {
+        List<String> includedPaths = properties.getIncludedPaths();
+
+        return includedPaths.stream().filter(pattern -> pathMatcher.match(pattern, path)).findFirst().orElse(path);
+    }
+
+    private boolean shouldRateLimit(HttpServletRequest request) {
+        return isRateLimitedMethod(request) && isRateLimitedPath(request);
+    }
+
+    private boolean isRateLimitedMethod(HttpServletRequest request) {
+        return properties.getEnabledMethods().stream().anyMatch(method -> method.equalsIgnoreCase(request.getMethod()));
+    }
+
+    private boolean isRateLimitedPath(HttpServletRequest request) {
+        String path = request.getRequestURI();
+
+        return properties.getIncludedPaths().stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
+    }
+}

@@ -15,6 +15,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -107,6 +108,17 @@ public class GlobalExceptionHandler {
         log.warn("Resource ownership violation: {}", ex.getMessage());
         ApiError apiError = new ApiError(HttpStatus.FORBIDDEN, "Access Denied", ex.getMessage());
         return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ApiError> handleResponseStatusException(ResponseStatusException ex) {
+        HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
+
+        log.warn("Response status exception: status={} reason={}", status, ex.getReason());
+
+        ApiError apiError = new ApiError(status, status.getReasonPhrase(), ex.getReason());
+
+        return new ResponseEntity<>(apiError, status);
     }
 
     // TODO -> InvalidDataAccessApiUsageException

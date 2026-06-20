@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,11 +21,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.omatheusmesmo.shoppmate.auth.service.JwtService;
 import com.omatheusmesmo.shoppmate.shared.testutils.UserTestFactory;
+import com.omatheusmesmo.shoppmate.test.config.RateLimitWebMvcTestConfig;
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import com.omatheusmesmo.shoppmate.user.service.UserService;
 
 @WebMvcTest(controllers = UserController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@Import(RateLimitWebMvcTestConfig.class)
 class UserControllerTest {
 
     @Autowired

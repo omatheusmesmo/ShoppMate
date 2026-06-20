@@ -10,6 +10,7 @@ import com.omatheusmesmo.shoppmate.list.mapper.ListMapper;
 import com.omatheusmesmo.shoppmate.list.service.ShoppingListService;
 import com.omatheusmesmo.shoppmate.shared.test.annotation.WithMockCustomUser;
 import com.omatheusmesmo.shoppmate.shared.testutils.ListTestFactory;
+import com.omatheusmesmo.shoppmate.test.config.RateLimitWebMvcTestConfig;
 import com.omatheusmesmo.shoppmate.user.dtos.UserResponseDTO;
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -34,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = ShoppingListController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@Import(RateLimitWebMvcTestConfig.class)
 class ShoppingListControllerTest {
 
     @Autowired

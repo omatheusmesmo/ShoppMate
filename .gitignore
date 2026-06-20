@@ -9,3 +9,4 @@ postgres-data/
 .factorypath
 .env
 certs/
+.env

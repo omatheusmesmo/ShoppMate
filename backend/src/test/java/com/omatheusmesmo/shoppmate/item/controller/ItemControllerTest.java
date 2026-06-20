@@ -6,10 +6,11 @@ import com.omatheusmesmo.shoppmate.item.dto.ItemRequestDTO;
 import com.omatheusmesmo.shoppmate.item.dto.ItemResponseDTO;
 import com.omatheusmesmo.shoppmate.item.entity.Item;
 import com.omatheusmesmo.shoppmate.item.mapper.ItemMapper;
-import com.omatheusmesmo.shoppmate.shared.testutils.ItemTestFactory;
-import com.omatheusmesmo.shoppmate.unit.dto.UnitResponseDTO;
 import com.omatheusmesmo.shoppmate.item.service.ItemService;
 import com.omatheusmesmo.shoppmate.auth.service.JwtService;
+import com.omatheusmesmo.shoppmate.shared.testutils.ItemTestFactory;
+import com.omatheusmesmo.shoppmate.test.config.RateLimitWebMvcTestConfig;
+import com.omatheusmesmo.shoppmate.unit.dto.UnitResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -34,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = ItemController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@Import(RateLimitWebMvcTestConfig.class)
 class ItemControllerTest {
 
     @Autowired
