@@ -1,8 +1,8 @@
 # Stage 1: Build environment
-FROM maven:3.9.6-eclipse-temurin-17-alpine AS build
+FROM maven:3.9.6-eclipse-temurin-17@sha256:29a1658b1f3078e07c2b17f7b519b45eb47f65d9628e887eac45a8c5c8f939d4 AS build
 WORKDIR /app
 
-# Copy pom.xml and download dependencies to leverage Docker cache
+# Copy pom.xml first and download dependencies to leverage Docker layer caching
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
@@ -11,33 +11,20 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Stage 2: Runtime environment
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:17-jre@sha256:d226a3132511d057267330beeca73804275899aacdea331b7bd8313bb1506a7a
 WORKDIR /app
 
-# Create a non-root user for better security
-RUN addgroup -S spring && adduser -S spring -G spring
+# Create a non-root user for better runtime security
+RUN groupadd --system spring && useradd --system --gid spring spring
 
-# Create the directory first
-RUN mkdir -p /app/certs
+# Copy only runtime artifacts into the final image
+COPY --from=build --chown=spring:spring /app/target/*.jar app.jar
 
-# Copy the keys during the build (if they exist)
-COPY certs/ /app/certs/
-
-# Ensure the 'spring' user owns them
-RUN chown -R spring:spring /app/certs
-
-# Switch to spring user
 USER spring:spring
 
-# Copy the built artifact from the build stage
-# We use a wildcard to capture the jar, but ensure only one is copied if possible
-COPY --from=build /app/target/*.jar app.jar
-
-# Runtime configuration
 ENV JAVA_OPTS="-Xms256m -Xmx512m" \
     SERVER_PORT=8080
 
 EXPOSE 8080
 
-# Execute the application
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

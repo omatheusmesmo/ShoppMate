@@ -1,14 +1,39 @@
-version: "3.8"
-
 services:
   postgres:
-    image: postgres:18
-    container_name: postgres
-    ports:
-      - "5432:5432"
+    image: postgres:18-alpine
+    container_name: shoppmate-db
     environment:
-      - POSTGRES_USER=${POSTGRES_USER:-user}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
-      - POSTGRES_DB=${POSTGRES_DB:-SHOPPMATE}
+      - POSTGRES_USER=${POSTGRES_USER:?POSTGRES_USER is required}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      - POSTGRES_DB=${POSTGRES_DB:?POSTGRES_DB is required}
     volumes:
-      - ./postgres-data:/var/lib/postgresql
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:?POSTGRES_USER is required} -d ${POSTGRES_DB:?POSTGRES_DB is required}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shoppmate-api
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./certs:/certs:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:?POSTGRES_DB is required}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER:?POSTGRES_USER is required}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      - JWT_TOKEN_EXPIRATION=${JWT_TOKEN_EXPIRATION:?JWT_TOKEN_EXPIRATION is required}
+volumes:
+  postgres-data:
