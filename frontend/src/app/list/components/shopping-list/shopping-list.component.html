@@ -59,6 +59,7 @@
             <div class="no-lists">
               <p>Você ainda não tem nenhuma lista de compras</p>
               <button
+                data-cy="create-list-button"
                 mat-raised-button
                 color="primary"
                 (click)="openNewListDialog()"
@@ -72,7 +73,7 @@
     </mat-card-content>
 
     <mat-card-actions>
-      <button mat-raised-button color="primary" (click)="openNewListDialog()">
+      <button data-cy="create-list-button" mat-raised-button color="primary" (click)="openNewListDialog()">
         <mat-icon>add</mat-icon>
         Nova Lista
       </button>

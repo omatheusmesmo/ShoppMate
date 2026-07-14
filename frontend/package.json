@@ -13,7 +13,10 @@
     "build:staging": "ng build --configuration=staging",
     "build:production": "ng build --configuration=production",
     "prettier": "prettier --write \"src/**/*.{html,ts,css,scss,json}\"",
-    "prettier:check": "prettier --check \"src/**/*.{html,ts,css,scss,json}\""
+    "prettier:check": "prettier --check \"src/**/*.{html,ts,css,scss,json}\"",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "e2e": "start-server-and-test start http://localhost:4200 cypress:run"
   },
   "private": true,
   "dependencies": {
@@ -38,6 +41,7 @@
     "@angular/compiler-cli": "^19.2.0",
     "@types/jasmine": "~5.1.0",
     "angular-eslint": "^19.8.1",
+    "cypress": "^15.18.0",
     "eslint": "^9.39.2",
     "jasmine-core": "~5.6.0",
     "karma": "~6.4.0",
@@ -45,6 +49,13 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "start-server-and-test": "^3.0.11",
     "typescript": "~5.7.2"
+  },
+  "allowScripts": {
+    "@parcel/watcher@2.5.1": true,
+    "cypress@15.18.0": true,
+    "esbuild@0.25.1": true,
+    "fsevents@2.3.3": true
   }
 }

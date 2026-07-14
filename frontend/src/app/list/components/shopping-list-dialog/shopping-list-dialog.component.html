@@ -5,6 +5,7 @@
     <mat-form-field appearance="outline" class="w-100">
       <mat-label>Nome da Lista</mat-label>
       <input
+        data-cy="list-name-input"
         matInput
         formControlName="name"
         placeholder="Digite o nome da lista"
@@ -22,6 +23,7 @@
 <mat-dialog-actions align="end">
   <button mat-button (click)="onCancel()">Cancelar</button>
   <button
+    data-cy="save-list-button"
     mat-raised-button
     color="primary"
     (click)="onSubmit()"
