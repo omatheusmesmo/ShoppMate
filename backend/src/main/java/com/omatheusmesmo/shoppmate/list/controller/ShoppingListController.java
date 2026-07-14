@@ -53,7 +53,7 @@ public class ShoppingListController {
     @GetMapping("/{id}")
     public ResponseEntity<ShoppingListResponseDTO> getShoppingListById(@PathVariable Long id,
             @AuthenticationPrincipal User user) {
-        ShoppingList shoppingList = service.findAndVerifyAccess(id, user);
+        ShoppingList shoppingList = service.findAndVerifyReadAccess(id, user);
         ShoppingListResponseDTO responseDTO = listMapper.toResponseDTO(shoppingList);
         return HttpResponseUtil.ok(responseDTO);
     }

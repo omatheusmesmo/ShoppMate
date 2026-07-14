@@ -39,9 +39,7 @@ public class ListItemService {
 
     public ListItem addShoppItemList(ListItemRequestDTO listItemRequestDTO, User user) {
         Item item = itemService.findById(listItemRequestDTO.itemId());
-        ShoppingList shoppingList = shoppingListService.findListById(listItemRequestDTO.listId());
-        shoppingListService.verifyOwnership(listItemRequestDTO.listId(), user);
-
+        ShoppingList shoppingList = shoppingListService.findAndVerifyWriteAccess(listItemRequestDTO.listId(), user);
         ListItem listItem = listItemMapper.toEntity(listItemRequestDTO, item, shoppingList);
 
         isListItemValid(listItem);
@@ -63,23 +61,30 @@ public class ListItemService {
         }
     }
 
-    public ListItem findListItemById(Long listId, Long id, User user) {
-        // Verify access first to prevent existence leakage
-        shoppingListService.verifyOwnership(listId, user);
+    public ListItem findListItemByIdForRead(Long listId, Long id, User user) {
 
-        // Query constrained by shoppListId - fails if item doesn't belong to the authorized list
+        shoppingListService.findAndVerifyReadAccess(listId, user);
+
+        return listItemRepository.findByIdAndShoppListIdAndDeletedFalseFetchShoppList(id, listId)
+                .orElseThrow(() -> new NoSuchElementException("ListItem not found"));
+    }
+
+    public ListItem findListItemByIdForWrite(Long listId, Long id, User user) {
+
+        shoppingListService.findAndVerifyWriteAccess(listId, user);
+
         return listItemRepository.findByIdAndShoppListIdAndDeletedFalseFetchShoppList(id, listId)
                 .orElseThrow(() -> new NoSuchElementException("ListItem not found"));
     }
 
     public void removeList(Long listId, Long id, User user) {
-        ListItem deletedItem = findListItemById(listId, id, user);
+        ListItem deletedItem = findListItemByIdForWrite(listId, id, user);
         auditService.softDelete(deletedItem);
         listItemRepository.save(deletedItem);
     }
 
     public ListItem editList(Long listId, Long id, ListItemUpdateRequestDTO listItemUpdateRequestDTO, User user) {
-        ListItem existingListItem = findListItemById(listId, id, user);
+        ListItem existingListItem = findListItemByIdForWrite(listId, id, user);
 
         existingListItem.setQuantity(listItemUpdateRequestDTO.quantity());
         existingListItem.setPurchased(listItemUpdateRequestDTO.purchased());
@@ -91,7 +96,8 @@ public class ListItemService {
     }
 
     public List<ListItem> findAll(Long idList, User user) {
-        shoppingListService.verifyOwnership(idList, user);
+        shoppingListService.findAndVerifyReadAccess(idList, user);
+
         return listItemRepository.findByShoppListIdAndDeletedFalse(idList);
     }
 }

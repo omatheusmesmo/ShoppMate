@@ -47,8 +47,7 @@ public class ListItemController {
     public ResponseEntity<ListItemResponseDTO> getListItemById(@PathVariable Long listId, @PathVariable Long id,
             @AuthenticationPrincipal User user) {
 
-        ListItem listItem = service.findListItemById(listId, id, user);
-
+        ListItem listItem = service.findListItemByIdForRead(listId, id, user);
         ListItemResponseDTO responseDTO = listItemMapper.toResponseDTO(listItem);
         return HttpResponseUtil.ok(responseDTO);
     }

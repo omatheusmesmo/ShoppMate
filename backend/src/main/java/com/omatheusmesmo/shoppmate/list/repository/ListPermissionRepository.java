@@ -15,4 +15,7 @@ public interface ListPermissionRepository extends JpaRepository<ListPermission, 
 
     @EntityGraph(attributePaths = { "user", "shoppingList", "shoppingList.owner" })
     Optional<ListPermission> findByIdAndDeletedFalse(Long id);
+
+    @EntityGraph(attributePaths = { "user", "shoppingList", "shoppingList.owner" })
+    Optional<ListPermission> findByShoppingListIdAndUserIdAndDeletedFalse(Long shoppingListId, Long userId);
 }

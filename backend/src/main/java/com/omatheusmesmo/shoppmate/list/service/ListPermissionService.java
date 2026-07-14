@@ -40,12 +40,8 @@ public class ListPermissionService {
     }
 
     public ListPermission addListPermission(ListPermissionRequestDTO listPermissionRequestDTO, User requester) {
-        ShoppingList shoppingList = shoppingListService.findListById(listPermissionRequestDTO.idList());
-
-        if (!shoppingList.getOwner().getId().equals(requester.getId())) {
-            throw new ResourceOwnershipException(
-                    "User does not have permission to grant access to this list. Only the list owner can grant permissions.");
-        }
+        ShoppingList shoppingList = shoppingListService.findAndVerifyOwnership(listPermissionRequestDTO.idList(),
+                requester);
 
         User user = userService.findUserById(listPermissionRequestDTO.idUser());
 
@@ -75,9 +71,7 @@ public class ListPermissionService {
         ListPermission listPermission = listPermissionRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new NoSuchElementException("ListPermission not found"));
 
-        if (!listPermission.getShoppingList().getOwner().getId().equals(user.getId())) {
-            throw new ResourceOwnershipException("Only the list owner can manage permissions");
-        }
+        shoppingListService.findAndVerifyOwnership(listPermission.getShoppingList().getId(), user);
 
         return listPermission;
     }
@@ -98,11 +92,7 @@ public class ListPermissionService {
     }
 
     public List<ListPermission> findAllPermissionsByListId(Long id, User user) {
-        ShoppingList list = shoppingListService.findAndVerifyAccess(id, user);
-
-        if (!list.getOwner().getId().equals(user.getId())) {
-            throw new ResourceOwnershipException("Only the list owner can view permissions");
-        }
+        shoppingListService.findAndVerifyOwnership(id, user);
 
         return listPermissionRepository.findByShoppingListIdAndDeletedFalse(id);
     }

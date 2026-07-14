@@ -300,4 +300,93 @@ class ListPermissionControllerSecurityIntegrationTest extends AbstractIntegratio
         mockMvc.perform(get("/lists/" + ownerList.getId() + "/permissions").header("Authorization",
                 "Bearer invalid.token.here")).andExpect(status().isForbidden());
     }
+
+    @Test
+    void testUserWithWritePermissionCannotViewPermissions() throws Exception {
+        ListPermissionRequestDTO writePermissionDTO = new ListPermissionRequestDTO(ownerList.getId(), userA.getId(),
+                Permission.WRITE);
+
+        listPermissionService.addListPermission(writePermissionDTO, owner);
+
+        mockMvc.perform(
+                get("/lists/" + ownerList.getId() + "/permissions").header("Authorization", "Bearer " + tokenUserA))
+                .andExpect(status().isForbidden()).andExpect(jsonPath("$.message").exists());
+    }
+
+    @Test
+    void testUserWithWritePermissionCannotGrantPermission() throws Exception {
+        ListPermissionRequestDTO writePermissionDTO = new ListPermissionRequestDTO(ownerList.getId(), userA.getId(),
+                Permission.WRITE);
+
+        listPermissionService.addListPermission(writePermissionDTO, owner);
+
+        ListPermissionRequestDTO grantDTO = new ListPermissionRequestDTO(ownerList.getId(), userB.getId(),
+                Permission.READ);
+
+        mockMvc.perform(post("/lists/" + ownerList.getId() + "/permissions").with(csrf())
+                .header("Authorization", "Bearer " + tokenUserA).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(grantDTO))).andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").exists());
+
+        var permissions = listPermissionService.findAllPermissionsByListId(ownerList.getId(), owner);
+
+        assertEquals(1, permissions.size(), "WRITE user must not be able to grant another permission");
+    }
+
+    @Test
+    void testUserWithWritePermissionCannotUpdatePermission() throws Exception {
+        ListPermissionRequestDTO writePermissionDTO = new ListPermissionRequestDTO(ownerList.getId(), userA.getId(),
+                Permission.WRITE);
+
+        listPermissionService.addListPermission(writePermissionDTO, owner);
+
+        ListPermissionRequestDTO userBPermissionDTO = new ListPermissionRequestDTO(ownerList.getId(), userB.getId(),
+                Permission.READ);
+
+        listPermissionService.addListPermission(userBPermissionDTO, owner);
+
+        var permissions = listPermissionService.findAllPermissionsByListId(ownerList.getId(), owner);
+
+        Long userBPermissionId = permissions.stream()
+                .filter(permission -> permission.getUser().getId().equals(userB.getId())).findFirst().orElseThrow()
+                .getId();
+
+        ListPermissionRequestDTO maliciousUpdate = new ListPermissionRequestDTO(ownerList.getId(), userB.getId(),
+                Permission.WRITE);
+
+        mockMvc.perform(put("/lists/" + ownerList.getId() + "/permissions/" + userBPermissionId).with(csrf())
+                .header("Authorization", "Bearer " + tokenUserA).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(maliciousUpdate))).andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").exists());
+
+        var unchangedPermission = listPermissionRepository.findById(userBPermissionId).orElseThrow();
+
+        assertEquals(Permission.READ, unchangedPermission.getPermission());
+    }
+
+    @Test
+    void testUserWithWritePermissionCannotRevokePermission() throws Exception {
+        ListPermissionRequestDTO writePermissionDTO = new ListPermissionRequestDTO(ownerList.getId(), userA.getId(),
+                Permission.WRITE);
+
+        listPermissionService.addListPermission(writePermissionDTO, owner);
+
+        ListPermissionRequestDTO userBPermissionDTO = new ListPermissionRequestDTO(ownerList.getId(), userB.getId(),
+                Permission.READ);
+
+        listPermissionService.addListPermission(userBPermissionDTO, owner);
+
+        var permissions = listPermissionService.findAllPermissionsByListId(ownerList.getId(), owner);
+
+        Long userBPermissionId = permissions.stream()
+                .filter(permission -> permission.getUser().getId().equals(userB.getId())).findFirst().orElseThrow()
+                .getId();
+
+        mockMvc.perform(delete("/lists/" + ownerList.getId() + "/permissions/" + userBPermissionId).with(csrf())
+                .header("Authorization", "Bearer " + tokenUserA)).andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").exists());
+
+        assertTrue(listPermissionRepository.findById(userBPermissionId).isPresent(),
+                "WRITE user must not be able to revoke permissions");
+    }
 }
