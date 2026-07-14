@@ -133,14 +133,18 @@ class CategoryControllerTest {
 
         CategoryResponseDTO responseDTO = new CategoryResponseDTO(id, updatedName, false, null);
 
-        when(categoryMapper.toEntity(any(CategoryRequestDTO.class), any(User.class))).thenReturn(category1);
-        doNothing().when(categoryService).editCategory(eq(id), any(CategoryRequestDTO.class), any(User.class));
-        when(categoryService.findCategoryById(id)).thenReturn(updatedCategory);
+        when(categoryService.editCategory(eq(id), any(CategoryRequestDTO.class), any(User.class)))
+                .thenReturn(updatedCategory);
+
         when(categoryMapper.toResponseDTO(updatedCategory)).thenReturn(responseDTO);
 
         // Act & Assert
         mockMvc.perform(put("/category/{id}", id).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO))).andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(responseDTO)));
+
+        verify(categoryService).editCategory(eq(id), eq(requestDTO), any(User.class));
+
+        verify(categoryMapper).toResponseDTO(updatedCategory);
     }
 }

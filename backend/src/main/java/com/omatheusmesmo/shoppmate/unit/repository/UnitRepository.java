@@ -20,4 +20,17 @@ public interface UnitRepository extends JpaRepository<Unit, Long> {
 
     @Query("SELECT u FROM Unit u LEFT JOIN u.owner o WHERE u.deleted = false AND (u.isSystemStandard = true OR o.id = :userId)")
     List<Unit> findAllAccessibleByUserId(@Param("userId") Long userId);
+
+    @Query("""
+            SELECT u
+            FROM Unit u
+            LEFT JOIN u.owner o
+            WHERE u.id = :unitId
+              AND u.deleted = false
+              AND (
+                  u.isSystemStandard = true
+                  OR o.id = :userId
+              )
+            """)
+    Optional<Unit> findAccessibleByIdAndUserId(@Param("unitId") Long unitId, @Param("userId") Long userId);
 }

@@ -174,4 +174,32 @@ class CategoryServiceTest {
         // Act & Assert - no exception expected
         categoryService.verifyOwnershipOrSystem(category, user);
     }
+
+    @Test
+    void findAccessibleCategoryById_AccessibleCategory_ReturnsCategory() {
+        // Arrange
+        when(categoryRepository.findAccessibleByIdAndUserId(category.getId(), user.getId()))
+                .thenReturn(Optional.of(category));
+
+        // Act
+        Category result = categoryService.findAccessibleCategoryById(category.getId(), user);
+
+        // Assert
+        assertEquals(category, result);
+
+        verify(categoryRepository).findAccessibleByIdAndUserId(category.getId(), user.getId());
+    }
+
+    @Test
+    void findAccessibleCategoryById_InaccessibleCategory_ThrowsNoSuchElementException() {
+        // Arrange
+        when(categoryRepository.findAccessibleByIdAndUserId(category.getId(), user.getId()))
+                .thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(NoSuchElementException.class,
+                () -> categoryService.findAccessibleCategoryById(category.getId(), user));
+
+        verify(categoryRepository).findAccessibleByIdAndUserId(category.getId(), user.getId());
+    }
 }

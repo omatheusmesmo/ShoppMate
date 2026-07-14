@@ -32,7 +32,13 @@ public class CategoryService {
 
     public Category findCategoryById(Long id) {
         return categoryRepository.findByIdAndDeletedFalse(id)
-                .orElseThrow(() -> new NoSuchElementException("Item not found with id: " + id));
+                .orElseThrow(() -> new NoSuchElementException("Category not found with id: " + id));
+    }
+
+    public Category findAccessibleCategoryById(Long id, User currentUser) {
+
+        return categoryRepository.findAccessibleByIdAndUserId(id, currentUser.getId())
+                .orElseThrow(() -> new NoSuchElementException("Category not found with id: " + id));
     }
 
     public Optional<Category> findCategoryByName(String name) {
@@ -40,29 +46,39 @@ public class CategoryService {
     }
 
     public void removeCategory(Long id, User currentUser) {
+
         Category category = findCategoryById(id);
         verifyOwnershipOrSystem(category, currentUser);
+
         auditService.softDelete(category);
         auditService.setAuditData(category, false);
         categoryRepository.save(category);
     }
 
-    public void editCategory(Long id, CategoryRequestDTO requestDTO, User currentUser) {
+    public Category editCategory(Long id, CategoryRequestDTO requestDTO, User currentUser) {
+
         Category existingCategory = findCategoryById(id);
         verifyOwnershipOrSystem(existingCategory, currentUser);
+
         existingCategory.setName(requestDTO.name());
         isCategoryValid(existingCategory);
+
         auditService.setAuditData(existingCategory, false);
         categoryRepository.save(existingCategory);
+
+        return existingCategory;
     }
 
     public void verifyOwnershipOrSystem(Category category, User currentUser) {
+
         if (category.isSystemStandard()) {
             throw new ResourceOwnershipException("System standard categories cannot be modified or deleted!");
         }
+
         if (category.getOwner() == null) {
             throw new ResourceOwnershipException("Non-system categories must have an owner; operation not permitted");
         }
+
         if (!category.getOwner().getId().equals(currentUser.getId())) {
             throw new ResourceOwnershipException("You can only modify or delete categories you own!");
         }
