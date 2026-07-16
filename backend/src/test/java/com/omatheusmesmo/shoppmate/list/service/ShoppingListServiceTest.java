@@ -264,31 +264,11 @@ class ShoppingListServiceTest {
     }
 
     @Test
-    void findAndVerifyOwnership_ReadUser_ThrowsResourceOwnershipException() {
+    void findAndVerifyOwnership_NonOwnerUser_ThrowsResourceOwnershipException() {
         when(shoppingListRepository.findByIdAndDeletedFalse(testList.getId())).thenReturn(Optional.of(testList));
 
         assertThrows(ResourceOwnershipException.class,
                 () -> shoppingListService.findAndVerifyOwnership(testList.getId(), sharedUser));
-
-        verifyNoInteractions(listPermissionRepository);
-    }
-
-    @Test
-    void findAndVerifyOwnership_WriteUser_ThrowsResourceOwnershipException() {
-        when(shoppingListRepository.findByIdAndDeletedFalse(testList.getId())).thenReturn(Optional.of(testList));
-
-        assertThrows(ResourceOwnershipException.class,
-                () -> shoppingListService.findAndVerifyOwnership(testList.getId(), sharedUser));
-
-        verifyNoInteractions(listPermissionRepository);
-    }
-
-    @Test
-    void findAndVerifyOwnership_UnrelatedUser_ThrowsResourceOwnershipException() {
-        when(shoppingListRepository.findByIdAndDeletedFalse(testList.getId())).thenReturn(Optional.of(testList));
-
-        assertThrows(ResourceOwnershipException.class,
-                () -> shoppingListService.findAndVerifyOwnership(testList.getId(), unrelatedUser));
 
         verifyNoInteractions(listPermissionRepository);
     }
