@@ -9,6 +9,9 @@ import com.omatheusmesmo.shoppmate.list.entity.ListItem;
 import com.omatheusmesmo.shoppmate.list.entity.ListPermission;
 import com.omatheusmesmo.shoppmate.list.entity.Permission;
 import com.omatheusmesmo.shoppmate.list.entity.ShoppingList;
+import com.omatheusmesmo.shoppmate.list.repository.ListPermissionRepository;
+import com.omatheusmesmo.shoppmate.user.entity.User;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicLong;
@@ -52,6 +55,18 @@ public class ListTestFactory {
         permission.setUpdatedAt(LocalDateTime.now());
         permission.setDeleted(false);
         return permission;
+    }
+
+    public static ListPermission grantPermission(ShoppingList shoppingList, User user, Permission permission,
+            ListPermissionRepository listPermissionRepository) {
+
+        ListPermission listPermission = createValidListPermission(shoppingList);
+        listPermission.setId(null);
+        listPermission.setShoppingList(shoppingList);
+        listPermission.setUser(user);
+        listPermission.setPermission(permission);
+
+        return listPermissionRepository.save(listPermission);
     }
 
     public static ShoppingListRequestDTO createValidShoppingListRequestDTO() {

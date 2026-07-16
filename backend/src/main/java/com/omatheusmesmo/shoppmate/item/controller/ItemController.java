@@ -5,10 +5,11 @@ import com.omatheusmesmo.shoppmate.item.dto.ItemResponseDTO;
 import com.omatheusmesmo.shoppmate.item.entity.Item;
 import com.omatheusmesmo.shoppmate.item.mapper.ItemMapper;
 import com.omatheusmesmo.shoppmate.item.service.ItemService;
+import com.omatheusmesmo.shoppmate.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -40,16 +40,19 @@ public class ItemController {
     @GetMapping
     public ResponseEntity<List<ItemResponseDTO>> getAllItems() {
         List<Item> items = itemService.findAll();
+
         List<ItemResponseDTO> responseDTOs = items.stream().map(itemMapper::toResponseDTO).toList();
+
         return ResponseEntity.ok(responseDTOs);
     }
 
     @Operation(summary = "Add a new item")
     @PostMapping
-    public ResponseEntity<ItemResponseDTO> addItem(@Valid @RequestBody ItemRequestDTO itemDTO) {
+    public ResponseEntity<ItemResponseDTO> addItem(@Valid @RequestBody ItemRequestDTO itemDTO,
+            @AuthenticationPrincipal User user) {
 
-        Item item = itemMapper.toEntity(itemDTO);
-        Item savedItem = itemService.addItem(item);
+        Item savedItem = itemService.addItem(itemDTO, user);
+
         ItemResponseDTO responseDTO = itemMapper.toResponseDTO(savedItem);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedItem.getId())
@@ -58,22 +61,21 @@ public class ItemController {
         return ResponseEntity.created(location).body(responseDTO);
     }
 
-    @Operation(summary = "Delete a item by id")
+    @Operation(summary = "Delete an item by id")
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteItem(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
         itemService.removeItem(id);
+
+        return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Update a item")
+    @Operation(summary = "Update an item")
     @PutMapping("/{id}")
-    public ResponseEntity<ItemResponseDTO> updateItem(@PathVariable Long id,
-            @Valid @RequestBody ItemRequestDTO itemDTO) {
+    public ResponseEntity<ItemResponseDTO> updateItem(@PathVariable Long id, @Valid @RequestBody ItemRequestDTO itemDTO,
+            @AuthenticationPrincipal User user) {
 
-        Item itemToUpdate = itemMapper.toEntity(itemDTO);
-        itemToUpdate.setId(id);
+        Item updatedItem = itemService.editItem(id, itemDTO, user);
 
-        Item updatedItem = itemService.editItem(itemToUpdate);
         ItemResponseDTO responseDTO = itemMapper.toResponseDTO(updatedItem);
 
         return ResponseEntity.ok(responseDTO);
@@ -82,8 +84,11 @@ public class ItemController {
     @Operation(summary = "Get an item by id")
     @GetMapping("/{id}")
     public ResponseEntity<ItemResponseDTO> getItemById(@PathVariable Long id) {
+
         Item item = itemService.findById(id);
+
         ItemResponseDTO responseDTO = itemMapper.toResponseDTO(item);
+
         return ResponseEntity.ok(responseDTO);
     }
 }

@@ -50,146 +50,232 @@ class ListPermissionServiceTest {
     private ShoppingList shoppingList;
     private User owner;
     private User targetUser;
+    private User nonOwner;
     private ListPermission listPermission;
 
     @BeforeEach
     void setUp() {
         shoppingList = ListTestFactory.createValidShoppingList();
         owner = shoppingList.getOwner();
+
         listPermission = ListTestFactory.createValidListPermission(shoppingList);
+
         targetUser = listPermission.getUser();
+
+        nonOwner = new User();
+        nonOwner.setId(owner.getId() + 1000);
     }
 
     @Test
-    void addListPermission_ValidDTO_ReturnsSavedPermission() {
-        // Arrange
+    void addListPermission_Owner_ReturnsSavedPermission() {
         ListPermissionRequestDTO requestDTO = ListTestFactory.createValidListPermissionRequestDTO(shoppingList.getId(),
                 targetUser.getId());
-        when(shoppingListService.findListById(shoppingList.getId())).thenReturn(shoppingList);
-        when(userService.findUserById(targetUser.getId())).thenReturn(targetUser);
-        when(listPermissionMapper.toEntity(requestDTO, shoppingList, targetUser)).thenReturn(listPermission);
-        when(listPermissionRepository.save(any(ListPermission.class))).thenReturn(listPermission);
 
-        // Act
+        when(shoppingListService.findAndVerifyOwnership(shoppingList.getId(), owner)).thenReturn(shoppingList);
+
+        when(userService.findUserById(targetUser.getId())).thenReturn(targetUser);
+
+        when(listPermissionMapper.toEntity(requestDTO, shoppingList, targetUser)).thenReturn(listPermission);
+
+        when(listPermissionRepository.save(listPermission)).thenReturn(listPermission);
+
         ListPermission result = listPermissionService.addListPermission(requestDTO, owner);
 
-        // Assert
         assertNotNull(result);
         assertEquals(listPermission, result);
-        verify(auditService, times(1)).setAuditData(listPermission, true);
-        verify(listPermissionRepository, times(1)).save(listPermission);
+
+        verify(shoppingListService).findAndVerifyOwnership(shoppingList.getId(), owner);
+
+        verify(userService).findUserById(targetUser.getId());
+
+        verify(auditService).setAuditData(listPermission, true);
+
+        verify(listPermissionRepository).save(listPermission);
     }
 
     @Test
-    void addListPermission_RequesterNotOwner_ThrowsResourceOwnershipException() {
-        // Arrange
+    void addListPermission_NonOwner_ThrowsResourceOwnershipException() {
         ListPermissionRequestDTO requestDTO = ListTestFactory.createValidListPermissionRequestDTO(shoppingList.getId(),
                 targetUser.getId());
-        User nonOwner = new User();
-        nonOwner.setId(owner.getId() + 1000);
-        when(shoppingListService.findListById(shoppingList.getId())).thenReturn(shoppingList);
 
-        // Act & Assert
-        ResourceOwnershipException exception = assertThrows(ResourceOwnershipException.class,
+        when(shoppingListService.findAndVerifyOwnership(shoppingList.getId(), nonOwner))
+                .thenThrow(new ResourceOwnershipException("Only the list owner can manage permissions"));
+
+        assertThrows(ResourceOwnershipException.class,
                 () -> listPermissionService.addListPermission(requestDTO, nonOwner));
-        assertTrue(exception.getMessage().contains("Only the list owner can grant permissions"));
+
+        verify(userService, never()).findUserById(anyLong());
+        verify(listPermissionMapper, never()).toEntity(any(), any(), any());
+
         verify(listPermissionRepository, never()).save(any());
     }
 
     @Test
-    void editList_ExistingId_ReturnsUpdatedPermission() {
-        // Arrange
+    void editList_Owner_ReturnsUpdatedPermission() {
         ListPermissionUpdateRequestDTO updateDTO = ListTestFactory.createValidListPermissionUpdateRequestDTO();
+
         when(listPermissionRepository.findByIdAndDeletedFalse(listPermission.getId()))
                 .thenReturn(Optional.of(listPermission));
-        when(listPermissionRepository.save(any(ListPermission.class))).thenReturn(listPermission);
 
-        // Act
+        when(shoppingListService.findAndVerifyOwnership(shoppingList.getId(), owner)).thenReturn(shoppingList);
+
+        when(listPermissionRepository.save(listPermission)).thenReturn(listPermission);
+
         ListPermission result = listPermissionService.editList(listPermission.getId(), updateDTO, owner);
 
-        // Assert
         assertNotNull(result);
         assertEquals(updateDTO.permission(), result.getPermission());
-        verify(auditService, times(1)).setAuditData(listPermission, false);
-        verify(listPermissionRepository, times(1)).save(listPermission);
+
+        verify(shoppingListService).findAndVerifyOwnership(shoppingList.getId(), owner);
+
+        verify(auditService).setAuditData(listPermission, false);
+
+        verify(listPermissionRepository).save(listPermission);
+    }
+
+    @Test
+    void editList_NonOwner_ThrowsResourceOwnershipException() {
+        ListPermissionUpdateRequestDTO updateDTO = ListTestFactory.createValidListPermissionUpdateRequestDTO();
+
+        when(listPermissionRepository.findByIdAndDeletedFalse(listPermission.getId()))
+                .thenReturn(Optional.of(listPermission));
+
+        when(shoppingListService.findAndVerifyOwnership(shoppingList.getId(), nonOwner))
+                .thenThrow(new ResourceOwnershipException("Only the list owner can manage permissions"));
+
+        assertThrows(ResourceOwnershipException.class,
+                () -> listPermissionService.editList(listPermission.getId(), updateDTO, nonOwner));
+
+        verify(auditService, never()).setAuditData(any(), anyBoolean());
+
+        verify(listPermissionRepository, never()).save(any());
     }
 
     @Test
     void editList_NonExistingId_ThrowsNoSuchElementException() {
-        // Arrange
         Long nonExistingId = listPermission.getId() + 1000;
+
         ListPermissionUpdateRequestDTO updateDTO = ListTestFactory.createValidListPermissionUpdateRequestDTO();
+
         when(listPermissionRepository.findByIdAndDeletedFalse(nonExistingId)).thenReturn(Optional.empty());
 
-        // Act & Assert
         assertThrows(NoSuchElementException.class,
                 () -> listPermissionService.editList(nonExistingId, updateDTO, owner));
+
+        verifyNoInteractions(shoppingListService);
+        verify(listPermissionRepository, never()).save(any());
     }
 
     @Test
-    void findListUserPermissionById_ExistingId_ReturnsPermission() {
-        // Arrange
+    void findListUserPermissionById_Owner_ReturnsPermission() {
         when(listPermissionRepository.findByIdAndDeletedFalse(listPermission.getId()))
                 .thenReturn(Optional.of(listPermission));
 
-        // Act
+        when(shoppingListService.findAndVerifyOwnership(shoppingList.getId(), owner)).thenReturn(shoppingList);
+
         ListPermission result = listPermissionService.findListUserPermissionById(listPermission.getId(), owner);
 
-        // Assert
         assertNotNull(result);
         assertEquals(listPermission, result);
-        verify(listPermissionRepository, times(1)).findByIdAndDeletedFalse(listPermission.getId());
+
+        verify(listPermissionRepository).findByIdAndDeletedFalse(listPermission.getId());
+
+        verify(shoppingListService).findAndVerifyOwnership(shoppingList.getId(), owner);
+    }
+
+    @Test
+    void findListUserPermissionById_NonOwner_ThrowsResourceOwnershipException() {
+        when(listPermissionRepository.findByIdAndDeletedFalse(listPermission.getId()))
+                .thenReturn(Optional.of(listPermission));
+
+        when(shoppingListService.findAndVerifyOwnership(shoppingList.getId(), nonOwner))
+                .thenThrow(new ResourceOwnershipException("Only the list owner can manage permissions"));
+
+        assertThrows(ResourceOwnershipException.class,
+                () -> listPermissionService.findListUserPermissionById(listPermission.getId(), nonOwner));
     }
 
     @Test
     void findListUserPermissionById_NonExistingId_ThrowsNoSuchElementException() {
-        // Arrange
         Long nonExistingId = listPermission.getId() + 1000;
+
         when(listPermissionRepository.findByIdAndDeletedFalse(nonExistingId)).thenReturn(Optional.empty());
 
-        // Act & Assert
         assertThrows(NoSuchElementException.class,
                 () -> listPermissionService.findListUserPermissionById(nonExistingId, owner));
+
+        verifyNoInteractions(shoppingListService);
     }
 
     @Test
-    void removeList_ExistingId_SoftDeletesPermission() {
-        // Arrange
+    void removeList_Owner_SoftDeletesPermission() {
         when(listPermissionRepository.findByIdAndDeletedFalse(listPermission.getId()))
                 .thenReturn(Optional.of(listPermission));
 
-        // Act
+        when(shoppingListService.findAndVerifyOwnership(shoppingList.getId(), owner)).thenReturn(shoppingList);
+
         assertDoesNotThrow(() -> listPermissionService.removeList(listPermission.getId(), owner));
 
-        // Assert
-        verify(auditService, times(1)).softDelete(listPermission);
-        verify(listPermissionRepository, times(1)).save(listPermission);
+        verify(shoppingListService).findAndVerifyOwnership(shoppingList.getId(), owner);
+
+        verify(auditService).softDelete(listPermission);
+        verify(listPermissionRepository).save(listPermission);
+    }
+
+    @Test
+    void removeList_NonOwner_ThrowsResourceOwnershipException() {
+        when(listPermissionRepository.findByIdAndDeletedFalse(listPermission.getId()))
+                .thenReturn(Optional.of(listPermission));
+
+        when(shoppingListService.findAndVerifyOwnership(shoppingList.getId(), nonOwner))
+                .thenThrow(new ResourceOwnershipException("Only the list owner can manage permissions"));
+
+        assertThrows(ResourceOwnershipException.class,
+                () -> listPermissionService.removeList(listPermission.getId(), nonOwner));
+
+        verify(auditService, never()).softDelete(any());
+        verify(listPermissionRepository, never()).save(any());
     }
 
     @Test
     void removeList_NonExistingId_ThrowsNoSuchElementException() {
-        // Arrange
         Long nonExistingId = listPermission.getId() + 1000;
+
         when(listPermissionRepository.findByIdAndDeletedFalse(nonExistingId)).thenReturn(Optional.empty());
 
-        // Act & Assert
         assertThrows(NoSuchElementException.class, () -> listPermissionService.removeList(nonExistingId, owner));
+
+        verifyNoInteractions(shoppingListService);
+        verify(auditService, never()).softDelete(any());
+        verify(listPermissionRepository, never()).save(any());
     }
 
     @Test
-    void findAllPermissionsByListId_ExistingListId_ReturnsPermissions() {
-        // Arrange
-        when(shoppingListService.findAndVerifyAccess(shoppingList.getId(), owner)).thenReturn(shoppingList);
+    void findAllPermissionsByListId_Owner_ReturnsPermissions() {
+        when(shoppingListService.findAndVerifyOwnership(shoppingList.getId(), owner)).thenReturn(shoppingList);
+
         when(listPermissionRepository.findByShoppingListIdAndDeletedFalse(shoppingList.getId()))
                 .thenReturn(List.of(listPermission));
 
-        // Act
         List<ListPermission> result = listPermissionService.findAllPermissionsByListId(shoppingList.getId(), owner);
 
-        // Assert
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(listPermission, result.get(0));
-        verify(listPermissionRepository, times(1)).findByShoppingListIdAndDeletedFalse(shoppingList.getId());
+
+        verify(shoppingListService).findAndVerifyOwnership(shoppingList.getId(), owner);
+
+        verify(listPermissionRepository).findByShoppingListIdAndDeletedFalse(shoppingList.getId());
+    }
+
+    @Test
+    void findAllPermissionsByListId_NonOwner_ThrowsResourceOwnershipException() {
+        when(shoppingListService.findAndVerifyOwnership(shoppingList.getId(), nonOwner))
+                .thenThrow(new ResourceOwnershipException("Only the list owner can manage permissions"));
+
+        assertThrows(ResourceOwnershipException.class,
+                () -> listPermissionService.findAllPermissionsByListId(shoppingList.getId(), nonOwner));
+
+        verify(listPermissionRepository, never()).findByShoppingListIdAndDeletedFalse(anyLong());
     }
 }

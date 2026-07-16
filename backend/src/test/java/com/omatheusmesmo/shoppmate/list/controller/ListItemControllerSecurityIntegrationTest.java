@@ -8,16 +8,19 @@ import com.omatheusmesmo.shoppmate.item.entity.Item;
 import com.omatheusmesmo.shoppmate.item.repository.ItemRepository;
 import com.omatheusmesmo.shoppmate.list.dtos.ListItemRequestDTO;
 import com.omatheusmesmo.shoppmate.list.dtos.ListItemUpdateRequestDTO;
-import com.omatheusmesmo.shoppmate.list.mapper.ListMapper;
-import com.omatheusmesmo.shoppmate.unit.entity.Unit;
-import com.omatheusmesmo.shoppmate.unit.repository.UnitRepository;
 import com.omatheusmesmo.shoppmate.list.dtos.ShoppingListRequestDTO;
 import com.omatheusmesmo.shoppmate.list.entity.ListItem;
+import com.omatheusmesmo.shoppmate.list.entity.Permission;
 import com.omatheusmesmo.shoppmate.list.entity.ShoppingList;
+import com.omatheusmesmo.shoppmate.list.mapper.ListMapper;
 import com.omatheusmesmo.shoppmate.list.repository.ListItemRepository;
+import com.omatheusmesmo.shoppmate.list.repository.ListPermissionRepository;
+import com.omatheusmesmo.shoppmate.list.repository.ShoppingListRepository;
 import com.omatheusmesmo.shoppmate.list.service.ListItemService;
 import com.omatheusmesmo.shoppmate.list.service.ShoppingListService;
 import com.omatheusmesmo.shoppmate.shared.testcontainers.AbstractIntegrationTest;
+import com.omatheusmesmo.shoppmate.unit.entity.Unit;
+import com.omatheusmesmo.shoppmate.unit.repository.UnitRepository;
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import com.omatheusmesmo.shoppmate.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -29,12 +32,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
-import com.omatheusmesmo.shoppmate.list.repository.ShoppingListRepository;
-import com.omatheusmesmo.shoppmate.list.repository.ListPermissionRepository;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static com.omatheusmesmo.shoppmate.shared.testutils.ListTestFactory.grantPermission;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -86,10 +93,13 @@ class ListItemControllerSecurityIntegrationTest extends AbstractIntegrationTest 
 
     private User userA;
     private User userB;
+
     private ShoppingList userAList;
     private ShoppingList userAList2;
     private ShoppingList userBList;
+
     private Item item;
+
     private ListItem userAListItem;
     private ListItem userBListItem;
 
@@ -181,6 +191,22 @@ class ListItemControllerSecurityIntegrationTest extends AbstractIntegrationTest 
     }
 
     @Test
+    void testReadUserCanGetSharedListItem() throws Exception {
+        grantPermission(userBList, userA, Permission.READ, listPermissionRepository);
+
+        mockMvc.perform(get("/lists/" + userBList.getId() + "/items/" + userBListItem.getId()).header("Authorization",
+                "Bearer " + tokenUserA)).andExpect(status().isOk()).andExpect(jsonPath("$.quantity").value(1));
+    }
+
+    @Test
+    void testWriteUserCanGetSharedListItem() throws Exception {
+        grantPermission(userBList, userA, Permission.WRITE, listPermissionRepository);
+
+        mockMvc.perform(get("/lists/" + userBList.getId() + "/items/" + userBListItem.getId()).header("Authorization",
+                "Bearer " + tokenUserA)).andExpect(status().isOk()).andExpect(jsonPath("$.quantity").value(1));
+    }
+
+    @Test
     void testUserCannotGetAllItemsFromAnotherUsersList() throws Exception {
         mockMvc.perform(get("/lists/" + userBList.getId() + "/items").header("Authorization", "Bearer " + tokenUserA))
                 .andExpect(status().isForbidden()).andExpect(jsonPath("$.message").exists());
@@ -194,6 +220,24 @@ class ListItemControllerSecurityIntegrationTest extends AbstractIntegrationTest 
     }
 
     @Test
+    void testReadUserCanGetAllItemsFromSharedList() throws Exception {
+        grantPermission(userBList, userA, Permission.READ, listPermissionRepository);
+
+        mockMvc.perform(get("/lists/" + userBList.getId() + "/items").header("Authorization", "Bearer " + tokenUserA))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.size()").value(1))
+                .andExpect(jsonPath("$[0].quantity").value(1));
+    }
+
+    @Test
+    void testWriteUserCanGetAllItemsFromSharedList() throws Exception {
+        grantPermission(userBList, userA, Permission.WRITE, listPermissionRepository);
+
+        mockMvc.perform(get("/lists/" + userBList.getId() + "/items").header("Authorization", "Bearer " + tokenUserA))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.size()").value(1))
+                .andExpect(jsonPath("$[0].quantity").value(1));
+    }
+
+    @Test
     void testUserCannotAddItemToAnotherUsersList() throws Exception {
         ListItemRequestDTO maliciousDTO = new ListItemRequestDTO(userBList.getId(), item.getId(), 5, null);
 
@@ -202,14 +246,48 @@ class ListItemControllerSecurityIntegrationTest extends AbstractIntegrationTest 
                 .content(objectMapper.writeValueAsString(maliciousDTO))).andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").exists());
 
-        Iterable<ListItem> userBItems = listItemRepository.findAll();
-        long userBItemCount = 0;
-        for (ListItem li : userBItems) {
-            if (li.getShoppList().getId().equals(userBList.getId())) {
-                userBItemCount++;
-            }
-        }
-        assertEquals(1, userBItemCount, "User B's list should still have only 1 item");
+        assertEquals(1, countItemsForList(userBList.getId()));
+    }
+
+    @Test
+    void testReadUserCannotAddItemToSharedList() throws Exception {
+        grantPermission(userBList, userA, Permission.READ, listPermissionRepository);
+
+        ListItemRequestDTO requestDTO = new ListItemRequestDTO(userBList.getId(), item.getId(), 5, null);
+
+        mockMvc.perform(post("/lists/" + userBList.getId() + "/items").with(csrf())
+                .header("Authorization", "Bearer " + tokenUserA).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO))).andExpect(status().isForbidden());
+
+        assertEquals(1, countItemsForList(userBList.getId()));
+    }
+
+    @Test
+    void testWriteUserCanAddItemToSharedList() throws Exception {
+        grantPermission(userBList, userA, Permission.WRITE, listPermissionRepository);
+
+        Category category = new Category();
+        category.setName("Shared Bakery");
+        category = categoryRepository.save(category);
+
+        Unit unit = new Unit();
+        unit.setName("Shared Pieces");
+        unit.setSymbol("sp");
+        unit = unitRepository.save(unit);
+
+        Item newItem = new Item();
+        newItem.setName("Shared Bread");
+        newItem.setCategory(category);
+        newItem.setUnit(unit);
+        newItem = itemRepository.save(newItem);
+
+        ListItemRequestDTO requestDTO = new ListItemRequestDTO(userBList.getId(), newItem.getId(), 5, null);
+
+        mockMvc.perform(post("/lists/" + userBList.getId() + "/items").with(csrf())
+                .header("Authorization", "Bearer " + tokenUserA).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO))).andExpect(status().isCreated());
+
+        assertEquals(2, countItemsForList(userBList.getId()));
     }
 
     @Test
@@ -235,14 +313,7 @@ class ListItemControllerSecurityIntegrationTest extends AbstractIntegrationTest 
                 .header("Authorization", "Bearer " + tokenUserA).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validDTO))).andExpect(status().isCreated());
 
-        Iterable<ListItem> allItems = listItemRepository.findAll();
-        long userAItemCount = 0;
-        for (ListItem li : allItems) {
-            if (li.getShoppList().getId().equals(userAList.getId())) {
-                userAItemCount++;
-            }
-        }
-        assertEquals(2, userAItemCount, "User A's list should now have 2 items");
+        assertEquals(2, countItemsForList(userAList.getId()));
     }
 
     @Test
@@ -251,8 +322,27 @@ class ListItemControllerSecurityIntegrationTest extends AbstractIntegrationTest 
                 .header("Authorization", "Bearer " + tokenUserA)).andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").exists());
 
-        assertTrue(listItemRepository.findById(userBListItem.getId()).isPresent(),
-                "User B's list item should still exist");
+        assertFalse(listItemRepository.findById(userBListItem.getId()).orElseThrow().getDeleted());
+    }
+
+    @Test
+    void testReadUserCannotDeleteSharedListItem() throws Exception {
+        grantPermission(userBList, userA, Permission.READ, listPermissionRepository);
+
+        mockMvc.perform(delete("/lists/" + userBList.getId() + "/items/" + userBListItem.getId()).with(csrf())
+                .header("Authorization", "Bearer " + tokenUserA)).andExpect(status().isForbidden());
+
+        assertFalse(listItemRepository.findById(userBListItem.getId()).orElseThrow().getDeleted());
+    }
+
+    @Test
+    void testWriteUserCanDeleteSharedListItem() throws Exception {
+        grantPermission(userBList, userA, Permission.WRITE, listPermissionRepository);
+
+        mockMvc.perform(delete("/lists/" + userBList.getId() + "/items/" + userBListItem.getId()).with(csrf())
+                .header("Authorization", "Bearer " + tokenUserA)).andExpect(status().isNoContent());
+
+        assertTrue(listItemRepository.findById(userBListItem.getId()).orElseThrow().getDeleted());
     }
 
     @Test
@@ -260,10 +350,8 @@ class ListItemControllerSecurityIntegrationTest extends AbstractIntegrationTest 
         mockMvc.perform(delete("/lists/" + userAList.getId() + "/items/" + userAListItem.getId()).with(csrf())
                 .header("Authorization", "Bearer " + tokenUserA)).andExpect(status().isNoContent());
 
-        assertTrue(listItemRepository.findById(userAListItem.getId()).isPresent(),
-                "Item should still exist in database (soft delete)");
-        assertTrue(listItemRepository.findById(userAListItem.getId()).get().getDeleted(),
-                "Item should be marked as deleted");
+        assertTrue(listItemRepository.findById(userAListItem.getId()).isPresent());
+        assertTrue(listItemRepository.findById(userAListItem.getId()).orElseThrow().getDeleted());
     }
 
     @Test
@@ -276,8 +364,36 @@ class ListItemControllerSecurityIntegrationTest extends AbstractIntegrationTest 
                 .content(objectMapper.writeValueAsString(maliciousUpdate))).andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").exists());
 
-        ListItem unchangedItem = listItemRepository.findById(userBListItem.getId()).orElseThrow();
-        assertEquals(1, unchangedItem.getQuantity(), "User B's item quantity should remain unchanged");
+        assertEquals(1, listItemRepository.findById(userBListItem.getId()).orElseThrow().getQuantity());
+    }
+
+    @Test
+    void testReadUserCannotEditSharedListItem() throws Exception {
+        grantPermission(userBList, userA, Permission.READ, listPermissionRepository);
+
+        ListItemUpdateRequestDTO updateDTO = new ListItemUpdateRequestDTO(userBList.getId(), item.getId(), 99, false,
+                null);
+
+        mockMvc.perform(put("/lists/" + userBList.getId() + "/items/" + userBListItem.getId()).with(csrf())
+                .header("Authorization", "Bearer " + tokenUserA).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateDTO))).andExpect(status().isForbidden());
+
+        assertEquals(1, listItemRepository.findById(userBListItem.getId()).orElseThrow().getQuantity());
+    }
+
+    @Test
+    void testWriteUserCanEditSharedListItem() throws Exception {
+        grantPermission(userBList, userA, Permission.WRITE, listPermissionRepository);
+
+        ListItemUpdateRequestDTO updateDTO = new ListItemUpdateRequestDTO(userBList.getId(), item.getId(), 10, true,
+                null);
+
+        mockMvc.perform(put("/lists/" + userBList.getId() + "/items/" + userBListItem.getId()).with(csrf())
+                .header("Authorization", "Bearer " + tokenUserA).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateDTO))).andExpect(status().isOk())
+                .andExpect(jsonPath("$.quantity").value(10));
+
+        assertEquals(10, listItemRepository.findById(userBListItem.getId()).orElseThrow().getQuantity());
     }
 
     @Test
@@ -290,8 +406,7 @@ class ListItemControllerSecurityIntegrationTest extends AbstractIntegrationTest 
                 .content(objectMapper.writeValueAsString(validUpdate))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.quantity").value(10));
 
-        ListItem updatedItem = listItemRepository.findById(userAListItem.getId()).orElseThrow();
-        assertEquals(10, updatedItem.getQuantity(), "User A's item quantity should be updated");
+        assertEquals(10, listItemRepository.findById(userAListItem.getId()).orElseThrow().getQuantity());
     }
 
     @Test
@@ -327,14 +442,7 @@ class ListItemControllerSecurityIntegrationTest extends AbstractIntegrationTest 
                 .content(objectMapper.writeValueAsString(maliciousDTO))).andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof IllegalArgumentException));
 
-        Iterable<ListItem> userAList2Items = listItemRepository.findAll();
-        long userAList2ItemCount = 0;
-        for (ListItem li : userAList2Items) {
-            if (li.getShoppList().getId().equals(userAList2.getId())) {
-                userAList2ItemCount++;
-            }
-        }
-        assertEquals(0, userAList2ItemCount, "User A's second list should have no items");
+        assertEquals(0, countItemsForList(userAList2.getId()));
     }
 
     @Test
@@ -342,10 +450,7 @@ class ListItemControllerSecurityIntegrationTest extends AbstractIntegrationTest 
         mockMvc.perform(delete("/lists/" + userAList2.getId() + "/items/" + userAListItem.getId()).with(csrf())
                 .header("Authorization", "Bearer " + tokenUserA)).andExpect(status().isNotFound());
 
-        assertTrue(listItemRepository.findById(userAListItem.getId()).isPresent(),
-                "User A's list item should still exist");
-        assertFalse(listItemRepository.findById(userAListItem.getId()).get().getDeleted(),
-                "Item should not be marked as deleted");
+        assertFalse(listItemRepository.findById(userAListItem.getId()).orElseThrow().getDeleted());
     }
 
     @Test
@@ -358,7 +463,18 @@ class ListItemControllerSecurityIntegrationTest extends AbstractIntegrationTest 
                 .content(objectMapper.writeValueAsString(maliciousUpdate))).andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof IllegalArgumentException));
 
-        ListItem unchangedItem = listItemRepository.findById(userAListItem.getId()).orElseThrow();
-        assertEquals(2, unchangedItem.getQuantity(), "User A's item quantity should remain unchanged");
+        assertEquals(2, listItemRepository.findById(userAListItem.getId()).orElseThrow().getQuantity());
+    }
+
+    private long countItemsForList(Long listId) {
+        long count = 0;
+
+        for (ListItem listItem : listItemRepository.findAll()) {
+            if (listItem.getShoppList().getId().equals(listId)) {
+                count++;
+            }
+        }
+
+        return count;
     }
 }

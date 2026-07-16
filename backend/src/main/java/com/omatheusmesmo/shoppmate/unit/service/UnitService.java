@@ -85,4 +85,10 @@ public class UnitService {
             throw new IllegalArgumentException("Enter a valid unit symbol!");
         }
     }
+
+    public Unit findAccessibleUnitById(Long id, User currentUser) {
+
+        return unitRepository.findAccessibleByIdAndUserId(id, currentUser.getId())
+                .orElseThrow(() -> new NoSuchElementException("Unit not found with id: " + id));
+    }
 }

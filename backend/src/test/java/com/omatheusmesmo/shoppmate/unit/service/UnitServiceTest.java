@@ -88,6 +88,31 @@ class UnitServiceTest {
     }
 
     @Test
+    void findAccessibleUnitById_AccessibleUnit_ReturnsUnit() {
+        // Arrange
+        when(unitRepository.findAccessibleByIdAndUserId(unit.getId(), user.getId())).thenReturn(Optional.of(unit));
+
+        // Act
+        Unit result = unitService.findAccessibleUnitById(unit.getId(), user);
+
+        // Assert
+        assertEquals(unit, result);
+
+        verify(unitRepository).findAccessibleByIdAndUserId(unit.getId(), user.getId());
+    }
+
+    @Test
+    void findAccessibleUnitById_InaccessibleUnit_ThrowsNoSuchElementException() {
+        // Arrange
+        when(unitRepository.findAccessibleByIdAndUserId(unit.getId(), user.getId())).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(NoSuchElementException.class, () -> unitService.findAccessibleUnitById(unit.getId(), user));
+
+        verify(unitRepository).findAccessibleByIdAndUserId(unit.getId(), user.getId());
+    }
+
+    @Test
     void isUnitValid_BlankSymbol_ThrowsIllegalArgumentException() {
         // Arrange
         unit.setSymbol(" ");

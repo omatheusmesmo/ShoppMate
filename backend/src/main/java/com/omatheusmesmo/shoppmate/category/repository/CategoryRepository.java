@@ -16,6 +16,28 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     Optional<Category> findByIdAndDeletedFalse(Long id);
 
-    @Query("SELECT c FROM Category c LEFT JOIN c.owner o WHERE c.deleted = false AND (c.isSystemStandard = true OR o.id = :userId)")
+    @Query("""
+            SELECT c
+            FROM Category c
+            LEFT JOIN c.owner o
+            WHERE c.id = :categoryId
+              AND c.deleted = false
+              AND (
+                  c.isSystemStandard = true
+                  OR o.id = :userId
+              )
+            """)
+    Optional<Category> findAccessibleByIdAndUserId(@Param("categoryId") Long categoryId, @Param("userId") Long userId);
+
+    @Query("""
+            SELECT c
+            FROM Category c
+            LEFT JOIN c.owner o
+            WHERE c.deleted = false
+              AND (
+                  c.isSystemStandard = true
+                  OR o.id = :userId
+              )
+            """)
     List<Category> findAllAccessibleByUserId(@Param("userId") Long userId);
 }
