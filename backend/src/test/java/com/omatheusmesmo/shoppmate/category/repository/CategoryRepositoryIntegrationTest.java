@@ -8,12 +8,14 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.omatheusmesmo.shoppmate.category.entity.Category;
 import com.omatheusmesmo.shoppmate.shared.testcontainers.AbstractIntegrationTest;
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import com.omatheusmesmo.shoppmate.user.repository.UserRepository;
 
+@Transactional
 class CategoryRepositoryIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -27,9 +29,6 @@ class CategoryRepositoryIntegrationTest extends AbstractIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        categoryRepository.deleteAll();
-        userRepository.deleteAll();
-
         currentUser = createUser("current-user@example.com");
         otherUser = createUser("other-user@example.com");
     }
@@ -88,7 +87,6 @@ class CategoryRepositoryIntegrationTest extends AbstractIntegrationTest {
     }
 
     private Category createCategory(String name, User owner, boolean systemStandard, boolean deleted) {
-
         Category category = new Category();
         category.setName(name);
         category.setOwner(owner);
