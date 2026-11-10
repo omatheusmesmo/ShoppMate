@@ -27,7 +27,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -56,6 +57,9 @@ class ShoppingListControllerSecurityIntegrationTest extends AbstractIntegrationT
 
     @Autowired
     private ShoppingListService shoppingListService;
+
+    @Autowired
+    ShoppingListUpdateRequestDTO shoppingListUpdateRequestDTO;
 
     @Autowired
     private ListPermissionRepository listPermissionRepository;
@@ -139,7 +143,7 @@ class ShoppingListControllerSecurityIntegrationTest extends AbstractIntegrationT
 
     @Test
     void testUserCannotEditAnotherUsersShoppingList() throws Exception {
-        ShoppingListUpdateRequestDTO updateDTO = new ShoppingListUpdateRequestDTO("Malicious Update");
+        ShoppingListUpdateRequestDTO updateDTO = new ShoppingListUpdateRequestDTO(shoppingListUpdateRequestDTO.id(), "Malicious Update", shoppingListUpdateRequestDTO.version());
 
         mockMvc.perform(put("/lists/" + userBList.getId()).with(csrf()).header("Authorization", "Bearer " + tokenUserA)
                 .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateDTO)))
@@ -151,7 +155,7 @@ class ShoppingListControllerSecurityIntegrationTest extends AbstractIntegrationT
 
     @Test
     void testUserCanEditOwnShoppingList() throws Exception {
-        ShoppingListUpdateRequestDTO updateDTO = new ShoppingListUpdateRequestDTO("Updated List Name");
+        ShoppingListUpdateRequestDTO updateDTO = new ShoppingListUpdateRequestDTO(shoppingListUpdateRequestDTO.id(), "Updated List Name", shoppingListUpdateRequestDTO.version());
 
         mockMvc.perform(put("/lists/" + userAList.getId()).with(csrf()).header("Authorization", "Bearer " + tokenUserA)
                 .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateDTO)))

@@ -1,7 +1,6 @@
 package com.omatheusmesmo.shoppmate.list.mapper;
 
 import com.omatheusmesmo.shoppmate.list.dtos.ShoppingListRequestDTO;
-import java.math.BigDecimal;
 import com.omatheusmesmo.shoppmate.list.dtos.ShoppingListResponseDTO;
 import com.omatheusmesmo.shoppmate.list.dtos.ShoppingListUpdateRequestDTO;
 import com.omatheusmesmo.shoppmate.list.entity.ListItem;
@@ -12,6 +11,8 @@ import com.omatheusmesmo.shoppmate.user.mapper.UserMapper;
 import com.omatheusmesmo.shoppmate.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
 
 @Component
 public class ListMapper {
@@ -44,7 +45,7 @@ public class ListMapper {
         UserResponseDTO ownerDTO = userMapper.toResponseDTO(entity.getOwner());
         BigDecimal totalValue = calculateTotalValue(entity);
 
-        return new ShoppingListResponseDTO(entity.getId(), entity.getName(), ownerDTO, totalValue);
+        return new ShoppingListResponseDTO(entity.getId(), entity.getName(), ownerDTO, totalValue, entity.getVersion());
     }
 
     private BigDecimal calculateTotalValue(ShoppingList entity) {
@@ -78,5 +79,23 @@ public class ListMapper {
             return;
         }
         entity.setName(dto.name());
+    }
+
+    public ShoppingList toDetachedEntityForUpdate(
+        ShoppingListUpdateRequestDTO dto,
+        User owner,
+        ShoppingList existingList
+    ) {
+        ShoppingList entity = new ShoppingList();
+
+        entity.setId(dto.id());
+        entity.setName(dto.name());
+        entity.setOwner(owner);
+        entity.setVersion(dto.version());
+
+        entity.setCreatedAt(existingList.getCreatedAt());
+        entity.setDeleted(existingList.getDeleted());
+
+        return entity;
     }
 }

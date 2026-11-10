@@ -64,7 +64,7 @@ class ShoppingListControllerTest {
         responseDTO = new ShoppingListResponseDTO(
                 shoppingList.getId(), shoppingList.getName(), new UserResponseDTO(shoppingList.getOwner().getId(),
                         shoppingList.getOwner().getFullName(), shoppingList.getOwner().getEmail()),
-                BigDecimal.valueOf(1.0));
+            BigDecimal.valueOf(1.0), shoppingList.getVersion());
     }
 
     @Test
@@ -92,7 +92,7 @@ class ShoppingListControllerTest {
         ShoppingListResponseDTO expectedResponseDTO = new ShoppingListResponseDTO(entityFromRequest.getId(),
                 entityFromRequest.getName(), new UserResponseDTO(entityFromRequest.getOwner().getId(),
                         entityFromRequest.getOwner().getFullName(), entityFromRequest.getOwner().getEmail()),
-                BigDecimal.valueOf(1.0));
+            BigDecimal.valueOf(1.0), entityFromRequest.getVersion());
 
         when(listMapper.toEntity(eq(requestDTO), any(User.class))).thenReturn(entityFromRequest);
         when(shoppingListService.saveList(any(ShoppingList.class))).thenReturn(entityFromRequest);

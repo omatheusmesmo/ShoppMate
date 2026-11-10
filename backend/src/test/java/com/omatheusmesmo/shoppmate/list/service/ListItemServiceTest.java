@@ -157,7 +157,7 @@ class ListItemServiceTest {
     void editList_ValidUpdate_ReturnsUpdatedListItem() {
         // Arrange
         ListItemUpdateRequestDTO updateDTO = ListTestFactory.createValidListItemUpdateRequestDTO(shoppingList.getId(),
-                item.getId());
+            item.getId(), listItem.getVersion());
         doNothing().when(shoppingListService).verifyOwnership(shoppingList.getId(), user);
         when(listItemRepository.findByIdAndShoppListIdAndDeletedFalseFetchShoppList(listItem.getId(),
                 shoppingList.getId())).thenReturn(Optional.of(listItem));
@@ -178,7 +178,7 @@ class ListItemServiceTest {
     void editList_NonExistingId_ThrowsNoSuchElementException() {
         // Arrange
         ListItemUpdateRequestDTO updateDTO = ListTestFactory.createValidListItemUpdateRequestDTO(shoppingList.getId(),
-                item.getId());
+            item.getId(), listItem.getVersion());
         doNothing().when(shoppingListService).verifyOwnership(shoppingList.getId(), user);
         when(listItemRepository.findByIdAndShoppListIdAndDeletedFalseFetchShoppList(anyLong(), anyLong()))
                 .thenReturn(Optional.empty());

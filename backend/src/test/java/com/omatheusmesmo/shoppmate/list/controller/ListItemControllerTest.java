@@ -68,7 +68,7 @@ class ListItemControllerTest {
                 listItem.getQuantity(), listItem.getPurchased());
 
         responseDTO = new ListItemResponseDTO(null, null, listItem.getItem().getId(), listItem.getQuantity(),
-                listItem.getPurchased(), listItem.getUnitPrice(), listItem.getUnitPrice());
+            listItem.getPurchased(), listItem.getUnitPrice(), listItem.getUnitPrice(), listItem.getVersion());
     }
 
     @Test

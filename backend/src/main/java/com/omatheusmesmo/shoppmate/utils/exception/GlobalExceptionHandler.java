@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -107,6 +108,21 @@ public class GlobalExceptionHandler {
         log.warn("Resource ownership violation: {}", ex.getMessage());
         ApiError apiError = new ApiError(HttpStatus.FORBIDDEN, "Access Denied", ex.getMessage());
         return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ApiError> handleOptimisticLockingFailure(
+        ObjectOptimisticLockingFailureException ex
+    ) {
+        log.warn("Optimistic locking conflict: {}", ex.getMessage());
+
+        ApiError apiError = new ApiError(
+            HttpStatus.CONFLICT,
+            "Update Conflict",
+            "This resource was updated by someone else. Please refresh and try again."
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
     }
 
     // TODO -> InvalidDataAccessApiUsageException
