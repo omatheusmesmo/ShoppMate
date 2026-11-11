@@ -8,16 +8,19 @@ import com.omatheusmesmo.shoppmate.item.entity.Item;
 import com.omatheusmesmo.shoppmate.item.repository.ItemRepository;
 import com.omatheusmesmo.shoppmate.list.dtos.ListItemRequestDTO;
 import com.omatheusmesmo.shoppmate.list.dtos.ListItemUpdateRequestDTO;
-import com.omatheusmesmo.shoppmate.list.mapper.ListMapper;
-import com.omatheusmesmo.shoppmate.unit.entity.Unit;
-import com.omatheusmesmo.shoppmate.unit.repository.UnitRepository;
 import com.omatheusmesmo.shoppmate.list.dtos.ShoppingListRequestDTO;
+import com.omatheusmesmo.shoppmate.list.dtos.ShoppingListUpdateRequestDTO;
 import com.omatheusmesmo.shoppmate.list.entity.ListItem;
 import com.omatheusmesmo.shoppmate.list.entity.ShoppingList;
+import com.omatheusmesmo.shoppmate.list.mapper.ListMapper;
 import com.omatheusmesmo.shoppmate.list.repository.ListItemRepository;
+import com.omatheusmesmo.shoppmate.list.repository.ListPermissionRepository;
+import com.omatheusmesmo.shoppmate.list.repository.ShoppingListRepository;
 import com.omatheusmesmo.shoppmate.list.service.ListItemService;
 import com.omatheusmesmo.shoppmate.list.service.ShoppingListService;
 import com.omatheusmesmo.shoppmate.shared.testcontainers.AbstractIntegrationTest;
+import com.omatheusmesmo.shoppmate.unit.entity.Unit;
+import com.omatheusmesmo.shoppmate.unit.repository.UnitRepository;
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import com.omatheusmesmo.shoppmate.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -29,8 +32,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
-import com.omatheusmesmo.shoppmate.list.repository.ShoppingListRepository;
-import com.omatheusmesmo.shoppmate.list.repository.ListPermissionRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -56,6 +57,9 @@ class ListItemControllerSecurityIntegrationTest extends AbstractIntegrationTest 
 
     @Autowired
     private ShoppingListService shoppingListService;
+
+    @Autowired
+    private ShoppingListUpdateRequestDTO shoppingListUpdateRequestDTO;
 
     @Autowired
     private ListItemService listItemService;
@@ -269,7 +273,7 @@ class ListItemControllerSecurityIntegrationTest extends AbstractIntegrationTest 
     @Test
     void testUserCannotEditAnotherUsersListItem() throws Exception {
         ListItemUpdateRequestDTO maliciousUpdate = new ListItemUpdateRequestDTO(userBList.getId(), item.getId(), 99,
-                false, null);
+            false, null, shoppingListUpdateRequestDTO.version());
 
         mockMvc.perform(put("/lists/" + userBList.getId() + "/items/" + userBListItem.getId()).with(csrf())
                 .header("Authorization", "Bearer " + tokenUserA).contentType(MediaType.APPLICATION_JSON)
@@ -283,7 +287,7 @@ class ListItemControllerSecurityIntegrationTest extends AbstractIntegrationTest 
     @Test
     void testUserCanEditOwnListItem() throws Exception {
         ListItemUpdateRequestDTO validUpdate = new ListItemUpdateRequestDTO(userAList.getId(), item.getId(), 10, true,
-                null);
+            null, userAListItem.getVersion());
 
         mockMvc.perform(put("/lists/" + userAList.getId() + "/items/" + userAListItem.getId()).with(csrf())
                 .header("Authorization", "Bearer " + tokenUserA).contentType(MediaType.APPLICATION_JSON)
@@ -351,7 +355,7 @@ class ListItemControllerSecurityIntegrationTest extends AbstractIntegrationTest 
     @Test
     void testUpdateListItemWithMismatchedPathListIdIsRejected() throws Exception {
         ListItemUpdateRequestDTO maliciousUpdate = new ListItemUpdateRequestDTO(userAList2.getId(), item.getId(), 99,
-                false, null);
+            false, null, userAListItem.getVersion());
 
         mockMvc.perform(put("/lists/" + userAList.getId() + "/items/" + userAListItem.getId()).with(csrf())
                 .header("Authorization", "Bearer " + tokenUserA).contentType(MediaType.APPLICATION_JSON)

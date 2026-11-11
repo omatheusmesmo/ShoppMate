@@ -5,5 +5,6 @@ import com.omatheusmesmo.shoppmate.item.dto.ItemResponseDTO;
 import java.math.BigDecimal;
 
 public record ListItemResponseDTO(ShoppingListResponseDTO shoppingList, ItemResponseDTO item, Long idListItem,
-        Integer quantity, Boolean purchased, BigDecimal unitPrice, BigDecimal totalPrice) {
+                                  Integer quantity, Boolean purchased, BigDecimal unitPrice, BigDecimal totalPrice,
+                                  Long version) {
 }

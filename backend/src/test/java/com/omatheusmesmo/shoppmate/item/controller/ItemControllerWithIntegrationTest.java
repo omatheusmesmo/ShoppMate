@@ -5,12 +5,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.omatheusmesmo.shoppmate.category.entity.Category;
 import com.omatheusmesmo.shoppmate.category.repository.CategoryRepository;
+import com.omatheusmesmo.shoppmate.item.dto.ItemRequestDTO;
+import com.omatheusmesmo.shoppmate.item.dto.ItemResponseDTO;
 import com.omatheusmesmo.shoppmate.item.entity.Item;
 import com.omatheusmesmo.shoppmate.item.repository.ItemRepository;
 import com.omatheusmesmo.shoppmate.shared.testcontainers.AbstractIntegrationTest;
 import com.omatheusmesmo.shoppmate.shared.testcontainers.utils.TestUserFactory;
-import com.omatheusmesmo.shoppmate.item.dto.ItemRequestDTO;
-import com.omatheusmesmo.shoppmate.item.dto.ItemResponseDTO;
 import com.omatheusmesmo.shoppmate.shared.testutils.CategoryTestFactory;
 import com.omatheusmesmo.shoppmate.shared.testutils.ItemTestFactory;
 import com.omatheusmesmo.shoppmate.shared.testutils.UnitTestFactory;
@@ -130,6 +130,7 @@ class ItemControllerWithIntegrationTest extends AbstractIntegrationTest {
         assertEquals(requestDTO.idCategory(), updatedItem.category().id());
         assertEquals(requestDTO.idUnit(), updatedItem.unit().id());
     }
+
 
     @Test
     void testGetAllItems() throws Exception {

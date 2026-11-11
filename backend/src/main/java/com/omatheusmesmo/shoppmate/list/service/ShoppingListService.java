@@ -76,17 +76,22 @@ public class ShoppingListService {
         return editListWithoutVerification(ShoppingList);
     }
 
-    public ShoppingList editList(Long id, ShoppingListUpdateRequestDTO dto, User currentLoggedUser) {
-        ShoppingList existingList = findAndVerifyAccess(id, currentLoggedUser);
-        listMapper.updateEntityFromDto(dto, existingList);
-        return editListWithoutVerification(existingList);
+    public ShoppingList editList(ShoppingListUpdateRequestDTO dto, User currentLoggedUser) {
+        ShoppingList existingList = findAndVerifyAccess(dto.id(), currentLoggedUser);
+
+        ShoppingList detachedList = listMapper.toDetachedEntityForUpdate(
+            dto,
+            existingList.getOwner(),
+            existingList
+        );
+
+        return editListWithoutVerification(detachedList);
     }
 
     private ShoppingList editListWithoutVerification(ShoppingList ShoppingList) {
         isListValid(ShoppingList);
         auditService.setAuditData(ShoppingList, false);
-        shoppingListRepository.save(ShoppingList);
-        return ShoppingList;
+        return shoppingListRepository.saveAndFlush(ShoppingList);
     }
 
     public List<ShoppingList> findAll() {

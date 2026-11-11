@@ -1,13 +1,13 @@
 package com.omatheusmesmo.shoppmate.list.service;
 
 import com.omatheusmesmo.shoppmate.item.entity.Item;
+import com.omatheusmesmo.shoppmate.item.service.ItemService;
 import com.omatheusmesmo.shoppmate.list.dtos.ListItemRequestDTO;
 import com.omatheusmesmo.shoppmate.list.dtos.ListItemUpdateRequestDTO;
 import com.omatheusmesmo.shoppmate.list.entity.ListItem;
 import com.omatheusmesmo.shoppmate.list.entity.ShoppingList;
 import com.omatheusmesmo.shoppmate.list.mapper.ListItemMapper;
 import com.omatheusmesmo.shoppmate.list.repository.ListItemRepository;
-import com.omatheusmesmo.shoppmate.item.service.ItemService;
 import com.omatheusmesmo.shoppmate.shared.service.AuditService;
 import com.omatheusmesmo.shoppmate.user.entity.User;
 import org.springframework.stereotype.Service;
@@ -78,16 +78,22 @@ public class ListItemService {
         listItemRepository.save(deletedItem);
     }
 
-    public ListItem editList(Long listId, Long id, ListItemUpdateRequestDTO listItemUpdateRequestDTO, User user) {
+    public ListItem editList(Long listId, Long id, ListItemUpdateRequestDTO dto, User user) {
         ListItem existingListItem = findListItemById(listId, id, user);
+        Item item = itemService.findById(dto.itemId());
 
-        existingListItem.setQuantity(listItemUpdateRequestDTO.quantity());
-        existingListItem.setPurchased(listItemUpdateRequestDTO.purchased());
-        existingListItem.setUnitPrice(listItemUpdateRequestDTO.unitPrice());
+        ListItem detachedListItem = listItemMapper.toDetachedEntityForUpdate(
+            dto,
+            id,
+            item,
+            existingListItem.getShoppList(),
+            existingListItem
+        );
 
-        auditService.setAuditData(existingListItem, false);
-        listItemRepository.save(existingListItem);
-        return existingListItem;
+        isListItemValid(detachedListItem);
+        auditService.setAuditData(detachedListItem, false);
+
+        return listItemRepository.saveAndFlush(detachedListItem);
     }
 
     public List<ListItem> findAll(Long idList, User user) {

@@ -9,6 +9,7 @@ import com.omatheusmesmo.shoppmate.list.entity.ListItem;
 import com.omatheusmesmo.shoppmate.list.entity.ListPermission;
 import com.omatheusmesmo.shoppmate.list.entity.Permission;
 import com.omatheusmesmo.shoppmate.list.entity.ShoppingList;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicLong;
@@ -63,10 +64,10 @@ public class ListTestFactory {
                 BigDecimal.valueOf(FakerUtil.getFaker().number().randomDouble(2, 1, 100)));
     }
 
-    public static ListItemUpdateRequestDTO createValidListItemUpdateRequestDTO(Long listId, Long itemId) {
+    public static ListItemUpdateRequestDTO createValidListItemUpdateRequestDTO(Long listId, Long itemId, Long version) {
         return new ListItemUpdateRequestDTO(listId, itemId, FakerUtil.getFaker().number().numberBetween(1, 10),
                 FakerUtil.getFaker().bool().bool(),
-                BigDecimal.valueOf(FakerUtil.getFaker().number().randomDouble(2, 1, 100)));
+            BigDecimal.valueOf(FakerUtil.getFaker().number().randomDouble(2, 1, 100)), version);
     }
 
     public static ListPermissionRequestDTO createValidListPermissionRequestDTO(Long listId, Long userId) {

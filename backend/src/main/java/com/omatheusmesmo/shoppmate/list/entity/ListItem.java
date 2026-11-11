@@ -2,17 +2,13 @@ package com.omatheusmesmo.shoppmate.list.entity;
 
 import com.omatheusmesmo.shoppmate.item.entity.Item;
 import com.omatheusmesmo.shoppmate.shared.domain.BaseAuditableEntity;
-import java.math.BigDecimal;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "list_items")
@@ -34,4 +30,9 @@ public class ListItem extends BaseAuditableEntity {
     private Boolean purchased = false;
 
     private BigDecimal unitPrice;
+
+    @Version
+    private Long version;
+
+
 }
